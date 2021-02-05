@@ -8,7 +8,7 @@ cd $SENTINEL_BASE_DIR
 test -n "${K8S_ENVIRONMENT}"
 test -n "${K8S_LOAD_BALANCER}"
 
-main() {}
+main() {
   if [ -z "${SENTINEL_ENV:-}" ]; then SENTINEL_ENV=$K8S_ENVIRONMENT; fi
   if [ -z "${SC_INTERNAL_URL:-}" ]; then SC_INTERNAL_URL="https://${K8S_LOAD_BALANCER}"; fi
 

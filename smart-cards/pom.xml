@@ -11,7 +11,7 @@
   <version>0.0.4-SNAPSHOT</version>
   <packaging>jar</packaging>
   <properties>
-    <fhir-resources.version>5.0.19-SNAPSHOT</fhir-resources.version>
+    <fhir-resources.version>5.0.20</fhir-resources.version>
   </properties>
   <dependencies>
     <dependency>

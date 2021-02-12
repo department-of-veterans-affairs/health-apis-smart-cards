@@ -9,17 +9,24 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 class SystemDefinitions {
+
+  private static Ids ids() {
+    return Ids.builder().patient("123").patientNotFound("404").build();
+  }
+
   private static SystemDefinition lab() {
     return SystemDefinition.builder()
         .internal(
             serviceDefinition(
                 "internal", "https://blue.lab.lighthouse.va.gov", 443, "/smart-cards/"))
+        .ids(ids())
         .build();
   }
 
   private static SystemDefinition local() {
     return SystemDefinition.builder()
         .internal(serviceDefinition("internal", "http://localhost", 8096, "/"))
+        .ids(ids())
         .build();
   }
 
@@ -28,6 +35,7 @@ class SystemDefinitions {
         .internal(
             serviceDefinition(
                 "internal", "https://blue.production.lighthouse.va.gov", 443, "/smart-cards/"))
+        .ids(ids())
         .build();
   }
 
@@ -36,6 +44,7 @@ class SystemDefinitions {
         .internal(
             serviceDefinition(
                 "internal", "https://blue.qa.lighthouse.va.gov", 443, "/smart-cards/"))
+        .ids(ids())
         .build();
   }
 
@@ -52,6 +61,7 @@ class SystemDefinitions {
         .internal(
             serviceDefinition(
                 "internal", "https://blue.staging.lighthouse.va.gov", 443, "/smart-cards/"))
+        .ids(ids())
         .build();
   }
 
@@ -60,6 +70,7 @@ class SystemDefinitions {
         .internal(
             serviceDefinition(
                 "internal", "https://blue.staging-lab.lighthouse.va.gov", 443, "/smart-cards/"))
+        .ids(ids())
         .build();
   }
 
@@ -81,6 +92,14 @@ class SystemDefinitions {
         throw new IllegalArgumentException(
             "Unsupported sentinel environment: " + Environment.get());
     }
+  }
+
+  @Value
+  @Builder
+  static final class Ids {
+    @NonNull String patient;
+
+    @NonNull String patientNotFound;
   }
 
   @Value
@@ -109,5 +128,7 @@ class SystemDefinitions {
   @Builder
   static final class SystemDefinition {
     @NonNull Service internal;
+
+    @NonNull Ids ids;
   }
 }

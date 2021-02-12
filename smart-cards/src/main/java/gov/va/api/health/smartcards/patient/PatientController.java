@@ -16,6 +16,7 @@ import gov.va.api.health.smartcards.vc.VerifiableCredential.CredentialSubject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
@@ -42,8 +43,8 @@ public class PatientController {
 
   /** Extracts resources from Bundle entries and pushes them to an existing List. */
   private <R extends Resource, E extends AbstractEntry<R>> void consumeBundle(
-      AbstractBundle<E> bundle, List<Resource> target) {
-    bundle.entry().stream().map(AbstractEntry::resource).forEachOrdered(target::add);
+      AbstractBundle<E> bundle, List<Resource> target, Function<R, R> transform) {
+    bundle.entry().stream().map(AbstractEntry::resource).map(transform).forEachOrdered(target::add);
   }
 
   private Patient findPatientById(String id) {
@@ -63,8 +64,8 @@ public class PatientController {
     Patient patient = findPatientById(id);
     Immunization.Bundle immunizations = mockFhirClient.immunizationBundle(patient);
     List<Resource> resources = new ArrayList<>();
-    resources.add(patient);
-    consumeBundle(immunizations, resources);
+    resources.add(transform(patient));
+    consumeBundle(immunizations, resources, this::transform);
     MixedBundle bundle = toBundle(resources);
     var vc = vc(bundle);
     return ResponseEntity.ok(vc);
@@ -72,6 +73,14 @@ public class PatientController {
 
   private MixedBundle toBundle(List<Resource> resources) {
     return bundler.bundle(resources);
+  }
+
+  private Patient transform(Patient patient) {
+    return PatientTransformer.builder().patient(patient).build().transform();
+  }
+
+  private Immunization transform(Immunization immunization) {
+    return ImmunizationTransformer.builder().immunization(immunization).build().transform();
   }
 
   private VerifiableCredential vc(MixedBundle bundle) {

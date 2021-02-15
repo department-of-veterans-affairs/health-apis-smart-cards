@@ -29,6 +29,7 @@ public class ImmunizationTransformer {
   Immunization transform() {
     return Immunization.builder()
         .resourceType("Immunization")
+        .id(immunization.id())
         .status(immunization.status())
         .vaccineCode(vaccineCode())
         .patient(patient())

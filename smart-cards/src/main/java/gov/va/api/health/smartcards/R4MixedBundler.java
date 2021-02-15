@@ -34,13 +34,7 @@ public class R4MixedBundler {
             .resourceType("Bundle")
             .type(BundleType.collection)
             .total(resources.size())
-            .entry(
-                resources.stream()
-                    .map(
-                        t -> {
-                          return asEntry(t);
-                        })
-                    .collect(toList()))
+            .entry(resources.stream().map(this::asEntry).collect(toList()))
             .build();
     return bundle;
   }

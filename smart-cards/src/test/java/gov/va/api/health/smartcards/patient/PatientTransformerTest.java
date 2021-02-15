@@ -22,6 +22,7 @@ public class PatientTransformerTest {
         .isEqualTo(
             Patient.builder()
                 .resourceType("Patient")
+                .id("x")
                 .identifier(List.of(mpi("x")))
                 .name(
                     List.of(

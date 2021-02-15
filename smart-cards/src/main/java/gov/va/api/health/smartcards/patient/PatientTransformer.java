@@ -44,6 +44,7 @@ public class PatientTransformer {
      */
     return Patient.builder()
         .resourceType("Patient")
+        .id(patient.id())
         .identifier(identifiers())
         .name(names())
         .gender(patient.gender())

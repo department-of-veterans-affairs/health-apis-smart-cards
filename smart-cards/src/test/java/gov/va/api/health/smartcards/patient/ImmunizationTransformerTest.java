@@ -19,6 +19,7 @@ public class ImmunizationTransformerTest {
         .isEqualTo(
             Immunization.builder()
                 .resourceType("Immunization")
+                .id("imm-1")
                 .status(Status.completed)
                 .vaccineCode(
                     CodeableConcept.builder()

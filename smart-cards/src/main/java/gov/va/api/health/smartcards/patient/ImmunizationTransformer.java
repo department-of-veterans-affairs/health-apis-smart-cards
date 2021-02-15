@@ -10,6 +10,10 @@ import lombok.NonNull;
 public class ImmunizationTransformer {
   Immunization immunization;
 
+  static Reference referenceOnly(@NonNull Reference reference) {
+    return Reference.builder().reference(reference.reference()).build();
+  }
+
   Reference location() {
     if (immunization.location() == null) {
       return null;
@@ -20,10 +24,6 @@ public class ImmunizationTransformer {
   Reference patient() {
     // Do not include display
     return referenceOnly(immunization.patient());
-  }
-
-  Reference referenceOnly(@NonNull Reference reference) {
-    return Reference.builder().reference(reference.reference()).build();
   }
 
   Immunization transform() {

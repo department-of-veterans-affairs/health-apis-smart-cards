@@ -1,5 +1,6 @@
 package gov.va.api.health.smartcards.patient;
 
+import static java.util.stream.Collectors.toList;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 import gov.va.api.health.r4.api.datatypes.HumanName;
@@ -7,7 +8,6 @@ import gov.va.api.health.r4.api.datatypes.Identifier;
 import gov.va.api.health.r4.api.resources.Patient;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.Builder;
 
 @Builder
@@ -21,7 +21,7 @@ public class PatientTransformer {
     // Only return MPI Identifier
     return patient.identifier().stream()
         .filter(id -> "http://va.gov/mpi".equals(id.system()))
-        .collect(Collectors.toList());
+        .collect(toList());
   }
 
   private HumanName name(HumanName name) {
@@ -35,7 +35,7 @@ public class PatientTransformer {
   }
 
   private List<HumanName> names() {
-    return patient.name().stream().map(this::name).collect(Collectors.toList());
+    return patient.name().stream().map(this::name).collect(toList());
   }
 
   Patient transform() {

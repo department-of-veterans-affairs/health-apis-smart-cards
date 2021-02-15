@@ -1,5 +1,7 @@
 package gov.va.api.health.smartcards;
 
+import static java.util.stream.Collectors.toList;
+
 import gov.va.api.health.r4.api.bundle.AbstractBundle.BundleType;
 import gov.va.api.health.r4.api.bundle.AbstractEntry.Search;
 import gov.va.api.health.r4.api.bundle.AbstractEntry.SearchMode;
@@ -7,7 +9,6 @@ import gov.va.api.health.r4.api.bundle.MixedBundle;
 import gov.va.api.health.r4.api.bundle.MixedEntry;
 import gov.va.api.health.r4.api.resources.Resource;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,7 +40,7 @@ public class R4MixedBundler {
                         t -> {
                           return asEntry(t);
                         })
-                    .collect(Collectors.toList()))
+                    .collect(toList()))
             .build();
     return bundle;
   }

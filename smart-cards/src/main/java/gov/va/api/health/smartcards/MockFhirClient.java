@@ -1,5 +1,7 @@
 package gov.va.api.health.smartcards;
 
+import static java.util.stream.Collectors.toList;
+
 import gov.va.api.health.r4.api.bundle.AbstractBundle;
 import gov.va.api.health.r4.api.bundle.AbstractEntry;
 import gov.va.api.health.r4.api.bundle.BundleLink;
@@ -13,7 +15,6 @@ import gov.va.api.health.r4.api.resources.Immunization;
 import gov.va.api.health.r4.api.resources.Patient;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -52,7 +53,7 @@ public class MockFhirClient implements FhirClient {
                                     .mode(AbstractEntry.SearchMode.match)
                                     .build())
                             .build())
-                .collect(Collectors.toList()))
+                .collect(toList()))
         .build();
   }
 

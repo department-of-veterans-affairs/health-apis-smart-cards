@@ -7,14 +7,10 @@ import gov.va.api.health.r4.api.datatypes.Annotation;
 import gov.va.api.health.r4.api.datatypes.CodeableConcept;
 import gov.va.api.health.r4.api.datatypes.Coding;
 import gov.va.api.health.r4.api.datatypes.HumanName;
-import gov.va.api.health.r4.api.datatypes.HumanName.NameUse;
 import gov.va.api.health.r4.api.datatypes.Identifier;
-import gov.va.api.health.r4.api.datatypes.Identifier.IdentifierUse;
 import gov.va.api.health.r4.api.elements.Reference;
 import gov.va.api.health.r4.api.resources.Immunization;
-import gov.va.api.health.r4.api.resources.Immunization.Status;
 import gov.va.api.health.r4.api.resources.Patient;
-import gov.va.api.health.r4.api.resources.Patient.Gender;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -47,16 +43,15 @@ public class MockFhirClient implements FhirClient {
         .entry(
             immunizations.stream()
                 .map(
-                    t -> {
-                      return Immunization.Entry.builder()
-                          .resource(t)
-                          .fullUrl(linkProperties.r4ReadUrl(t))
-                          .search(
-                              AbstractEntry.Search.builder()
-                                  .mode(AbstractEntry.SearchMode.match)
-                                  .build())
-                          .build();
-                    })
+                    t ->
+                        Immunization.Entry.builder()
+                            .resource(t)
+                            .fullUrl(linkProperties.r4ReadUrl(t))
+                            .search(
+                                AbstractEntry.Search.builder()
+                                    .mode(AbstractEntry.SearchMode.match)
+                                    .build())
+                            .build())
                 .collect(Collectors.toList()))
         .build();
   }
@@ -66,7 +61,7 @@ public class MockFhirClient implements FhirClient {
         Immunization.builder()
             .resourceType("Immunization")
             .id(String.format("imm-1-%s", patient.id()))
-            .status(Status.completed)
+            .status(Immunization.Status.completed)
             .vaccineCode(
                 CodeableConcept.builder()
                     .coding(List.of(Coding.builder().system(VACCINE_SYSTEM).code("207").build()))
@@ -97,7 +92,7 @@ public class MockFhirClient implements FhirClient {
         Immunization.builder()
             .resourceType("Immunization")
             .id(String.format("imm-2-%s", patient.id()))
-            .status(Status.completed)
+            .status(Immunization.Status.completed)
             .vaccineCode(
                 CodeableConcept.builder()
                     .coding(List.of(Coding.builder().system(VACCINE_SYSTEM).code("207").build()))
@@ -138,17 +133,18 @@ public class MockFhirClient implements FhirClient {
         Patient.builder()
             .resourceType("Patient")
             .id(id)
-            .identifier(List.of(Identifier.builder().id(id).use(IdentifierUse.temp).build()))
+            .identifier(
+                List.of(Identifier.builder().id(id).use(Identifier.IdentifierUse.temp).build()))
             .active(true)
             .name(
                 List.of(
                     HumanName.builder()
-                        .use(NameUse.anonymous)
+                        .use(HumanName.NameUse.anonymous)
                         .text(String.format("%s %s", firstName, lastName))
                         .family(lastName)
                         .given(List.of(firstName))
                         .build()))
-            .gender(Gender.unknown)
+            .gender(Patient.Gender.unknown)
             .birthDate("1955-01-01")
             .deceasedBoolean(false)
             .build());

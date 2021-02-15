@@ -1,6 +1,5 @@
 package gov.va.api.health.smartcards.patient;
 
-import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import gov.va.api.health.r4.api.datatypes.CodeableConcept;
@@ -29,7 +28,7 @@ public class PatientTransformerTest {
                         HumanName.builder()
                             .use(NameUse.anonymous)
                             .family("Doe")
-                            .given(singletonList("Joe"))
+                            .given(List.of("Joe"))
                             .build()))
                 .gender(Gender.unknown)
                 .birthDate("1955-01-01")
@@ -61,12 +60,12 @@ public class PatientTransformerTest {
             List.of(Identifier.builder().use(IdentifierUse.temp).value("x").build(), mpi("x")))
         .active(true)
         .name(
-            singletonList(
+            List.of(
                 HumanName.builder()
                     .use(NameUse.anonymous)
                     .text(String.format("%s %s", firstName, lastName))
                     .family(lastName)
-                    .given(singletonList(firstName))
+                    .given(List.of(firstName))
                     .build()))
         .gender(Gender.unknown)
         .birthDate("1955-01-01")

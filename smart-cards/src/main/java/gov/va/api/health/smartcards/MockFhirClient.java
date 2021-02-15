@@ -1,7 +1,5 @@
 package gov.va.api.health.smartcards;
 
-import static java.util.Collections.singletonList;
-
 import gov.va.api.health.r4.api.bundle.AbstractBundle;
 import gov.va.api.health.r4.api.bundle.AbstractEntry;
 import gov.va.api.health.r4.api.bundle.BundleLink;
@@ -37,7 +35,7 @@ public class MockFhirClient implements FhirClient {
     return Immunization.Bundle.builder()
         .type(AbstractBundle.BundleType.searchset)
         .link(
-            singletonList(
+            List.of(
                 BundleLink.builder()
                     .relation(BundleLink.LinkRelation.self)
                     .url(
@@ -89,7 +87,7 @@ public class MockFhirClient implements FhirClient {
                     .display("Location for " + patient.id())
                     .build())
             .note(
-                singletonList(
+                List.of(
                     Annotation.builder()
                         .text(
                             "Dose #1 of 2 of COVID-19, mRNA, LNP-S, PF, 100 mcg/ 0.5 mL dose "
@@ -120,7 +118,7 @@ public class MockFhirClient implements FhirClient {
                     .display("Location for " + patient.id())
                     .build())
             .note(
-                singletonList(
+                List.of(
                     Annotation.builder()
                         .text(
                             "Dose #2 of 2 of COVID-19, mRNA, LNP-S, PF, 100 mcg/ 0.5 mL dose "
@@ -143,12 +141,12 @@ public class MockFhirClient implements FhirClient {
             .identifier(List.of(Identifier.builder().id(id).use(IdentifierUse.temp).build()))
             .active(true)
             .name(
-                singletonList(
+                List.of(
                     HumanName.builder()
                         .use(NameUse.anonymous)
                         .text(String.format("%s %s", firstName, lastName))
                         .family(lastName)
-                        .given(singletonList(firstName))
+                        .given(List.of(firstName))
                         .build()))
             .gender(Gender.unknown)
             .birthDate("1955-01-01")

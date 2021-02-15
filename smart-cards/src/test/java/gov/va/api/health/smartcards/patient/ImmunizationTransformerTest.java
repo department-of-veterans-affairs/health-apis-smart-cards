@@ -1,6 +1,5 @@
 package gov.va.api.health.smartcards.patient;
 
-import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import gov.va.api.health.r4.api.datatypes.Annotation;
@@ -63,7 +62,7 @@ public class ImmunizationTransformerTest {
                 .display("LOC1 VAMC")
                 .build())
         .note(
-            singletonList(
+            List.of(
                 Annotation.builder()
                     .text(
                         "Dose #1 of 2 of COVID-19, mRNA, LNP-S, PF, 100 mcg/ 0.5 mL dose "

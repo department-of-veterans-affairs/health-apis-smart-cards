@@ -49,11 +49,7 @@ public class PatientController {
   }
 
   private Patient.Bundle findPatientById(String id) {
-    Patient.Bundle patientBundle = mockFhirClient.patientBundle(id);
-    if (patientBundle.total() == 0) {
-      throw new Exceptions.NotFound(id);
-    }
-    return patientBundle;
+    return mockFhirClient.patientBundle(id);
   }
 
   private Patient getPatientFromBundle(Patient.Bundle bundle, @NonNull String id) {

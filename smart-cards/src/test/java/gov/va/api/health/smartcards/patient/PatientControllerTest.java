@@ -13,6 +13,7 @@ import gov.va.api.health.smartcards.MockFhirClient;
 import gov.va.api.health.smartcards.R4MixedBundler;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.springframework.validation.DataBinder;
 
 public class PatientControllerTest {
   private long countEntriesByType(MixedBundle bundle, String type) {
@@ -20,6 +21,12 @@ public class PatientControllerTest {
     return bundle.entry().stream()
         .filter(e -> e.resource().getClass().getSimpleName().equals(type))
         .count();
+  }
+
+  @Test
+  void initDirectFieldAccess() {
+    new PatientController(mock(MockFhirClient.class), mock(R4MixedBundler.class))
+        .initDirectFieldAccess(mock(DataBinder.class));
   }
 
   @Test

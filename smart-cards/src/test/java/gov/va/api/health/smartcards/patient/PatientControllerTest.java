@@ -25,7 +25,7 @@ public class PatientControllerTest {
   @Test
   public void issueVc() {
     var fhirClient = new MockFhirClient(mock(LinkProperties.class));
-    var bundler = new R4MixedBundler(mock(LinkProperties.class));
+    var bundler = new R4MixedBundler();
     var controller = new PatientController(fhirClient, bundler);
     var result = controller.issueVc("123").getBody();
     assertNotNull(result);
@@ -40,7 +40,7 @@ public class PatientControllerTest {
   @Test
   public void issueVc_notFound() {
     var fhirClient = new MockFhirClient(mock(LinkProperties.class));
-    var bundler = new R4MixedBundler(mock(LinkProperties.class));
+    var bundler = new R4MixedBundler();
     var controller = new PatientController(fhirClient, bundler);
     assertThrows(Exceptions.NotFound.class, () -> controller.issueVc("404"));
   }

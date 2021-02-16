@@ -13,6 +13,7 @@ import gov.va.api.health.r4.api.datatypes.Identifier;
 import gov.va.api.health.r4.api.elements.Reference;
 import gov.va.api.health.r4.api.resources.Immunization;
 import gov.va.api.health.r4.api.resources.Patient;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +39,7 @@ public class MockFhirClient implements FhirClient {
                     .url(
                         String.format(
                             "%s?patient=%s",
-                            linkProperties.r4ResourceUrl("Immunization"), patient.id()))
+                            linkProperties.dataQueryR4ResourceUrl("Immunization"), patient.id()))
                     .build()))
         .total(immunizations.size())
         .entry(
@@ -47,7 +48,7 @@ public class MockFhirClient implements FhirClient {
                     t ->
                         Immunization.Entry.builder()
                             .resource(t)
-                            .fullUrl(linkProperties.r4ReadUrl(t))
+                            .fullUrl(linkProperties.dataQueryR4ReadUrl(t))
                             .search(
                                 AbstractEntry.Search.builder()
                                     .mode(AbstractEntry.SearchMode.match)
@@ -70,7 +71,7 @@ public class MockFhirClient implements FhirClient {
                     .build())
             .patient(
                 Reference.builder()
-                    .reference(linkProperties.r4ReadUrl(patient))
+                    .reference(linkProperties.dataQueryR4ReadUrl(patient))
                     .display(patient.name().stream().findFirst().get().text())
                     .build())
             .occurrenceDateTime("2020-12-18T12:24:55Z")
@@ -79,7 +80,8 @@ public class MockFhirClient implements FhirClient {
                 Reference.builder()
                     .reference(
                         String.format(
-                            "%s/loc-%s", linkProperties.r4ResourceUrl("Location"), patient.id()))
+                            "%s/loc-%s",
+                            linkProperties.dataQueryR4ResourceUrl("Location"), patient.id()))
                     .display("Location for " + patient.id())
                     .build())
             .note(
@@ -101,7 +103,7 @@ public class MockFhirClient implements FhirClient {
                     .build())
             .patient(
                 Reference.builder()
-                    .reference(linkProperties.r4ReadUrl(patient))
+                    .reference(linkProperties.dataQueryR4ReadUrl(patient))
                     .display(patient.name().stream().findFirst().get().text())
                     .build())
             .occurrenceDateTime("2021-01-14T09:30:21Z")
@@ -110,7 +112,8 @@ public class MockFhirClient implements FhirClient {
                 Reference.builder()
                     .reference(
                         String.format(
-                            "%s/loc-%s", linkProperties.r4ResourceUrl("Location"), patient.id()))
+                            "%s/loc-%s",
+                            linkProperties.dataQueryR4ResourceUrl("Location"), patient.id()))
                     .display("Location for " + patient.id())
                     .build())
             .note(
@@ -123,8 +126,22 @@ public class MockFhirClient implements FhirClient {
             .build());
   }
 
-  @Override
-  public Optional<Patient> patient(String id) {
+  private Identifier mpi(String id) {
+    return Identifier.builder()
+        .use(Identifier.IdentifierUse.usual)
+        .type(
+            CodeableConcept.builder()
+                .coding(
+                    List.of(
+                        Coding.builder().system("http://hl7.org/fhir/v2/0203").code("MR").build()))
+                .build())
+        .system("http://va.gov/mpi")
+        .value(id)
+        .assigner(Reference.builder().display("Master Patient Index").build())
+        .build();
+  }
+
+  private Optional<Patient> patient(String id) {
     if ("404".equals(id)) {
       return Optional.empty();
     }
@@ -135,7 +152,9 @@ public class MockFhirClient implements FhirClient {
             .resourceType("Patient")
             .id(id)
             .identifier(
-                List.of(Identifier.builder().id(id).use(Identifier.IdentifierUse.temp).build()))
+                List.of(
+                    Identifier.builder().id(id).use(Identifier.IdentifierUse.temp).build(),
+                    mpi(id)))
             .active(true)
             .name(
                 List.of(
@@ -149,5 +168,37 @@ public class MockFhirClient implements FhirClient {
             .birthDate("1955-01-01")
             .deceasedBoolean(false)
             .build());
+  }
+
+  @Override
+  public Patient.Bundle patientBundle(String id) {
+    var patient = patient(id);
+    List<Patient> patients = new ArrayList<>();
+    patient.ifPresent(patients::add);
+    return Patient.Bundle.builder()
+        .type(AbstractBundle.BundleType.searchset)
+        .link(
+            List.of(
+                BundleLink.builder()
+                    .relation(BundleLink.LinkRelation.self)
+                    .url(
+                        String.format(
+                            "%s?_id=%s", linkProperties.dataQueryR4ResourceUrl("Patient"), id))
+                    .build()))
+        .total(patients.size())
+        .entry(
+            patient.stream()
+                .map(
+                    t ->
+                        Patient.Entry.builder()
+                            .resource(t)
+                            .fullUrl(linkProperties.dataQueryR4ReadUrl(t))
+                            .search(
+                                AbstractEntry.Search.builder()
+                                    .mode(AbstractEntry.SearchMode.match)
+                                    .build())
+                            .build())
+                .collect(toList()))
+        .build();
   }
 }

@@ -5,6 +5,7 @@ import static com.google.common.base.Preconditions.checkState;
 import gov.va.api.health.r4.api.bundle.AbstractBundle;
 import gov.va.api.health.r4.api.bundle.AbstractEntry;
 import gov.va.api.health.r4.api.bundle.MixedBundle;
+import gov.va.api.health.r4.api.bundle.MixedEntry;
 import gov.va.api.health.r4.api.resources.Immunization;
 import gov.va.api.health.r4.api.resources.Patient;
 import gov.va.api.health.r4.api.resources.Resource;
@@ -15,9 +16,9 @@ import gov.va.api.health.smartcards.vc.VerifiableCredential;
 import gov.va.api.health.smartcards.vc.VerifiableCredential.CredentialSubject;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,14 +43,25 @@ public class PatientController {
   R4MixedBundler bundler;
 
   /** Extracts resources from Bundle entries and pushes them to an existing List. */
-  private <R extends Resource, E extends AbstractEntry<R>> void consumeBundle(
-      AbstractBundle<E> bundle, List<Resource> target, Function<R, R> transform) {
-    bundle.entry().stream().map(AbstractEntry::resource).map(transform).forEachOrdered(target::add);
+  private <R extends Resource, E extends AbstractEntry<R>, B extends AbstractBundle<E>>
+      void consumeBundle(B bundle, List<MixedEntry> target, Function<E, MixedEntry> transform) {
+    bundle.entry().stream().map(transform).forEachOrdered(target::add);
   }
 
-  private Patient findPatientById(String id) {
-    Optional<Patient> maybePatient = mockFhirClient.patient(id);
-    return maybePatient.orElseThrow(() -> new Exceptions.NotFound(id));
+  private Patient.Bundle findPatientById(String id) {
+    Patient.Bundle patientBundle = mockFhirClient.patientBundle(id);
+    if (patientBundle.total() == 0) {
+      throw new Exceptions.NotFound(id);
+    }
+    return patientBundle;
+  }
+
+  private Patient getPatientFromBundle(Patient.Bundle bundle, @NonNull String id) {
+    var entry = bundle.entry().stream().filter(t -> id.equals(t.resource().id())).findFirst();
+    if (entry.isPresent()) {
+      return entry.get().resource();
+    }
+    throw new Exceptions.NotFound(id);
   }
 
   @InitBinder
@@ -61,26 +73,29 @@ public class PatientController {
   @SneakyThrows
   ResponseEntity<VerifiableCredential> issueVc(@PathVariable("id") String id) {
     checkState(!StringUtils.isEmpty(id), "id is required");
-    Patient patient = findPatientById(id);
+    Patient.Bundle patients = findPatientById(id);
+    Patient patient = getPatientFromBundle(patients, id);
+
     Immunization.Bundle immunizations = mockFhirClient.immunizationBundle(patient);
-    List<Resource> resources = new ArrayList<>();
-    resources.add(transform(patient));
+    List<MixedEntry> resources = new ArrayList<>();
+
+    consumeBundle(patients, resources, this::transform);
     consumeBundle(immunizations, resources, this::transform);
     MixedBundle bundle = toBundle(resources);
     var vc = vc(bundle);
     return ResponseEntity.ok(vc);
   }
 
-  private MixedBundle toBundle(List<Resource> resources) {
+  private MixedBundle toBundle(List<MixedEntry> resources) {
     return bundler.bundle(resources);
   }
 
-  private Patient transform(Patient patient) {
-    return PatientTransformer.builder().patient(patient).build().transform();
+  private MixedEntry transform(Patient.Entry entry) {
+    return PatientTransformer.builder().entry(entry).build().transform();
   }
 
-  private Immunization transform(Immunization immunization) {
-    return ImmunizationTransformer.builder().immunization(immunization).build().transform();
+  private MixedEntry transform(Immunization.Entry entry) {
+    return ImmunizationTransformer.builder().entry(entry).build().transform();
   }
 
   private VerifiableCredential vc(MixedBundle bundle) {

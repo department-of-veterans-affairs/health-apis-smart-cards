@@ -2,6 +2,9 @@ package gov.va.api.health.smartcards.patient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import gov.va.api.health.r4.api.bundle.AbstractEntry.Search;
+import gov.va.api.health.r4.api.bundle.AbstractEntry.SearchMode;
+import gov.va.api.health.r4.api.bundle.MixedEntry;
 import gov.va.api.health.r4.api.datatypes.CodeableConcept;
 import gov.va.api.health.r4.api.datatypes.Coding;
 import gov.va.api.health.r4.api.datatypes.HumanName;
@@ -18,21 +21,25 @@ public class PatientTransformerTest {
   @Test
   public void basic() {
     var patient = patient();
-    assertThat(PatientTransformer.builder().patient(patient).build().transform())
+    assertThat(PatientTransformer.builder().entry(patient).build().transform())
         .isEqualTo(
-            Patient.builder()
-                .resourceType("Patient")
-                .id("x")
-                .identifier(List.of(mpi("x")))
-                .name(
-                    List.of(
-                        HumanName.builder()
-                            .use(NameUse.anonymous)
-                            .family("Doe")
-                            .given(List.of("Joe"))
-                            .build()))
-                .gender(Gender.unknown)
-                .birthDate("1955-01-01")
+            MixedEntry.builder()
+                .fullUrl("http://example.com/r4/Patient/x")
+                .resource(
+                    Patient.builder()
+                        .resourceType("Patient")
+                        .identifier(List.of(mpi("x")))
+                        .name(
+                            List.of(
+                                HumanName.builder()
+                                    .use(NameUse.anonymous)
+                                    .family("Doe")
+                                    .given(List.of("Joe"))
+                                    .build()))
+                        .gender(Gender.unknown)
+                        .birthDate("1955-01-01")
+                        .build())
+                .search(Search.builder().mode(SearchMode.match).build())
                 .build());
   }
 
@@ -51,26 +58,31 @@ public class PatientTransformerTest {
         .build();
   }
 
-  Patient patient() {
+  Patient.Entry patient() {
     String firstName = "Joe";
     String lastName = "Doe";
-    return Patient.builder()
-        .resourceType("Patient")
-        .id("x")
-        .identifier(
-            List.of(Identifier.builder().use(IdentifierUse.temp).value("x").build(), mpi("x")))
-        .active(true)
-        .name(
-            List.of(
-                HumanName.builder()
-                    .use(NameUse.anonymous)
-                    .text(String.format("%s %s", firstName, lastName))
-                    .family(lastName)
-                    .given(List.of(firstName))
-                    .build()))
-        .gender(Gender.unknown)
-        .birthDate("1955-01-01")
-        .deceasedBoolean(false)
+    return Patient.Entry.builder()
+        .fullUrl("http://example.com/r4/Patient/x")
+        .resource(
+            Patient.builder()
+                .resourceType("Patient")
+                .id("x")
+                .identifier(
+                    List.of(
+                        Identifier.builder().use(IdentifierUse.temp).value("x").build(), mpi("x")))
+                .active(true)
+                .name(
+                    List.of(
+                        HumanName.builder()
+                            .use(NameUse.anonymous)
+                            .text(String.format("%s %s", firstName, lastName))
+                            .family(lastName)
+                            .given(List.of(firstName))
+                            .build()))
+                .gender(Gender.unknown)
+                .birthDate("1955-01-01")
+                .deceasedBoolean(false)
+                .build())
         .build();
   }
 }

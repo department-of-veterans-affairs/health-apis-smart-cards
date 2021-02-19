@@ -1,22 +1,30 @@
 package gov.va.api.health.smartcards.patient;
 
 import static com.google.common.base.Preconditions.checkState;
+import static gov.va.api.health.smartcards.Controllers.checkRequestState;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import gov.va.api.health.autoconfig.configuration.JacksonConfig;
 import gov.va.api.health.r4.api.bundle.AbstractBundle;
 import gov.va.api.health.r4.api.bundle.AbstractEntry;
 import gov.va.api.health.r4.api.bundle.MixedBundle;
 import gov.va.api.health.r4.api.bundle.MixedEntry;
 import gov.va.api.health.r4.api.resources.Immunization;
+import gov.va.api.health.r4.api.resources.Parameters;
+import gov.va.api.health.r4.api.resources.Parameters.Parameter;
 import gov.va.api.health.r4.api.resources.Patient;
 import gov.va.api.health.r4.api.resources.Resource;
 import gov.va.api.health.smartcards.Exceptions;
 import gov.va.api.health.smartcards.MockFhirClient;
 import gov.va.api.health.smartcards.R4MixedBundler;
+import gov.va.api.health.smartcards.vc.CredentialType;
 import gov.va.api.health.smartcards.vc.VerifiableCredential;
 import gov.va.api.health.smartcards.vc.VerifiableCredential.CredentialSubject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import javax.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.SneakyThrows;
@@ -28,6 +36,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,6 +47,8 @@ import org.springframework.web.bind.annotation.RestController;
     produces = {"application/json", "application/fhir+json"})
 @AllArgsConstructor(onConstructor_ = @Autowired)
 public class PatientController {
+  private static final ObjectMapper MAPPER = JacksonConfig.createMapper();
+
   private final MockFhirClient mockFhirClient;
 
   R4MixedBundler bundler;
@@ -67,19 +78,33 @@ public class PatientController {
 
   @PostMapping(value = "/{id}/$HealthWallet.issueVc")
   @SneakyThrows
-  ResponseEntity<VerifiableCredential> issueVc(@PathVariable("id") String id) {
+  ResponseEntity<Parameters> issueVc(
+      @PathVariable("id") String id, @Valid @RequestBody Parameters parameters) {
     checkState(!StringUtils.isEmpty(id), "id is required");
+    checkRequestState(parameters.parameter() != null, "parameters are required");
+    validateCredentialType(parameters);
     Patient.Bundle patients = findPatientById(id);
     Patient patient = getPatientFromBundle(patients, id);
-
     Immunization.Bundle immunizations = mockFhirClient.immunizationBundle(patient);
     List<MixedEntry> resources = new ArrayList<>();
-
     consumeBundle(patients, resources, this::transform);
     consumeBundle(immunizations, resources, this::transform);
     MixedBundle bundle = toBundle(resources);
     var vc = vc(bundle);
-    return ResponseEntity.ok(vc);
+    var parametersResponse = parameters(vc);
+    return ResponseEntity.ok(parametersResponse);
+  }
+
+  @SneakyThrows
+  private Parameters parameters(VerifiableCredential vc) {
+    return Parameters.builder()
+        .parameter(
+            List.of(
+                Parameters.Parameter.builder()
+                    .name("verifiableCredential")
+                    .valueString(MAPPER.writeValueAsString(vc))
+                    .build()))
+        .build();
   }
 
   private MixedBundle toBundle(List<MixedEntry> resources) {
@@ -92,6 +117,20 @@ public class PatientController {
 
   private MixedEntry transform(Immunization.Entry entry) {
     return ImmunizationTransformer.builder().entry(entry).build().transform();
+  }
+
+  private void validateCredentialType(Parameters parameters) {
+    var params =
+        parameters.parameter().stream()
+            .filter(p -> "credentialType".equals(p.name()))
+            .map(Parameter::valueUri)
+            .map(CredentialType::fromUri)
+            .collect(Collectors.toList());
+    if (params.isEmpty()) {
+      throw new Exceptions.BadRequest("credentialType parameter is required");
+    }
+
+
   }
 
   private VerifiableCredential vc(MixedBundle bundle) {

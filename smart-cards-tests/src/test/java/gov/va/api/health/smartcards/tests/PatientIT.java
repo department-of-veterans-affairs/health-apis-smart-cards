@@ -102,6 +102,14 @@ public class PatientIT {
     // Parameters object with invalid credentialType
     doPost(
         path, parametersWithCredentialType("NOPE"), "issueVc (invalid, bad credentialType)", 400);
+
+    // Parameters object with unimplemented credentialType (immunization)
+    doPost(
+        path,
+        parametersWithCredentialType(
+            "https://smarthealth.cards#covid19", "https://smarthealth.cards#immunization"),
+        "issueVc (invalid, unimplemented credentialType)",
+        501);
   }
 
   @Test

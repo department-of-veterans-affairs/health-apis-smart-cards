@@ -92,6 +92,18 @@ public class PatientControllerTest {
     assertThrows(Exceptions.NotFound.class, () -> controller.issueVc("404", parametersCovid19()));
   }
 
+  @Test
+  public void issueVc_unimplementedCredentialType() {
+    var fhirClient = new MockFhirClient(mock(LinkProperties.class));
+    var bundler = new R4MixedBundler();
+    var controller = new PatientController(fhirClient, bundler);
+    assertThrows(
+        Exceptions.NotImplemented.class,
+        () ->
+            controller.issueVc(
+                "123", parametersWithCredentialType("https://smarthealth.cards#immunization")));
+  }
+
   private Parameters parametersCovid19() {
     return parametersWithCredentialType("https://smarthealth.cards#covid19");
   }

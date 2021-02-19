@@ -181,6 +181,12 @@ public final class WebExceptionHandler {
     return responseFor("not-found", e, request, emptyList(), true);
   }
 
+  @ExceptionHandler({Exceptions.NotImplemented.class})
+  @ResponseStatus(HttpStatus.NOT_IMPLEMENTED)
+  public OperationOutcome handleNotImplemented(Exception e, HttpServletRequest request) {
+    return responseFor("not-implemented", e, request, emptyList(), true);
+  }
+
   /**
    * For exceptions relating to unmarshalling json, we want to make sure no PII is being logged.
    * Therefore, when we encounter these exceptions, we will not print the stacktrace to prevent PII

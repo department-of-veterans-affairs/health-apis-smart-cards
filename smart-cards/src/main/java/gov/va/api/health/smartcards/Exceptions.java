@@ -32,4 +32,10 @@ public class Exceptions {
       super(message);
     }
   }
+
+  public static final class NotImplemented extends RuntimeException {
+    public NotImplemented(String message) {
+      super(message);
+    }
+  }
 }

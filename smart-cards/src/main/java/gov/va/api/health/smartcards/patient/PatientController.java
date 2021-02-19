@@ -2,6 +2,7 @@ package gov.va.api.health.smartcards.patient;
 
 import static com.google.common.base.Preconditions.checkState;
 import static gov.va.api.health.smartcards.Controllers.checkRequestState;
+import static java.util.stream.Collectors.toList;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.va.api.health.autoconfig.configuration.JacksonConfig;
@@ -23,7 +24,6 @@ import gov.va.api.health.smartcards.vc.VerifiableCredential.CredentialSubject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import javax.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -48,6 +48,12 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor(onConstructor_ = @Autowired)
 public class PatientController {
   private static final ObjectMapper MAPPER = JacksonConfig.createMapper();
+
+  private static final List<CredentialType> UNIMPLEMENTED_CREDENTIAL_TYPES =
+      List.of(
+          CredentialType.immunization,
+          CredentialType.presentation_context_online,
+          CredentialType.presentation_context_in_person);
 
   private final MockFhirClient mockFhirClient;
 
@@ -125,12 +131,21 @@ public class PatientController {
             .filter(p -> "credentialType".equals(p.name()))
             .map(Parameter::valueUri)
             .map(CredentialType::fromUri)
-            .collect(Collectors.toList());
+            .collect(toList());
     if (params.isEmpty()) {
       throw new Exceptions.BadRequest("credentialType parameter is required");
     }
 
+    var requestedButUnimplemented =
+        UNIMPLEMENTED_CREDENTIAL_TYPES.stream()
+            .filter(u -> params.contains(u))
+            .map(CredentialType::getUri)
+            .collect(toList());
 
+    if (!requestedButUnimplemented.isEmpty()) {
+      throw new Exceptions.NotImplemented(
+          String.format("Not yet implemented support for %s", requestedButUnimplemented));
+    }
   }
 
   private VerifiableCredential vc(MixedBundle bundle) {

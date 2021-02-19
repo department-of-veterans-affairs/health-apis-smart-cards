@@ -7,7 +7,7 @@ public enum CredentialType {
   covid19("https://smarthealth.cards#covid19"),
   immunization("https://smarthealth.cards#immunization"),
   presentation_context_online("https://smarthealth.cards#presentation-context-online"),
-  getPresentation_context_in_person("https://smarthealth.cards#presentation-context-in-person");
+  presentation_context_in_person("https://smarthealth.cards#presentation-context-in-person");
 
   private final String uri;
 
@@ -21,5 +21,9 @@ public enum CredentialType {
         .filter(c -> c.uri.equals(uri))
         .findFirst()
         .orElseThrow(() -> new Exceptions.InvalidCredentialType(uri));
+  }
+
+  public String getUri() {
+    return uri;
   }
 }

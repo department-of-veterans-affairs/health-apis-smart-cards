@@ -24,6 +24,7 @@ import gov.va.api.health.smartcards.vc.VerifiableCredential.CredentialSubject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Stream;
 import javax.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -87,7 +88,7 @@ public class PatientController {
   ResponseEntity<Parameters> issueVc(
       @PathVariable("id") String id, @Valid @RequestBody Parameters parameters) {
     checkState(!StringUtils.isEmpty(id), "id is required");
-    validateCredentialType(parameters);
+    var credentialTypes = validateCredentialType(parameters);
     Patient.Bundle patients = findPatientById(id);
     Patient patient = getPatientFromBundle(patients, id);
     Immunization.Bundle immunizations = mockFhirClient.immunizationBundle(patient);
@@ -95,7 +96,7 @@ public class PatientController {
     consumeBundle(patients, resources, this::transform);
     consumeBundle(immunizations, resources, this::transform);
     MixedBundle bundle = toBundle(resources);
-    var vc = vc(bundle);
+    var vc = vc(bundle, credentialTypes);
     var parametersResponse = parameters(vc);
     return ResponseEntity.ok(parametersResponse);
   }
@@ -124,7 +125,7 @@ public class PatientController {
     return ImmunizationTransformer.builder().entry(entry).build().transform();
   }
 
-  private void validateCredentialType(Parameters parameters) {
+  private List<CredentialType> validateCredentialType(Parameters parameters) {
     checkRequestState(parameters.parameter() != null, "parameters are required");
     var params =
         parameters.parameter().stream()
@@ -146,12 +147,17 @@ public class PatientController {
       throw new Exceptions.NotImplemented(
           String.format("Not yet implemented support for %s", requestedButUnimplemented));
     }
+    return params;
   }
 
-  private VerifiableCredential vc(MixedBundle bundle) {
+  private VerifiableCredential vc(MixedBundle bundle, List<CredentialType> credentialTypes) {
     return VerifiableCredential.builder()
         .context(List.of("https://www.w3.org/2018/credentials/v1"))
-        .type(List.of("VerifiableCredential", "https://smarthealth.cards#covid19"))
+        .type(
+            Stream.concat(
+                    Stream.of("VerifiableCredential"),
+                    credentialTypes.stream().map(CredentialType::getUri))
+                .collect(toList()))
         .credentialSubject(CredentialSubject.builder().fhirBundle(bundle).build())
         .build();
   }

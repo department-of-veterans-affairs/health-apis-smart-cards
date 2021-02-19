@@ -102,6 +102,30 @@ public class WebExceptionHandlerTest {
   }
 
   @Test
+  void notImplemented() {
+    OperationOutcome outcome =
+        new WebExceptionHandler("")
+            .handleNotImplemented(
+                new Exceptions.NotImplemented("x"), mock(HttpServletRequest.class));
+    assertThat(outcome.id(null).extension(null))
+        .isEqualTo(
+            OperationOutcome.builder()
+                .resourceType("OperationOutcome")
+                .text(
+                    Narrative.builder()
+                        .status(Narrative.NarrativeStatus.additional)
+                        .div("<div>Failure: null</div>")
+                        .build())
+                .issue(
+                    List.of(
+                        OperationOutcome.Issue.builder()
+                            .severity(OperationOutcome.Issue.IssueSeverity.fatal)
+                            .code("not-implemented")
+                            .build()))
+                .build());
+  }
+
+  @Test
   void sanitizedMessage_exception() {
     assertThat(WebExceptionHandler.sanitizedMessage(new RuntimeException("oh noez")))
         .isEqualTo("oh noez");

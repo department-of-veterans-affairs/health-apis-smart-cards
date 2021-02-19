@@ -71,7 +71,12 @@ public class PatientControllerTest {
     var fhirClient = new MockFhirClient(mock(LinkProperties.class));
     var bundler = new R4MixedBundler();
     var controller = new PatientController(fhirClient, bundler);
+    // Empty List
     assertThrows(Exceptions.BadRequest.class, () -> controller.issueVc("123", parametersEmpty()));
+    // null List
+    assertThrows(
+        Exceptions.BadRequest.class,
+        () -> controller.issueVc("123", parametersEmpty().parameter(null)));
   }
 
   @Test
@@ -109,7 +114,7 @@ public class PatientControllerTest {
   }
 
   private Parameters parametersEmpty() {
-    return Parameters.builder().build();
+    return Parameters.builder().parameter(List.of()).build();
   }
 
   private Parameters parametersWithCredentialType(String... credentialType) {

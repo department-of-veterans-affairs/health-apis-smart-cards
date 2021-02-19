@@ -87,7 +87,6 @@ public class PatientController {
   ResponseEntity<Parameters> issueVc(
       @PathVariable("id") String id, @Valid @RequestBody Parameters parameters) {
     checkState(!StringUtils.isEmpty(id), "id is required");
-    checkRequestState(parameters.parameter() != null, "parameters are required");
     validateCredentialType(parameters);
     Patient.Bundle patients = findPatientById(id);
     Patient patient = getPatientFromBundle(patients, id);
@@ -126,6 +125,7 @@ public class PatientController {
   }
 
   private void validateCredentialType(Parameters parameters) {
+    checkRequestState(parameters.parameter() != null, "parameters are required");
     var params =
         parameters.parameter().stream()
             .filter(p -> "credentialType".equals(p.name()))

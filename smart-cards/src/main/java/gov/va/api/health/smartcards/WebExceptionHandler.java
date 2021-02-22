@@ -12,7 +12,6 @@ import com.fasterxml.jackson.core.io.JsonEOFException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
-import gov.va.api.health.autoconfig.configuration.JacksonConfig;
 import gov.va.api.health.autoconfig.encryption.BasicEncryption;
 import gov.va.api.health.r4.api.elements.Extension;
 import gov.va.api.health.r4.api.elements.Narrative;
@@ -28,6 +27,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.UnsatisfiedServletRequestParameterException;
@@ -41,7 +41,7 @@ import org.springframework.web.client.HttpClientErrorException;
 @RestControllerAdvice
 @RequestMapping(produces = "application/json")
 public final class WebExceptionHandler {
-  private static final ObjectMapper MAPPER = JacksonConfig.createMapper();
+  private static final ObjectMapper MAPPER = JacksonMapperConfig.createMapper();
 
   private final String encryptionKey;
 
@@ -159,6 +159,8 @@ public final class WebExceptionHandler {
   @ExceptionHandler({
     BindException.class,
     Exceptions.BadRequest.class,
+    Exceptions.InvalidCredentialType.class,
+    HttpMessageNotReadableException.class,
     UnsatisfiedServletRequestParameterException.class
   })
   @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -176,6 +178,12 @@ public final class WebExceptionHandler {
   @ResponseStatus(HttpStatus.NOT_FOUND)
   OperationOutcome handleNotFound(Exception e, HttpServletRequest request) {
     return responseFor("not-found", e, request, emptyList(), true);
+  }
+
+  @ExceptionHandler({Exceptions.NotImplemented.class})
+  @ResponseStatus(HttpStatus.NOT_IMPLEMENTED)
+  public OperationOutcome handleNotImplemented(Exception e, HttpServletRequest request) {
+    return responseFor("not-implemented", e, request, emptyList(), true);
   }
 
   /**

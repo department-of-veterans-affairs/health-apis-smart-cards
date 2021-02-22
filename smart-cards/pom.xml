@@ -8,10 +8,10 @@
     <relativePath/>
   </parent>
   <artifactId>smart-cards</artifactId>
-  <version>0.0.5-SNAPSHOT</version>
+  <version>0.0.5</version>
   <packaging>jar</packaging>
   <properties>
-    <fhir-resources.version>6.0.3</fhir-resources.version>
+    <fhir-resources.version>6.0.5</fhir-resources.version>
   </properties>
   <dependencies>
     <dependency>

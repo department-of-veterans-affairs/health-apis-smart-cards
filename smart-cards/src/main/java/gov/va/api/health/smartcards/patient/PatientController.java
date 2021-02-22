@@ -52,9 +52,9 @@ public class PatientController {
 
   private static final List<CredentialType> UNIMPLEMENTED_CREDENTIAL_TYPES =
       List.of(
-          CredentialType.immunization,
-          CredentialType.presentation_context_online,
-          CredentialType.presentation_context_in_person);
+          CredentialType.IMMUNIZATION,
+          CredentialType.PRESENTATION_CONTEXT_ONLINE,
+          CredentialType.PRESENTATION_CONTEXT_IN_PERSON);
 
   private final MockFhirClient mockFhirClient;
 

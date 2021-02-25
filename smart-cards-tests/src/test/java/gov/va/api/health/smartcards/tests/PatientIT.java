@@ -118,34 +118,25 @@ public class PatientIT {
   void read_invalidParameters() {
     String id = systemDefinition().ids().patient();
     String path = String.format("r4/Patient/%s/$HealthWallet.issueVc", id);
+    var internalService = systemDefinition().internal();
     // Empty body
-    doPost(systemDefinition().internal(), path, null, "issueVc(invalid, empty body)", 400);
+    doPost(internalService, path, null, "issueVc(invalid, empty body)", 400);
     // Bad body schema
     doPost(
-        systemDefinition().internal(),
-        path,
-        "{\"foo\": \"bar\"}",
-        "issueVc (invalid, bad payload schema)",
-        400);
-    doPost(
-        systemDefinition().internal(), path, "NOPE", "issueVc (invalid, bad payload schema)", 400);
+        internalService, path, "{\"foo\": \"bar\"}", "issueVc (invalid, bad payload schema)", 400);
+    doPost(internalService, path, "NOPE", "issueVc (invalid, bad payload schema)", 400);
     // Parameters object without any parameters
-    doPost(
-        systemDefinition().internal(),
-        path,
-        parametersEmpty(),
-        "issueVc (invalid, no parameters)",
-        400);
+    doPost(internalService, path, parametersEmpty(), "issueVc (invalid, no parameters)", 400);
     // Parameters object with invalid credentialType
     doPost(
-        systemDefinition().internal(),
+        internalService,
         path,
         parametersWithCredentialType("NOPE"),
         "issueVc (invalid, bad credentialType)",
         400);
     // Parameters object with unimplemented credentialType (immunization)
     doPost(
-        systemDefinition().internal(),
+        internalService,
         path,
         parametersWithCredentialType(
             "https://smarthealth.cards#covid19", "https://smarthealth.cards#immunization"),

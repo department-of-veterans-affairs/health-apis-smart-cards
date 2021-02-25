@@ -84,6 +84,7 @@
                 </transformer>
               </transformers>
               <minimizeJar>true</minimizeJar>
+              <createDependencyReducedPom>false</createDependencyReducedPom>
               <artifactSet>
                 <excludes>
                   <exclude>org.projectlombok:*</exclude>

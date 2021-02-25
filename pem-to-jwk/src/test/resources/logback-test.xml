@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+      <Pattern>%msg%n</Pattern>
+    </encoder>
+  </appender>
+  <!-- Change level to INFO if you want to see output from unit tests -->
+  <logger name="gov.va.api.pem2jwk" level="OFF" additivity="false">
+    <appender-ref ref="CONSOLE"/>
+  </logger>
+  <root level="error">
+    <appender-ref ref="CONSOLE"/>
+  </root>
+</configuration>

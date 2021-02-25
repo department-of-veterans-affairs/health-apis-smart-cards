@@ -11,12 +11,7 @@ import lombok.experimental.UtilityClass;
 class SystemDefinitions {
 
   private static Ids ids() {
-    return Ids.builder()
-        .patient("123")
-        .patientNotFound("404")
-        .r4Path("r4/Patient/%s/$HealthWallet.issueVc")
-        .dstu2Path("dstu2/Patient/%s/$HealthWallet.issueVc")
-        .build();
+    return Ids.builder().patient("123").patientNotFound("404").build();
   }
 
   private static SystemDefinition lab() {
@@ -120,10 +115,6 @@ class SystemDefinitions {
     @NonNull String patient;
 
     @NonNull String patientNotFound;
-
-    @NonNull String r4Path;
-
-    @NonNull String dstu2Path;
   }
 
   @Value

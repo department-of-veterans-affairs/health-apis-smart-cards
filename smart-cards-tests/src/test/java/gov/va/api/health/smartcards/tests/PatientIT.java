@@ -37,11 +37,11 @@ public class PatientIT {
 
   @SneakyThrows
   private static ExpectedResponse doPost(
+      SystemDefinitions.Service svc,
       String request,
       Object payload,
       String description,
-      Integer expectedStatus,
-      SystemDefinitions.Service svc) {
+      Integer expectedStatus) {
     RequestSpecification spec =
         RestAssured.given()
             .baseUri(svc.url())
@@ -85,72 +85,82 @@ public class PatientIT {
   void read() {
     String id = systemDefinition().ids().patient();
     doPost(
-        String.format(systemDefinition().ids().r4Path(), id),
+        systemDefinition().internal(),
+        String.format("r4/Patient/%s/$HealthWallet.issueVc", id),
         parametersCovid19(),
         "issuevc",
-        200,
-        systemDefinition().internal());
+        200);
   }
 
   @Test
-  void readDstu2() {
+  void read_externalDstu2() {
     String id = systemDefinition().ids().patient();
     doPost(
-        String.format(systemDefinition().ids().dstu2Path(), id),
+        systemDefinition().external(),
+        String.format("dstu2/Patient/%s/$HealthWallet.issueVc", id),
         parametersCovid19(),
         "issuevc",
-        200,
-        systemDefinition().external());
+        200);
+  }
+
+  @Test
+  void read_externalR4() {
+    String id = systemDefinition().ids().patient();
+    doPost(
+        systemDefinition().external(),
+        String.format("r4/Patient/%s/$HealthWallet.issueVc", id),
+        parametersCovid19(),
+        "issuevc",
+        200);
   }
 
   @Test
   void read_invalidParameters() {
     String id = systemDefinition().ids().patient();
-    String path = String.format(systemDefinition().ids().r4Path(), id);
+    String path = String.format("r4/Patient/%s/$HealthWallet.issueVc", id);
     // Empty body
-    doPost(path, null, "issueVc(invalid, empty body)", 400, systemDefinition().internal());
+    doPost(systemDefinition().internal(), path, null, "issueVc(invalid, empty body)", 400);
     // Bad body schema
     doPost(
+        systemDefinition().internal(),
         path,
         "{\"foo\": \"bar\"}",
         "issueVc (invalid, bad payload schema)",
-        400,
-        systemDefinition().internal());
+        400);
     doPost(
-        path, "NOPE", "issueVc (invalid, bad payload schema)", 400, systemDefinition().internal());
+        systemDefinition().internal(), path, "NOPE", "issueVc (invalid, bad payload schema)", 400);
     // Parameters object without any parameters
     doPost(
+        systemDefinition().internal(),
         path,
         parametersEmpty(),
         "issueVc (invalid, no parameters)",
-        400,
-        systemDefinition().internal());
+        400);
     // Parameters object with invalid credentialType
     doPost(
+        systemDefinition().internal(),
         path,
         parametersWithCredentialType("NOPE"),
         "issueVc (invalid, bad credentialType)",
-        400,
-        systemDefinition().internal());
-
+        400);
     // Parameters object with unimplemented credentialType (immunization)
     doPost(
+        systemDefinition().internal(),
         path,
         parametersWithCredentialType(
             "https://smarthealth.cards#covid19", "https://smarthealth.cards#immunization"),
         "issueVc (invalid, unimplemented credentialType)",
-        501,
-        systemDefinition().internal());
+        501);
   }
 
   @Test
   void read_notFound() {
     String id = systemDefinition().ids().patientNotFound();
     doPost(
-        String.format(systemDefinition().ids().r4Path(), id),
+        systemDefinition().internal(),
+        String.format("r4/Patient/%s/$HealthWallet.issueVc", id),
         parametersCovid19(),
         "issuevc (not found)",
-        404,
-        systemDefinition().internal());
+        404);
   }
 }

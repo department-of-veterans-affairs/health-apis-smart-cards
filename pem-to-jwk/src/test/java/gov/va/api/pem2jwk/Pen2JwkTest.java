@@ -14,7 +14,7 @@ public class Pen2JwkTest {
 
   @Test
   public void test() {
-    Pem2Jwk.main(args("./src/test/resources/cert.pem"));
+    Pem2Jwk.main(args("./src/test/resources/cert.txt"));
   }
 
   @Test
@@ -24,7 +24,8 @@ public class Pen2JwkTest {
         FileNotFoundException.class, () -> Pem2Jwk.main(args("./not/a/real/file/path.txt")));
 
     // invalid pem
-    assertThrows(JOSEException.class, () -> Pem2Jwk.main(args("./src/test/resources/invalid.pem")));
+    assertThrows(
+        JOSEException.class, () -> Pem2Jwk.main(args("./src/test/resources/invalid-cert.txt")));
 
     // no args
     assertThrows(IllegalArgumentException.class, () -> Pem2Jwk.main(args()));

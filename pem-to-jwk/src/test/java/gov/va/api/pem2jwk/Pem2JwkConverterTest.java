@@ -20,7 +20,7 @@ public class Pem2JwkConverterTest {
   public void test() {
     String contents =
         FileUtils.readFileToString(
-            new File("src/test/resources/cert.pem"), Charset.defaultCharset());
+            new File("src/test/resources/cert.txt"), Charset.defaultCharset());
 
     var out = Pem2JwkConverter.builder().pemContents(contents).build().toJwk();
     assertThat(out.type()).isEqualTo(KeyType.EC);

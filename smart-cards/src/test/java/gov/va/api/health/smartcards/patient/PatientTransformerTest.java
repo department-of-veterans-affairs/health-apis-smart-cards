@@ -28,14 +28,9 @@ public class PatientTransformerTest {
                 .resource(
                     Patient.builder()
                         .resourceType("Patient")
-                        .identifier(List.of(mpi("x")))
                         .name(
                             List.of(
-                                HumanName.builder()
-                                    .use(NameUse.anonymous)
-                                    .family("Doe")
-                                    .given(List.of("Joe"))
-                                    .build()))
+                                HumanName.builder().family("Doe").given(List.of("Joe")).build()))
                         .gender(Gender.unknown)
                         .birthDate("1955-01-01")
                         .build())

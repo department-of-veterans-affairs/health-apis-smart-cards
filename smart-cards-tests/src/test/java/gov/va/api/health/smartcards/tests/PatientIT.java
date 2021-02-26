@@ -1,6 +1,7 @@
 package gov.va.api.health.smartcards.tests;
 
 import static gov.va.api.health.sentinel.EnvironmentAssumptions.assumeEnvironmentIn;
+import static gov.va.api.health.sentinel.EnvironmentAssumptions.assumeEnvironmentNotIn;
 import static gov.va.api.health.sentinel.ExpectedResponse.logAllWithTruncatedBody;
 import static gov.va.api.health.smartcards.tests.SystemDefinitions.systemDefinition;
 import static java.util.stream.Collectors.toList;
@@ -94,6 +95,7 @@ public class PatientIT {
 
   @Test
   void read_externalDstu2() {
+    assumeEnvironmentNotIn(Environment.LOCAL);
     String id = systemDefinition().ids().patient();
     doPost(
         systemDefinition().external(),
@@ -105,6 +107,7 @@ public class PatientIT {
 
   @Test
   void read_externalR4() {
+    assumeEnvironmentNotIn(Environment.LOCAL);
     String id = systemDefinition().ids().patient();
     doPost(
         systemDefinition().external(),

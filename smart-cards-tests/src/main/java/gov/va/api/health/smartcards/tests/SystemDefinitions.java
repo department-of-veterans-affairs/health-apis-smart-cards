@@ -28,8 +28,7 @@ class SystemDefinitions {
   private static SystemDefinition local() {
     return SystemDefinition.builder()
         .internal(serviceDefinition("internal", "http://localhost", 8096, "/"))
-        .external(
-            serviceDefinition("external", "https://blue.qa.lighthouse.va.gov", 443, "/fhir/v0/"))
+        .external(serviceDefinition("external", "http://localhost", 8096, "/"))
         .ids(ids())
         .build();
   }

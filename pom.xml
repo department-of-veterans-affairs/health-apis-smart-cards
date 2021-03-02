@@ -12,5 +12,6 @@
   <modules>
     <module>smart-cards</module>
     <module>smart-cards-tests</module>
+    <module>smart-cards-mock-services</module>
   </modules>
 </project>

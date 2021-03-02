@@ -18,6 +18,6 @@ import org.springframework.context.annotation.Configuration;
 @Builder
 @AllArgsConstructor
 public class MockServicesOptions {
-    /** The port that mock server will be started on. */
-    int port;
+  /** The port that mock server will be started on. */
+  @Builder.Default int port = 8666;
 }

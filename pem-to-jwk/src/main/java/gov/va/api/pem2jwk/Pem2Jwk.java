@@ -17,7 +17,7 @@ public class Pem2Jwk {
       throw new IllegalArgumentException("Invalid number of args. Only input pem file is allowed");
     }
     String input = args[0];
-    String contents = FileUtils.readFileToString(new File(input), Charset.defaultCharset());
+    String contents = FileUtils.readFileToString(new File(input), "UTF-8");
     JwkOutput converted = Pem2JwkConverter.builder().pemContents(contents).build().toJwk();
     log.info("From " + input + ": ");
     log.info("Type                  : " + converted.type());

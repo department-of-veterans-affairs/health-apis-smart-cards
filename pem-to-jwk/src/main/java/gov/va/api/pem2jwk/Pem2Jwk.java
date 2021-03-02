@@ -2,7 +2,6 @@ package gov.va.api.pem2jwk;
 
 import gov.va.api.pem2jwk.Pem2JwkConverter.JwkOutput;
 import java.io.File;
-import java.nio.charset.Charset;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;

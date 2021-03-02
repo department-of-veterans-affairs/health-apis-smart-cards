@@ -15,13 +15,15 @@ import gov.va.api.health.r4.api.elements.Reference;
 import gov.va.api.health.r4.api.resources.Patient;
 import gov.va.api.health.r4.api.resources.Patient.Gender;
 import java.util.List;
+import javax.validation.Validation;
 import org.junit.jupiter.api.Test;
 
 public class PatientTransformerTest {
   @Test
   public void basic() {
     var patient = patient();
-    assertThat(PatientTransformer.builder().entry(patient).build().transform())
+    var transformed = PatientTransformer.builder().entry(patient).build().transform();
+    assertThat(transformed)
         .isEqualTo(
             MixedEntry.builder()
                 .fullUrl("http://example.com/r4/Patient/x")
@@ -36,6 +38,8 @@ public class PatientTransformerTest {
                         .build())
                 .search(Search.builder().mode(SearchMode.match).build())
                 .build());
+    assertThat(Validation.buildDefaultValidatorFactory().getValidator().validate(transformed))
+        .isEmpty();
   }
 
   Identifier mpi(String id) {

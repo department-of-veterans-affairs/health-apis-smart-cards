@@ -87,11 +87,4 @@ public class ImmunizationTransformerTest {
                 .build())
         .build();
   }
-
-  @Test
-  public void statusNotDone() {
-    var immunization = immunization();
-    immunization.resource().status(Status.not_done);
-    assertThat(ImmunizationTransformer.builder().entry(immunization).build().transform()).isNull();
-  }
 }

@@ -10,6 +10,7 @@ import gov.va.api.health.r4.api.bundle.AbstractEntry;
 import gov.va.api.health.r4.api.bundle.MixedBundle;
 import gov.va.api.health.r4.api.bundle.MixedEntry;
 import gov.va.api.health.r4.api.resources.Immunization;
+import gov.va.api.health.r4.api.resources.Immunization.Status;
 import gov.va.api.health.r4.api.resources.Parameters;
 import gov.va.api.health.r4.api.resources.Parameters.Parameter;
 import gov.va.api.health.r4.api.resources.Patient;
@@ -23,8 +24,8 @@ import gov.va.api.health.smartcards.vc.VerifiableCredential;
 import gov.va.api.health.smartcards.vc.VerifiableCredential.CredentialSubject;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 import javax.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -63,8 +64,16 @@ public class PatientController {
 
   /** Extracts resources from Bundle entries and pushes them to an existing List. */
   private <R extends Resource, E extends AbstractEntry<R>, B extends AbstractBundle<E>>
-      void consumeBundle(B bundle, List<MixedEntry> target, Function<E, MixedEntry> transform) {
-    bundle.entry().stream().map(transform).filter(Objects::nonNull).forEachOrdered(target::add);
+      void consumeBundle(
+          B bundle,
+          List<MixedEntry> target,
+          Predicate<E> filter,
+          Function<E, MixedEntry> transform) {
+    bundle.entry().stream().filter(filter).map(transform).forEachOrdered(target::add);
+  }
+
+  private boolean filter(Immunization.Entry entry) {
+    return entry.resource().status() == Status.completed;
   }
 
   private Patient.Bundle findPatientById(String id) {
@@ -94,8 +103,8 @@ public class PatientController {
     Patient patient = getPatientFromBundle(patients, id);
     Immunization.Bundle immunizations = mockFhirClient.immunizationBundle(patient);
     List<MixedEntry> resources = new ArrayList<>();
-    consumeBundle(patients, resources, this::transform);
-    consumeBundle(immunizations, resources, this::transform);
+    consumeBundle(patients, resources, x -> true, this::transform);
+    consumeBundle(immunizations, resources, this::filter, this::transform);
     MixedBundle bundle = toBundle(resources);
     var vc = vc(bundle, credentialTypes);
     var parametersResponse = parameters(vc);
@@ -137,13 +146,11 @@ public class PatientController {
     if (params.isEmpty()) {
       throw new Exceptions.BadRequest("credentialType parameter is required");
     }
-
     var requestedButUnimplemented =
         UNIMPLEMENTED_CREDENTIAL_TYPES.stream()
             .filter(u -> params.contains(u))
             .map(CredentialType::getUri)
             .collect(toList());
-
     if (!requestedButUnimplemented.isEmpty()) {
       throw new Exceptions.NotImplemented(
           String.format("Not yet implemented support for %s", requestedButUnimplemented));

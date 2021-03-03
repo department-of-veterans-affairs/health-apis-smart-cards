@@ -13,10 +13,10 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties
 @ConfigurationProperties("mock-services")
 @Data
-@Accessors(fluent = false)
-@NoArgsConstructor
 @Builder
+@NoArgsConstructor
 @AllArgsConstructor
+@Accessors(fluent = false)
 public class MockServicesOptions {
-  int port;
+  private int port;
 }

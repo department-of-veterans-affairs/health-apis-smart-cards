@@ -30,7 +30,6 @@ public class PatientTransformer {
         .fullUrl(entry.fullUrl())
         .resource(
             Patient.builder()
-                .resourceType("Patient")
                 .name(names())
                 .gender(entry.resource().gender())
                 .birthDate(entry.resource().birthDate())

@@ -12,6 +12,7 @@
   <modules>
     <module>pem-to-jwk</module>
     <module>smart-cards</module>
+    <module>smart-cards-mock-services</module>
     <module>smart-cards-tests</module>
   </modules>
 </project>

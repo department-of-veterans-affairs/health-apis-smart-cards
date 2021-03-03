@@ -21,8 +21,8 @@ import org.mockserver.netty.MockServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@Component
 @Slf4j
+@Component
 public class MockServices {
   private final List<String> supportedQueries = new ArrayList<>();
 
@@ -82,8 +82,7 @@ public class MockServices {
     return request;
   }
 
-  /** Inits server. */
-  public void start() {
+  void start() {
     checkState(ms == null, "Mock Services have already been started");
     log.info("Starting mock services on port {}", options.getPort());
     ms = new MockServer(options.getPort());

@@ -10,6 +10,7 @@
   <version>0.0.8-SNAPSHOT</version>
   <packaging>pom</packaging>
   <modules>
+    <module>pem-to-jwk</module>
     <module>smart-cards</module>
     <module>smart-cards-tests</module>
   </modules>

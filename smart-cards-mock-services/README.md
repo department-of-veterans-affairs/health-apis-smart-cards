@@ -1,19 +1,9 @@
 # smart-cards-mock-services
 
-Mock Service application, used for local testing.
+[Spring Boot](https://spring.io/projects/spring-boot) application that
+mimics the external web services used by the Smart Cards application.
 
 ## Local Development
+`java -jar target/smart-cards-mock-services-${VERSION}.jar`
 
-### Build
-
-To run full build:
-
-`mvn clean install`
-
-To run build without additional formatting, code coverage enforcement, static code analysis, integration tests, etc., disable the `standard` profile:
-
-`mvn -P'!standard' package`
-
-Start Java app:
-
-`java -Dspring.profiles.active=dev -jar target/smart-cards-${VERSION}.jar`
+Use `http://localhost:8777/help` to list supported queries.

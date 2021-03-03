@@ -12,6 +12,7 @@ import gov.va.api.health.r4.api.datatypes.HumanName;
 import gov.va.api.health.r4.api.datatypes.Identifier;
 import gov.va.api.health.r4.api.elements.Reference;
 import gov.va.api.health.r4.api.resources.Immunization;
+import gov.va.api.health.r4.api.resources.Immunization.Status;
 import gov.va.api.health.r4.api.resources.Patient;
 import java.util.ArrayList;
 import java.util.List;
@@ -123,6 +124,32 @@ public class MockFhirClient implements FhirClient {
                             "Dose #2 of 2 of COVID-19, mRNA, LNP-S, PF, 100 mcg/ 0.5 mL dose "
                                 + "vaccine administered.")
                         .build()))
+            .build(),
+        // 'not_done' Immunization to verify filters
+        Immunization.builder()
+            .resourceType("Immunization")
+            .id(String.format("imm-3-%s", patient.id()))
+            .status(Status.not_done)
+            .vaccineCode(
+                CodeableConcept.builder()
+                    .coding(List.of(Coding.builder().system(VACCINE_SYSTEM).code("207").build()))
+                    .text("COVID-19, mRNA, LNP-S, PF, 100 mcg/ 0.5 mL dose")
+                    .build())
+            .patient(
+                Reference.builder()
+                    .reference(linkProperties.dataQueryR4ReadUrl(patient))
+                    .display(patient.name().stream().findFirst().get().text())
+                    .build())
+            .occurrenceDateTime("2021-01-18T09:30:21Z")
+            .primarySource(true)
+            .location(
+                Reference.builder()
+                    .reference(
+                        String.format(
+                            "%s/loc-%s",
+                            linkProperties.dataQueryR4ResourceUrl("Location"), patient.id()))
+                    .display("Location for " + patient.id())
+                    .build())
             .build());
   }
 

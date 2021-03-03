@@ -23,6 +23,7 @@ import gov.va.api.health.smartcards.vc.VerifiableCredential;
 import gov.va.api.health.smartcards.vc.VerifiableCredential.CredentialSubject;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import javax.validation.Valid;
@@ -63,7 +64,7 @@ public class PatientController {
   /** Extracts resources from Bundle entries and pushes them to an existing List. */
   private <R extends Resource, E extends AbstractEntry<R>, B extends AbstractBundle<E>>
       void consumeBundle(B bundle, List<MixedEntry> target, Function<E, MixedEntry> transform) {
-    bundle.entry().stream().map(transform).forEachOrdered(target::add);
+    bundle.entry().stream().map(transform).filter(Objects::nonNull).forEachOrdered(target::add);
   }
 
   private Patient.Bundle findPatientById(String id) {

@@ -6,6 +6,7 @@ import gov.va.api.health.r4.api.bundle.MixedEntry;
 import gov.va.api.health.r4.api.datatypes.CodeableConcept;
 import gov.va.api.health.r4.api.elements.Reference;
 import gov.va.api.health.r4.api.resources.Immunization;
+import gov.va.api.health.r4.api.resources.Immunization.Status;
 import lombok.Builder;
 import lombok.NonNull;
 
@@ -30,16 +31,17 @@ public class ImmunizationTransformer {
   }
 
   MixedEntry transform() {
+    if (entry.resource().status() != Status.completed) {
+      return null;
+    }
     return MixedEntry.builder()
         .fullUrl(entry.fullUrl())
         .resource(
             Immunization.builder()
-                .resourceType("Immunization")
                 .status(entry.resource().status())
                 .vaccineCode(vaccineCode())
                 .patient(patient())
                 .occurrenceDateTime(entry.resource().occurrenceDateTime())
-                .primarySource(entry.resource().primarySource())
                 .location(location())
                 .build())
         .search(Search.builder().mode(SearchMode.match).build())

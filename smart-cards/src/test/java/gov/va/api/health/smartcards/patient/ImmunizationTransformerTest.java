@@ -38,7 +38,6 @@ public class ImmunizationTransformerTest {
                         .patient(
                             Reference.builder().reference("https://foo.com/r4/Patient/x").build())
                         .occurrenceDateTime("2020-12-18T12:24:55Z")
-                        .primarySource(true)
                         .location(
                             Reference.builder()
                                 .reference("https://foo.com/r4/Location/loc-1")
@@ -87,5 +86,12 @@ public class ImmunizationTransformerTest {
                             .build()))
                 .build())
         .build();
+  }
+
+  @Test
+  public void statusNotDone() {
+    var immunization = immunization();
+    immunization.resource().status(Status.not_done);
+    assertThat(ImmunizationTransformer.builder().entry(immunization).build().transform()).isNull();
   }
 }

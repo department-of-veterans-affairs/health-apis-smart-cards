@@ -15,8 +15,8 @@ import gov.va.api.health.r4.api.resources.Parameters.Parameter;
 import gov.va.api.health.r4.api.resources.Patient;
 import gov.va.api.health.r4.api.resources.Resource;
 import gov.va.api.health.smartcards.Exceptions;
+import gov.va.api.health.smartcards.FhirClient;
 import gov.va.api.health.smartcards.JacksonMapperConfig;
-import gov.va.api.health.smartcards.MockFhirClient;
 import gov.va.api.health.smartcards.R4MixedBundler;
 import gov.va.api.health.smartcards.vc.CredentialType;
 import gov.va.api.health.smartcards.vc.VerifiableCredential;
@@ -56,7 +56,7 @@ public class PatientController {
           CredentialType.PRESENTATION_CONTEXT_ONLINE,
           CredentialType.PRESENTATION_CONTEXT_IN_PERSON);
 
-  private final MockFhirClient mockFhirClient;
+  private final FhirClient fhirClient;
 
   R4MixedBundler bundler;
 
@@ -67,7 +67,7 @@ public class PatientController {
   }
 
   private Patient.Bundle findPatientById(String id) {
-    return mockFhirClient.patientBundle(id);
+    return fhirClient.patientBundle(id);
   }
 
   private Patient getPatientFromBundle(Patient.Bundle bundle, @NonNull String id) {
@@ -91,7 +91,7 @@ public class PatientController {
     var credentialTypes = validateCredentialType(parameters);
     Patient.Bundle patients = findPatientById(id);
     Patient patient = getPatientFromBundle(patients, id);
-    Immunization.Bundle immunizations = mockFhirClient.immunizationBundle(patient);
+    Immunization.Bundle immunizations = fhirClient.immunizationBundle(patient);
     List<MixedEntry> resources = new ArrayList<>();
     consumeBundle(patients, resources, this::transform);
     consumeBundle(immunizations, resources, this::transform);

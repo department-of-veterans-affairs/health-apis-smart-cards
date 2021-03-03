@@ -1,4 +1,4 @@
-package gov.va.api.health.smartcards.mockservices;
+package gov.va.api.health.smartcardsmockservices;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;

@@ -11,7 +11,7 @@
   <packaging>pom</packaging>
   <modules>
     <module>smart-cards</module>
-    <module>smart-cards-tests</module>
     <module>smart-cards-mock-services</module>
+    <module>smart-cards-tests</module>
   </modules>
 </project>

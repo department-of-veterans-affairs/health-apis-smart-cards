@@ -1,4 +1,4 @@
-package gov.va.api.health.smartcards.mockservices;
+package gov.va.api.health.smartcardsmockservices;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,5 +19,5 @@ import org.springframework.context.annotation.Configuration;
 @AllArgsConstructor
 public class MockServicesOptions {
   /** The port that mock server will be started on. */
-  @Builder.Default int port = 8666;
+  int port;
 }

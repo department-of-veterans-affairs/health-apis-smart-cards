@@ -34,6 +34,16 @@ public class MockServices {
     return new Header("Content-Type", "application/json");
   }
 
+  @SneakyThrows
+  private static String contentOf(String resource) {
+    log.info("Loading resource {}", resource);
+    return Resources.toString(MockServices.class.getResource(resource), StandardCharsets.UTF_8);
+  }
+
+  private static Header contentTextPlain() {
+    return new Header("Content-Type", "text/plain");
+  }
+
   private void addHelp(MockServerClient mock) {
     mock.when(request().withPath("/help"))
         .respond(
@@ -70,16 +80,6 @@ public class MockServices {
                   pv[0], URLDecoder.decode(pv[1], StandardCharsets.UTF_8));
             });
     return request;
-  }
-
-  @SneakyThrows
-  private String contentOf(String resource) {
-    log.info("Loading resource {}", resource);
-    return Resources.toString(MockServices.class.getResource(resource), StandardCharsets.UTF_8);
-  }
-
-  private Header contentTextPlain() {
-    return new Header("Content-Type", "text/plain");
   }
 
   /** Inits server. */

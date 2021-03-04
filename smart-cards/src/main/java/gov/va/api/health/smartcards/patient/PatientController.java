@@ -22,6 +22,7 @@ import gov.va.api.health.smartcards.vc.CredentialType;
 import gov.va.api.health.smartcards.vc.VerifiableCredential;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import javax.validation.Valid;
@@ -68,8 +69,8 @@ public class PatientController {
     bundle.entry().stream().map(transform).forEachOrdered(target::add);
   }
 
-  private Patient.Bundle findPatientById(String id, String key) {
-    return fhirClient.patientBundle(id, key);
+  private Patient.Bundle findPatientById(String id, Map<String, String> headers) {
+    return fhirClient.patientBundle(id, headers);
   }
 
   private Patient getPatientFromBundle(Patient.Bundle bundle, @NonNull String id) {
@@ -90,10 +91,10 @@ public class PatientController {
   ResponseEntity<Parameters> issueVc(
       @PathVariable("id") String id,
       @Valid @RequestBody Parameters parameters,
-      @RequestHeader(value = "Authorization") String key) {
+      @RequestHeader Map<String, String> headers) {
     checkState(!StringUtils.isEmpty(id), "id is required");
     var credentialTypes = validateCredentialType(parameters);
-    Patient.Bundle patients = findPatientById(id, key);
+    Patient.Bundle patients = findPatientById(id, headers);
     Patient patient = getPatientFromBundle(patients, id);
     Immunization.Bundle immunizations = mockFhirClient.immunizationBundle(patient);
     List<MixedEntry> resources = new ArrayList<>();

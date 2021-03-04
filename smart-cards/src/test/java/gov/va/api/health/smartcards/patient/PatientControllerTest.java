@@ -11,7 +11,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import gov.va.api.health.autoconfig.configuration.JacksonConfig;
 import gov.va.api.health.r4.api.bundle.MixedBundle;
 import gov.va.api.health.r4.api.resources.Parameters;
 import gov.va.api.health.r4.api.resources.Patient;
@@ -23,7 +22,9 @@ import gov.va.api.health.smartcards.MockFhirClient;
 import gov.va.api.health.smartcards.R4MixedBundler;
 import gov.va.api.health.smartcards.vc.VerifiableCredential;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -36,6 +37,8 @@ import org.springframework.web.client.RestTemplate;
 
 public class PatientControllerTest {
   public static final ObjectMapper MAPPER = JacksonMapperConfig.createMapper();
+
+  private static final Map<String, String> HEADERS = new HashMap<>();
 
   private static long countEntriesByType(MixedBundle bundle, String type) {
     checkNotNull(bundle);
@@ -83,10 +86,14 @@ public class PatientControllerTest {
     return new PatientController(fhirClient, mockFhirClient, bundler);
   }
 
-  private PatientController createMockController(ResponseEntity<String> patientBundleResponse) {
+  private PatientController createMockController(
+      ResponseEntity<Patient.Bundle> patientBundleResponse) {
     var mockRestTemplate = mock(RestTemplate.class);
     when(mockRestTemplate.exchange(
-            anyString(), any(HttpMethod.class), any(), ArgumentMatchers.<Class<String>>any()))
+            anyString(),
+            any(HttpMethod.class),
+            any(),
+            ArgumentMatchers.<Class<Patient.Bundle>>any()))
         .thenReturn(patientBundleResponse);
     var mockFhirClient = new MockFhirClient(mock(LinkProperties.class));
     var fhirClient = new DataQueryFhirClient(mockRestTemplate, mock(LinkProperties.class));
@@ -103,9 +110,9 @@ public class PatientControllerTest {
 
   @Test
   public void issueVc() {
-    var patientBundleResponse = new ResponseEntity<String>(mockPatient("123"), HttpStatus.ACCEPTED);
+    var patientBundleResponse = new ResponseEntity<>(mockPatient("123"), HttpStatus.ACCEPTED);
     var controller = createMockController(patientBundleResponse);
-    var result = controller.issueVc("123", parametersCovid19(), "someKey").getBody();
+    var result = controller.issueVc("123", parametersCovid19(), HEADERS).getBody();
     assertNotNull(result);
     var vc = findVcFromParameters(result);
     assertThat(vc.context()).isEqualTo(List.of("https://www.w3.org/2018/credentials/v1"));
@@ -121,11 +128,11 @@ public class PatientControllerTest {
     var controller = createEmptyMockController();
     // Empty List
     assertThrows(
-        Exceptions.BadRequest.class, () -> controller.issueVc("123", parametersEmpty(), "someKey"));
+        Exceptions.BadRequest.class, () -> controller.issueVc("123", parametersEmpty(), HEADERS));
     // null List
     assertThrows(
         Exceptions.BadRequest.class,
-        () -> controller.issueVc("123", parametersEmpty().parameter(null), "someKey"));
+        () -> controller.issueVc("123", parametersEmpty().parameter(null), HEADERS));
   }
 
   @Test
@@ -133,15 +140,15 @@ public class PatientControllerTest {
     var controller = createEmptyMockController();
     assertThrows(
         Exceptions.InvalidCredentialType.class,
-        () -> controller.issueVc("123", parametersWithCredentialType("NOPE"), "someKey"));
+        () -> controller.issueVc("123", parametersWithCredentialType("NOPE"), HEADERS));
   }
 
   @Test
   public void issueVc_notFound() {
-    var patientBundleResponse = new ResponseEntity<String>(mockPatient("404"), HttpStatus.ACCEPTED);
+    var patientBundleResponse = new ResponseEntity<>(mockPatient("404"), HttpStatus.ACCEPTED);
     var controller = createMockController(patientBundleResponse);
     assertThrows(
-        Exceptions.NotFound.class, () -> controller.issueVc("404", parametersCovid19(), "someKey"));
+        Exceptions.NotFound.class, () -> controller.issueVc("404", parametersCovid19(), HEADERS));
   }
 
   @Test
@@ -153,14 +160,12 @@ public class PatientControllerTest {
             controller.issueVc(
                 "123",
                 parametersWithCredentialType("https://smarthealth.cards#immunization"),
-                "someKey"));
+                HEADERS));
   }
 
   @SneakyThrows
-  String mockPatient(String id) {
-    var mapper = JacksonConfig.createMapper();
+  Patient.Bundle mockPatient(String id) {
     var mockFhirClient = new MockFhirClient(mock(LinkProperties.class));
-    var patient = mockFhirClient.patientBundle(id, "someKey");
-    return mapper.writeValueAsString(patient);
+    return mockFhirClient.patientBundle(id, HEADERS);
   }
 }

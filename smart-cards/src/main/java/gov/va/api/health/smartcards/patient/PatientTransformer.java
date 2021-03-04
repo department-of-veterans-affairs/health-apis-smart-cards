@@ -2,8 +2,7 @@ package gov.va.api.health.smartcards.patient;
 
 import static java.util.stream.Collectors.toList;
 
-import gov.va.api.health.r4.api.bundle.AbstractEntry.Search;
-import gov.va.api.health.r4.api.bundle.AbstractEntry.SearchMode;
+import gov.va.api.health.r4.api.bundle.AbstractEntry;
 import gov.va.api.health.r4.api.bundle.MixedEntry;
 import gov.va.api.health.r4.api.datatypes.HumanName;
 import gov.va.api.health.r4.api.resources.Patient;
@@ -34,7 +33,7 @@ public class PatientTransformer {
                 .gender(entry.resource().gender())
                 .birthDate(entry.resource().birthDate())
                 .build())
-        .search(Search.builder().mode(SearchMode.match).build())
+        .search(AbstractEntry.Search.builder().mode(AbstractEntry.SearchMode.match).build())
         .build();
   }
 }

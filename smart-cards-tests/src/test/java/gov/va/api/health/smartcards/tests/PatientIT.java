@@ -83,7 +83,7 @@ public class PatientIT {
                 .collect(toList()))
         .build();
   }
-  
+
   @Test
   void read() {
     String id = systemDefinition().ids().patient();

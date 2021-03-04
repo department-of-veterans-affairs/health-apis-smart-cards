@@ -5,13 +5,16 @@ import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import gov.va.api.health.autoconfig.configuration.JacksonConfig;
 import gov.va.api.health.r4.api.bundle.MixedBundle;
 import gov.va.api.health.r4.api.resources.Parameters;
 import gov.va.api.health.r4.api.resources.Patient;
-import gov.va.api.health.r4.api.resources.Resource;
 import gov.va.api.health.smartcards.DataQueryFhirClient;
 import gov.va.api.health.smartcards.Exceptions;
 import gov.va.api.health.smartcards.JacksonMapperConfig;
@@ -24,6 +27,10 @@ import java.util.List;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.DataBinder;
 import org.springframework.web.client.RestTemplate;
 
@@ -78,8 +85,13 @@ public class PatientControllerTest {
 
   @Test
   public void issueVc() {
+    var patientBundleResponse = new ResponseEntity<String>(mockPatient("123"), HttpStatus.ACCEPTED);
+    var mockRestTemplate = mock(RestTemplate.class);
+    when(mockRestTemplate.exchange(
+            anyString(), any(HttpMethod.class), any(), ArgumentMatchers.<Class<String>>any()))
+        .thenReturn(patientBundleResponse);
     var mockFhirClient = new MockFhirClient(mock(LinkProperties.class));
-    var fhirClient = new DataQueryFhirClient(mock(RestTemplate.class), mock(LinkProperties.class));
+    var fhirClient = new DataQueryFhirClient(mockRestTemplate, mock(LinkProperties.class));
     var bundler = new R4MixedBundler();
     var controller = new PatientController(fhirClient, mockFhirClient, bundler);
     var result = controller.issueVc("123", parametersCovid19(), "someKey").getBody();
@@ -121,7 +133,12 @@ public class PatientControllerTest {
 
   @Test
   public void issueVc_notFound() {
-    var fhirClient = new DataQueryFhirClient(mock(RestTemplate.class), mock(LinkProperties.class));
+    var patientBundleResponse = new ResponseEntity<String>(mockPatient("404"), HttpStatus.ACCEPTED);
+    var mockRestTemplate = mock(RestTemplate.class);
+    when(mockRestTemplate.exchange(
+            anyString(), any(HttpMethod.class), any(), ArgumentMatchers.<Class<String>>any()))
+        .thenReturn(patientBundleResponse);
+    var fhirClient = new DataQueryFhirClient(mockRestTemplate, mock(LinkProperties.class));
     var mockFhirClient = new MockFhirClient(mock(LinkProperties.class));
     var bundler = new R4MixedBundler();
     var controller = new PatientController(fhirClient, mockFhirClient, bundler);
@@ -142,5 +159,13 @@ public class PatientControllerTest {
                 "123",
                 parametersWithCredentialType("https://smarthealth.cards#immunization"),
                 "someKey"));
+  }
+
+  @SneakyThrows
+  String mockPatient(String id) {
+    var mapper = JacksonConfig.createMapper();
+    var mockFhirClient = new MockFhirClient(mock(LinkProperties.class));
+    var patient = mockFhirClient.patientBundle(id, "someKey");
+    return mapper.writeValueAsString(patient);
   }
 }

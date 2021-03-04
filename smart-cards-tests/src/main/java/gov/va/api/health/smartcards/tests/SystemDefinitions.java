@@ -9,7 +9,6 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 class SystemDefinitions {
-
   private static Ids ids() {
     return Ids.builder().patient("1011537977V693883").patientNotFound("404").build();
   }

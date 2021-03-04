@@ -7,7 +7,6 @@ import gov.va.api.health.r4.api.resources.Immunization;
 import org.junit.jupiter.api.Test;
 
 public class LinkPropertiesTest {
-
   private static final String DQ_INTERNAL_URL = "http://dq.va.gov";
   private static final String DQ_INTERNAL_PATH = "/fhir";
 

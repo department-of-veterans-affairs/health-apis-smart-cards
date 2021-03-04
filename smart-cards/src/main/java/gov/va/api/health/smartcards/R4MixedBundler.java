@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor(onConstructor = @__({@Autowired}))
 public class R4MixedBundler {
-
   /** Bundle. */
   public MixedBundle bundle(List<MixedEntry> entries) {
     var bundle =

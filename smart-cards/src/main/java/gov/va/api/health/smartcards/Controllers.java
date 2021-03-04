@@ -8,7 +8,6 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class Controllers {
-
   /** Wrapper for Preconditions.checkState which throws a BadRequest. */
   @SneakyThrows
   public static void checkRequestState(boolean condition, @NonNull String message) {

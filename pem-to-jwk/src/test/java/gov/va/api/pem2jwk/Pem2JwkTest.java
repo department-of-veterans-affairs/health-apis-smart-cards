@@ -7,7 +7,6 @@ import java.io.FileNotFoundException;
 import org.junit.jupiter.api.Test;
 
 public class Pem2JwkTest {
-
   private String[] args(String... args) {
     return args;
   }

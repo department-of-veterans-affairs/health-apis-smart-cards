@@ -8,7 +8,6 @@ import org.apache.commons.io.FileUtils;
 
 @Slf4j
 public class Pem2Jwk {
-
   /** Main CLI entrypoint. */
   @SneakyThrows
   public static final void main(String[] args) {

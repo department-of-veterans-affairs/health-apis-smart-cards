@@ -14,7 +14,6 @@ import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 
 public class Pem2JwkConverterTest {
-
   @Test
   @SneakyThrows
   public void test() {

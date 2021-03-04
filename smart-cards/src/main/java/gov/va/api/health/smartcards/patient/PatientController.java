@@ -14,9 +14,10 @@ import gov.va.api.health.r4.api.resources.Parameters;
 import gov.va.api.health.r4.api.resources.Parameters.Parameter;
 import gov.va.api.health.r4.api.resources.Patient;
 import gov.va.api.health.r4.api.resources.Resource;
+import gov.va.api.health.smartcards.DataQueryFhirClient;
 import gov.va.api.health.smartcards.Exceptions;
-import gov.va.api.health.smartcards.FhirClient;
 import gov.va.api.health.smartcards.JacksonMapperConfig;
+import gov.va.api.health.smartcards.MockFhirClient;
 import gov.va.api.health.smartcards.R4MixedBundler;
 import gov.va.api.health.smartcards.vc.CredentialType;
 import gov.va.api.health.smartcards.vc.VerifiableCredential;
@@ -38,6 +39,7 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -56,7 +58,9 @@ public class PatientController {
           CredentialType.PRESENTATION_CONTEXT_ONLINE,
           CredentialType.PRESENTATION_CONTEXT_IN_PERSON);
 
-  private final FhirClient fhirClient;
+  private final DataQueryFhirClient fhirClient;
+
+  private final MockFhirClient mockFhirClient;
 
   R4MixedBundler bundler;
 
@@ -66,8 +70,8 @@ public class PatientController {
     bundle.entry().stream().map(transform).forEachOrdered(target::add);
   }
 
-  private Patient.Bundle findPatientById(String id) {
-    return fhirClient.patientBundle(id);
+  private Patient.Bundle findPatientById(String id, String key) {
+    return fhirClient.patientBundle(id, key);
   }
 
   private Patient getPatientFromBundle(Patient.Bundle bundle, @NonNull String id) {
@@ -86,12 +90,14 @@ public class PatientController {
   @PostMapping(value = "/{id}/$HealthWallet.issueVc")
   @SneakyThrows
   ResponseEntity<Parameters> issueVc(
-      @PathVariable("id") String id, @Valid @RequestBody Parameters parameters) {
+      @PathVariable("id") String id,
+      @Valid @RequestBody Parameters parameters,
+      @RequestHeader(value = "Authorization") String key) {
     checkState(!StringUtils.isEmpty(id), "id is required");
     var credentialTypes = validateCredentialType(parameters);
-    Patient.Bundle patients = findPatientById(id);
+    Patient.Bundle patients = findPatientById(id, key);
     Patient patient = getPatientFromBundle(patients, id);
-    Immunization.Bundle immunizations = fhirClient.immunizationBundle(patient);
+    Immunization.Bundle immunizations = mockFhirClient.immunizationBundle(patient);
     List<MixedEntry> resources = new ArrayList<>();
     consumeBundle(patients, resources, this::transform);
     consumeBundle(immunizations, resources, this::transform);

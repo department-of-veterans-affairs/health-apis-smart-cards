@@ -171,7 +171,7 @@ public class MockFhirClient implements FhirClient {
   }
 
   @Override
-  public Patient.Bundle patientBundle(String id) {
+  public Patient.Bundle patientBundle(String id, String key) {
     var patient = patient(id);
     List<Patient> patients = new ArrayList<>();
     patient.ifPresent(patients::add);

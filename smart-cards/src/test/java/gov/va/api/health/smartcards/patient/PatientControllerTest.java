@@ -12,6 +12,7 @@ import gov.va.api.health.autoconfig.configuration.JacksonConfig;
 import gov.va.api.health.r4.api.bundle.MixedBundle;
 import gov.va.api.health.r4.api.resources.Parameters;
 import gov.va.api.health.r4.api.resources.Resource;
+import gov.va.api.health.smartcards.DataQueryFhirClient;
 import gov.va.api.health.smartcards.Exceptions;
 import gov.va.api.health.smartcards.LinkProperties;
 import gov.va.api.health.smartcards.MockFhirClient;
@@ -22,6 +23,7 @@ import java.util.List;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.validation.DataBinder;
+import org.springframework.web.client.RestTemplate;
 
 public class PatientControllerTest {
   public static final ObjectMapper MAPPER =
@@ -46,16 +48,18 @@ public class PatientControllerTest {
 
   @Test
   void initDirectFieldAccess() {
-    new PatientController(mock(MockFhirClient.class), mock(R4MixedBundler.class))
+    new PatientController(
+            mock(DataQueryFhirClient.class), mock(MockFhirClient.class), mock(R4MixedBundler.class))
         .initDirectFieldAccess(mock(DataBinder.class));
   }
 
   @Test
   public void issueVc() {
-    var fhirClient = new MockFhirClient(mock(LinkProperties.class));
+    var mockFhirClient = new MockFhirClient(mock(LinkProperties.class));
+    var fhirClient = new DataQueryFhirClient(mock(RestTemplate.class), mock(LinkProperties.class));
     var bundler = new R4MixedBundler();
-    var controller = new PatientController(fhirClient, bundler);
-    var result = controller.issueVc("123", parametersCovid19()).getBody();
+    var controller = new PatientController(fhirClient, mockFhirClient, bundler);
+    var result = controller.issueVc("123", parametersCovid19(), "someKey").getBody();
     assertNotNull(result);
     var vc = findVcFromParameters(result);
     assertThat(vc.context()).isEqualTo(List.of("https://www.w3.org/2018/credentials/v1"));
@@ -68,45 +72,53 @@ public class PatientControllerTest {
 
   @Test
   public void issueVc_EmptyParameters() {
-    var fhirClient = new MockFhirClient(mock(LinkProperties.class));
+    var fhirClient = new DataQueryFhirClient(mock(RestTemplate.class), mock(LinkProperties.class));
+    var mockFhirClient = new MockFhirClient(mock(LinkProperties.class));
     var bundler = new R4MixedBundler();
-    var controller = new PatientController(fhirClient, bundler);
+    var controller = new PatientController(fhirClient, mockFhirClient, bundler);
     // Empty List
-    assertThrows(Exceptions.BadRequest.class, () -> controller.issueVc("123", parametersEmpty()));
+    assertThrows(
+        Exceptions.BadRequest.class, () -> controller.issueVc("123", parametersEmpty(), "someKey"));
     // null List
     assertThrows(
         Exceptions.BadRequest.class,
-        () -> controller.issueVc("123", parametersEmpty().parameter(null)));
+        () -> controller.issueVc("123", parametersEmpty().parameter(null), "someKey"));
   }
 
   @Test
   public void issueVc_invalidCredentialType() {
-    var fhirClient = new MockFhirClient(mock(LinkProperties.class));
+    var fhirClient = new DataQueryFhirClient(mock(RestTemplate.class), mock(LinkProperties.class));
+    var mockFhirClient = new MockFhirClient(mock(LinkProperties.class));
     var bundler = new R4MixedBundler();
-    var controller = new PatientController(fhirClient, bundler);
+    var controller = new PatientController(fhirClient, mockFhirClient, bundler);
     assertThrows(
         Exceptions.InvalidCredentialType.class,
-        () -> controller.issueVc("123", parametersWithCredentialType("NOPE")));
+        () -> controller.issueVc("123", parametersWithCredentialType("NOPE"), "someKey"));
   }
 
   @Test
   public void issueVc_notFound() {
-    var fhirClient = new MockFhirClient(mock(LinkProperties.class));
+    var fhirClient = new DataQueryFhirClient(mock(RestTemplate.class), mock(LinkProperties.class));
+    var mockFhirClient = new MockFhirClient(mock(LinkProperties.class));
     var bundler = new R4MixedBundler();
-    var controller = new PatientController(fhirClient, bundler);
-    assertThrows(Exceptions.NotFound.class, () -> controller.issueVc("404", parametersCovid19()));
+    var controller = new PatientController(fhirClient, mockFhirClient, bundler);
+    assertThrows(
+        Exceptions.NotFound.class, () -> controller.issueVc("404", parametersCovid19(), "someKey"));
   }
 
   @Test
   public void issueVc_unimplementedCredentialType() {
-    var fhirClient = new MockFhirClient(mock(LinkProperties.class));
+    var fhirClient = new DataQueryFhirClient(mock(RestTemplate.class), mock(LinkProperties.class));
+    var mockFhirClient = new MockFhirClient(mock(LinkProperties.class));
     var bundler = new R4MixedBundler();
-    var controller = new PatientController(fhirClient, bundler);
+    var controller = new PatientController(fhirClient, mockFhirClient, bundler);
     assertThrows(
         Exceptions.NotImplemented.class,
         () ->
             controller.issueVc(
-                "123", parametersWithCredentialType("https://smarthealth.cards#immunization")));
+                "123",
+                parametersWithCredentialType("https://smarthealth.cards#immunization"),
+                "someKey"));
   }
 
   private Parameters parametersCovid19() {

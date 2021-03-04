@@ -77,8 +77,8 @@
                 <argument>smart-cards.jar</argument>
                 <argument>-Dloader=gov.va.api.health.smartcards.Application</argument>
                 <argument>-Dlogging.level.root=INFO</argument>
-                <argument>-Ddata-query.internal-url=http://localhost:8090</argument>
-                <argument>-Ddata-query.r4-base-path=r4</argument>
+                <argument>-Ddata-query.internal-url=http://localhost:8777</argument>
+                <argument>-Ddata-query.r4-base-path=fhir/v0/r4</argument>
                 <argument>-Dpublic-r4-base-path=r4</argument>
                 <argument>-Dpublic-url=http://localhost:8096</argument>
                 <argument>-Dweb-exception-key=-sharktopus-v-pteracuda-</argument>

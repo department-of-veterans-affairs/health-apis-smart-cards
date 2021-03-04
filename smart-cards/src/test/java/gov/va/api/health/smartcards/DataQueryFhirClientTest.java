@@ -26,12 +26,12 @@ public class DataQueryFhirClientTest {
   @Test
   void makesRequests() {
     RestTemplate restTemplate = mock(RestTemplate.class);
-    DataQueryFhirClient dataQueryFhirClient =
-        new DataQueryFhirClient(restTemplate, "http://someUrl.com");
+    LinkProperties linkProperties = mock(LinkProperties.class);
+    DataQueryFhirClient dataQueryFhirClient = new DataQueryFhirClient(restTemplate, linkProperties);
     var response = new ResponseEntity<>(contentOf("/patient-bundle.json"), HttpStatus.OK);
     when(restTemplate.exchange(
             any(String.class), eq(HttpMethod.GET), any(HttpEntity.class), eq(String.class)))
         .thenReturn(response);
-    assertThat(dataQueryFhirClient.patientBundle("123")).isNotNull();
+    assertThat(dataQueryFhirClient.patientBundle("123", "someKey")).isNotNull();
   }
 }

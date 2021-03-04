@@ -6,5 +6,5 @@ import gov.va.api.health.r4.api.resources.Patient;
 public interface FhirClient {
   Immunization.Bundle immunizationBundle(Patient patient);
 
-  Patient.Bundle patientBundle(String id);
+  Patient.Bundle patientBundle(String id, String key);
 }

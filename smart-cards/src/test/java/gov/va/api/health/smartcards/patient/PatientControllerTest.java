@@ -76,20 +76,20 @@ public class PatientControllerTest {
         .build();
   }
 
-  private PatientController createMockController(ResponseEntity<String> patientBundleResponse) {
-    var mockRestTemplate = mock(RestTemplate.class);
-    when(mockRestTemplate.exchange(
-        anyString(), any(HttpMethod.class), any(), ArgumentMatchers.<Class<String>>any()))
-        .thenReturn(patientBundleResponse);
+  private PatientController createEmptyMockController() {
+    var fhirClient = new DataQueryFhirClient(mock(RestTemplate.class), mock(LinkProperties.class));
     var mockFhirClient = new MockFhirClient(mock(LinkProperties.class));
-    var fhirClient = new DataQueryFhirClient(mockRestTemplate, mock(LinkProperties.class));
     var bundler = new R4MixedBundler();
     return new PatientController(fhirClient, mockFhirClient, bundler);
   }
 
-  private PatientController createEmptyMockController() {
-    var fhirClient = new DataQueryFhirClient(mock(RestTemplate.class), mock(LinkProperties.class));
+  private PatientController createMockController(ResponseEntity<String> patientBundleResponse) {
+    var mockRestTemplate = mock(RestTemplate.class);
+    when(mockRestTemplate.exchange(
+            anyString(), any(HttpMethod.class), any(), ArgumentMatchers.<Class<String>>any()))
+        .thenReturn(patientBundleResponse);
     var mockFhirClient = new MockFhirClient(mock(LinkProperties.class));
+    var fhirClient = new DataQueryFhirClient(mockRestTemplate, mock(LinkProperties.class));
     var bundler = new R4MixedBundler();
     return new PatientController(fhirClient, mockFhirClient, bundler);
   }

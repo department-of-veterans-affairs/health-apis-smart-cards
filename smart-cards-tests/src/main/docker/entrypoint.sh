@@ -8,20 +8,18 @@ cd $SENTINEL_BASE_DIR
 test -n "${K8S_ENVIRONMENT}"
 test -n "${K8S_LOAD_BALANCER}"
 
-main() {
-  if [ -z "${SENTINEL_ENV:-}" ]; then SENTINEL_ENV=$K8S_ENVIRONMENT; fi
-  if [ -z "${SC_INTERNAL_URL:-}" ]; then SC_INTERNAL_URL="https://${K8S_LOAD_BALANCER}"; fi
+if [ -z "${MAGIC_ACCESS_TOKEN:-}" ]; then MAGIC_ACCESS_TOKEN="$MAGIC_ACCESS_TOKEN"; fi
+if [ -z "${SENTINEL_ENV:-}" ]; then SENTINEL_ENV="$K8S_ENVIRONMENT"; fi
+if [ -z "${SENTINEL_URL:-}" ]; then SENTINEL_URL="https://${K8S_LOAD_BALANCER}"; fi
 
-  SYSTEM_PROPERTIES="-Dsentinel=${SENTINEL_ENV} -Dsentinel.internal.url=${SC_INTERNAL_URL}"
+java-tests \
+  --module-name "smart-cards-tests" \
+  --regression-test-pattern ".*IT\$" \
+  --smoke-test-pattern ".*Smoke.*IT\$" \
+  -Daccess-token="$MAGIC_ACCESS_TOKEN" \
+  -Dsentinel="$SENTINEL_ENV" \
+  -Dsentinel.external.url="${SENTINEL_URL}" \
+  -Dsentinel.internal.url="${SENTINEL_URL}" \
+  $@
 
-  java-tests \
-    --module-name "smart-cards-tests" \
-    --regression-test-pattern ".*IT\$" \
-    --smoke-test-pattern ".*Smoke.*IT\$" \
-    $SYSTEM_PROPERTIES \
-    $@
-
-  exit $?
-}
-
-main $@
+exit $?

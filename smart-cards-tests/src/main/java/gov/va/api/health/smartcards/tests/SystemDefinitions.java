@@ -19,6 +19,8 @@ class SystemDefinitions {
         .internal(
             serviceDefinition(
                 "internal", "https://blue.lab.lighthouse.va.gov", 443, "/smart-cards/"))
+        .external(
+            serviceDefinition("external", "https://blue.lab.lighthouse.va.gov", 443, "/fhir/v0/"))
         .ids(ids())
         .build();
   }
@@ -26,6 +28,7 @@ class SystemDefinitions {
   private static SystemDefinition local() {
     return SystemDefinition.builder()
         .internal(serviceDefinition("internal", "http://localhost", 8096, "/"))
+        .external(serviceDefinition("external", "http://localhost", 8096, "/"))
         .ids(ids())
         .build();
   }
@@ -35,6 +38,9 @@ class SystemDefinitions {
         .internal(
             serviceDefinition(
                 "internal", "https://blue.production.lighthouse.va.gov", 443, "/smart-cards/"))
+        .external(
+            serviceDefinition(
+                "external", "https://blue.production.lighthouse.va.gov", 443, "/smart-cards/"))
         .ids(ids())
         .build();
   }
@@ -44,6 +50,8 @@ class SystemDefinitions {
         .internal(
             serviceDefinition(
                 "internal", "https://blue.qa.lighthouse.va.gov", 443, "/smart-cards/"))
+        .external(
+            serviceDefinition("external", "https://blue.qa.lighthouse.va.gov", 443, "/fhir/v0/"))
         .ids(ids())
         .build();
   }
@@ -61,6 +69,9 @@ class SystemDefinitions {
         .internal(
             serviceDefinition(
                 "internal", "https://blue.staging.lighthouse.va.gov", 443, "/smart-cards/"))
+        .external(
+            serviceDefinition(
+                "external", "https://blue.staging.lighthouse.va.gov", 443, "/fhir/v0/"))
         .ids(ids())
         .build();
   }
@@ -70,6 +81,9 @@ class SystemDefinitions {
         .internal(
             serviceDefinition(
                 "internal", "https://blue.staging-lab.lighthouse.va.gov", 443, "/smart-cards/"))
+        .external(
+            serviceDefinition(
+                "external", "https://blue.staging-lab.lighthouse.va.gov", 443, "/fhir/v0/"))
         .ids(ids())
         .build();
   }
@@ -128,6 +142,8 @@ class SystemDefinitions {
   @Builder
   static final class SystemDefinition {
     @NonNull Service internal;
+
+    @NonNull Service external;
 
     @NonNull Ids ids;
   }

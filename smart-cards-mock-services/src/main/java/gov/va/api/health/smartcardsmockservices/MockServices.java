@@ -34,6 +34,16 @@ public class MockServices {
     return new Header("Content-Type", "application/json");
   }
 
+  @SneakyThrows
+  private static String contentOf(String resource) {
+    log.info("Loading resource {}", resource);
+    return Resources.toString(MockServices.class.getResource(resource), StandardCharsets.UTF_8);
+  }
+
+  private static Header contentTextPlain() {
+    return new Header("Content-Type", "text/plain");
+  }
+
   private void addHelp(MockServerClient mock) {
     mock.when(request().withPath("/help"))
         .respond(
@@ -72,18 +82,7 @@ public class MockServices {
     return request;
   }
 
-  @SneakyThrows
-  private String contentOf(String resource) {
-    log.info("Loading resource {}", resource);
-    return Resources.toString(MockServices.class.getResource(resource), StandardCharsets.UTF_8);
-  }
-
-  private Header contentTextPlain() {
-    return new Header("Content-Type", "text/plain");
-  }
-
-  /** Inits server. */
-  public void start() {
+  void start() {
     checkState(ms == null, "Mock Services have already been started");
     log.info("Starting mock services on port {}", options.getPort());
     ms = new MockServer(options.getPort());

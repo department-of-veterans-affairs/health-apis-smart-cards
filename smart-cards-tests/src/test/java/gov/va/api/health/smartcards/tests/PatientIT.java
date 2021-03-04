@@ -1,6 +1,7 @@
 package gov.va.api.health.smartcards.tests;
 
 import static gov.va.api.health.sentinel.EnvironmentAssumptions.assumeEnvironmentIn;
+import static gov.va.api.health.sentinel.EnvironmentAssumptions.assumeEnvironmentNotIn;
 import static gov.va.api.health.sentinel.ExpectedResponse.logAllWithTruncatedBody;
 import static gov.va.api.health.smartcards.tests.SystemDefinitions.systemDefinition;
 import static java.util.stream.Collectors.toList;
@@ -8,6 +9,7 @@ import static java.util.stream.Collectors.toList;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.va.api.health.autoconfig.configuration.JacksonConfig;
 import gov.va.api.health.r4.api.resources.Parameters;
+import gov.va.api.health.r4.api.resources.Resource;
 import gov.va.api.health.sentinel.Environment;
 import gov.va.api.health.sentinel.ExpectedResponse;
 import io.restassured.RestAssured;
@@ -21,7 +23,8 @@ import org.junit.jupiter.api.Test;
 
 @Slf4j
 public class PatientIT {
-  private static final ObjectMapper MAPPER = JacksonConfig.createMapper();
+  private static final ObjectMapper MAPPER =
+      JacksonConfig.createMapper().registerModule(new Resource.ResourceModule());
 
   private static final String ACCESS_TOKEN = System.getProperty("access-token", "unset");
 
@@ -37,8 +40,11 @@ public class PatientIT {
 
   @SneakyThrows
   private static ExpectedResponse doPost(
-      String request, Object payload, String description, Integer expectedStatus) {
-    SystemDefinitions.Service svc = systemDefinition().internal();
+      SystemDefinitions.Service svc,
+      String request,
+      Object payload,
+      String description,
+      Integer expectedStatus) {
     RequestSpecification spec =
         RestAssured.given()
             .baseUri(svc.url())
@@ -49,7 +55,7 @@ public class PatientIT {
             .body(MAPPER.writeValueAsString(payload));
     log.info(
         "Expect {} POST '{}' is status code ({})",
-        svc.apiPath() + request,
+        svc.urlWithApiPath() + request,
         description,
         expectedStatus);
     ExpectedResponse response =
@@ -61,15 +67,15 @@ public class PatientIT {
     return response;
   }
 
-  private Parameters parametersCovid19() {
+  private static Parameters parametersCovid19() {
     return parametersWithCredentialType("https://smarthealth.cards#covid19");
   }
 
-  private Parameters parametersEmpty() {
+  private static Parameters parametersEmpty() {
     return Parameters.builder().build();
   }
 
-  private Parameters parametersWithCredentialType(String... credentialType) {
+  private static Parameters parametersWithCredentialType(String... credentialType) {
     return Parameters.builder()
         .parameter(
             Arrays.stream(credentialType)
@@ -82,6 +88,7 @@ public class PatientIT {
   void read() {
     String id = systemDefinition().ids().patient();
     doPost(
+        systemDefinition().internal(),
         String.format("r4/Patient/%s/$HealthWallet.issueVc", id),
         parametersCovid19(),
         "issuevc",
@@ -89,22 +96,74 @@ public class PatientIT {
   }
 
   @Test
-  void read_invalidParameters() {
+  void read_externalDstu2() {
+    assumeEnvironmentNotIn(Environment.LOCAL);
+    String id = systemDefinition().ids().patient();
+    doPost(
+        systemDefinition().external(),
+        String.format("dstu2/Patient/%s/$HealthWallet.issueVc", id),
+        parametersCovid19(),
+        "issuevc",
+        200);
+  }
+
+  @Test
+  void read_externalR4() {
+    assumeEnvironmentNotIn(Environment.LOCAL);
+    String id = systemDefinition().ids().patient();
+    doPost(
+        systemDefinition().external(),
+        String.format("r4/Patient/%s/$HealthWallet.issueVc", id),
+        parametersCovid19(),
+        "issuevc",
+        200);
+  }
+
+  @Test
+  void read_invalid_badCredentialType() {
     String id = systemDefinition().ids().patient();
     String path = String.format("r4/Patient/%s/$HealthWallet.issueVc", id);
-    // Empty body
-    doPost(path, null, "issueVc(invalid, empty body)", 400);
-    // Bad body schema
-    doPost(path, "{\"foo\": \"bar\"}", "issueVc (invalid, bad payload schema)", 400);
-    doPost(path, "NOPE", "issueVc (invalid, bad payload schema)", 400);
-    // Parameters object without any parameters
-    doPost(path, parametersEmpty(), "issueVc (invalid, no parameters)", 400);
-    // Parameters object with invalid credentialType
+    var svc = systemDefinition().internal();
     doPost(
-        path, parametersWithCredentialType("NOPE"), "issueVc (invalid, bad credentialType)", 400);
+        svc,
+        path,
+        parametersWithCredentialType("NOPE"),
+        "issueVc (invalid, bad credentialType)",
+        400);
+  }
 
-    // Parameters object with unimplemented credentialType (immunization)
+  @Test
+  void read_invalid_bodySchema() {
+    String id = systemDefinition().ids().patient();
+    String path = String.format("r4/Patient/%s/$HealthWallet.issueVc", id);
+    var svc = systemDefinition().internal();
+    doPost(svc, path, "{\"foo\":\"bar\"}", "issueVc (invalid, bad payload schema)", 400);
+    doPost(svc, path, "NOPE", "issueVc (invalid, bad payload schema)", 400);
+  }
+
+  @Test
+  void read_invalid_emptyBody() {
+    String id = systemDefinition().ids().patient();
+    String path = String.format("r4/Patient/%s/$HealthWallet.issueVc", id);
+    var svc = systemDefinition().internal();
+    doPost(svc, path, null, "issueVc(invalid, empty body)", 400);
+  }
+
+  @Test
+  void read_invalid_parametersEmpty() {
+    String id = systemDefinition().ids().patient();
+    String path = String.format("r4/Patient/%s/$HealthWallet.issueVc", id);
+    var svc = systemDefinition().internal();
+    doPost(svc, path, parametersEmpty(), "issueVc (invalid, no parameters)", 400);
+  }
+
+  @Test
+  void read_invalid_unimplementedCredentialType() {
+    String id = systemDefinition().ids().patient();
+    String path = String.format("r4/Patient/%s/$HealthWallet.issueVc", id);
+    var svc = systemDefinition().internal();
     doPost(
+        svc,
         path,
         parametersWithCredentialType(
             "https://smarthealth.cards#covid19", "https://smarthealth.cards#immunization"),
@@ -116,6 +175,7 @@ public class PatientIT {
   void read_notFound() {
     String id = systemDefinition().ids().patientNotFound();
     doPost(
+        systemDefinition().internal(),
         String.format("r4/Patient/%s/$HealthWallet.issueVc", id),
         parametersCovid19(),
         "issuevc (not found)",

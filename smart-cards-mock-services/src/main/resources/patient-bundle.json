@@ -5,20 +5,20 @@
   "link" : [
     {
       "relation" : "first",
-      "url" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Patient?_id=1011537977V693883&_count=30&page=1"
+      "url" : "http://localhost:8777/fhir/v0/r4/Patient?_id=1011537977V693883&_count=30&page=1"
     },
     {
       "relation" : "self",
-      "url" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Patient?_id=1011537977V693883&_count=30&page=1"
+      "url" : "http://localhost:8777/fhir/v0/r4/Patient?_id=1011537977V693883&_count=30&page=1"
     },
     {
       "relation" : "last",
-      "url" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Patient?_id=1011537977V693883&_count=30&page=1"
+      "url" : "http://localhost:8777/fhir/v0/r4/Patient?_id=1011537977V693883&_count=30&page=1"
     }
   ],
   "entry" : [
     {
-      "fullUrl" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Patient/1011537977V693883",
+      "fullUrl" : "http://localhost:8777/fhir/v0/r4/Patient/1011537977V693883",
       "resource" : {
         "resourceType" : "Patient",
         "id" : "1011537977V693883",
@@ -203,7 +203,7 @@
           }
         ],
         "managingOrganization" : {
-          "reference" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Organization/I2-7AIBT772ETHNWMLGPQDB42KKHPYJJ67K55YZVB6KAF66GGU44UFQ0000"
+          "reference" : "http://localhost:8777/fhir/v0/r4/Organization/I2-7AIBT772ETHNWMLGPQDB42KKHPYJJ67K55YZVB6KAF66GGU44UFQ0000"
         }
       },
       "search" : {

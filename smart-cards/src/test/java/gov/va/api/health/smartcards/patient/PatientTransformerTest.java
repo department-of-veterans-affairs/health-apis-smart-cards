@@ -2,47 +2,26 @@ package gov.va.api.health.smartcards.patient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import gov.va.api.health.r4.api.bundle.AbstractEntry.Search;
-import gov.va.api.health.r4.api.bundle.AbstractEntry.SearchMode;
+import gov.va.api.health.r4.api.bundle.AbstractEntry;
 import gov.va.api.health.r4.api.bundle.MixedEntry;
 import gov.va.api.health.r4.api.datatypes.CodeableConcept;
 import gov.va.api.health.r4.api.datatypes.Coding;
 import gov.va.api.health.r4.api.datatypes.HumanName;
-import gov.va.api.health.r4.api.datatypes.HumanName.NameUse;
 import gov.va.api.health.r4.api.datatypes.Identifier;
-import gov.va.api.health.r4.api.datatypes.Identifier.IdentifierUse;
 import gov.va.api.health.r4.api.elements.Reference;
 import gov.va.api.health.r4.api.resources.Patient;
-import gov.va.api.health.r4.api.resources.Patient.Gender;
 import java.util.List;
 import javax.validation.Validation;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 public class PatientTransformerTest {
-  @Test
-  public void basic() {
-    var patient = patient();
-    var transformed = PatientTransformer.builder().entry(patient).build().transform();
-    assertThat(transformed)
-        .isEqualTo(
-            MixedEntry.builder()
-                .fullUrl("http://example.com/r4/Patient/x")
-                .resource(
-                    Patient.builder()
-                        .resourceType("Patient")
-                        .name(
-                            List.of(
-                                HumanName.builder().family("Doe").given(List.of("Joe")).build()))
-                        .gender(Gender.unknown)
-                        .birthDate("1955-01-01")
-                        .build())
-                .search(Search.builder().mode(SearchMode.match).build())
-                .build());
-    assertThat(Validation.buildDefaultValidatorFactory().getValidator().validate(transformed))
-        .isEmpty();
+  @BeforeAll
+  static void init() {
+    Patient.IDENTIFIER_MIN_SIZE.set(0);
   }
 
-  Identifier mpi(String id) {
+  static Identifier mpi(String id) {
     return Identifier.builder()
         .use(Identifier.IdentifierUse.usual)
         .type(
@@ -57,7 +36,7 @@ public class PatientTransformerTest {
         .build();
   }
 
-  Patient.Entry patient() {
+  static Patient.Entry patient() {
     String firstName = "Joe";
     String lastName = "Doe";
     return Patient.Entry.builder()
@@ -68,20 +47,44 @@ public class PatientTransformerTest {
                 .id("x")
                 .identifier(
                     List.of(
-                        Identifier.builder().use(IdentifierUse.temp).value("x").build(), mpi("x")))
+                        Identifier.builder().use(Identifier.IdentifierUse.temp).value("x").build(),
+                        mpi("x")))
                 .active(true)
                 .name(
                     List.of(
                         HumanName.builder()
-                            .use(NameUse.anonymous)
+                            .use(HumanName.NameUse.anonymous)
                             .text(String.format("%s %s", firstName, lastName))
                             .family(lastName)
                             .given(List.of(firstName))
                             .build()))
-                .gender(Gender.unknown)
+                .gender(Patient.Gender.unknown)
                 .birthDate("1955-01-01")
                 .deceasedBoolean(false)
                 .build())
         .build();
+  }
+
+  @Test
+  void basic() {
+    var patient = patient();
+    var transformed = PatientTransformer.builder().entry(patient).build().transform();
+    assertThat(transformed)
+        .isEqualTo(
+            MixedEntry.builder()
+                .fullUrl("http://example.com/r4/Patient/x")
+                .resource(
+                    Patient.builder()
+                        .resourceType("Patient")
+                        .name(
+                            List.of(
+                                HumanName.builder().family("Doe").given(List.of("Joe")).build()))
+                        .gender(Patient.Gender.unknown)
+                        .birthDate("1955-01-01")
+                        .build())
+                .search(AbstractEntry.Search.builder().mode(AbstractEntry.SearchMode.match).build())
+                .build());
+    assertThat(Validation.buildDefaultValidatorFactory().getValidator().validate(transformed))
+        .isEmpty();
   }
 }

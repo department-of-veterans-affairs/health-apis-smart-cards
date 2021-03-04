@@ -55,7 +55,7 @@ public class PatientIT {
             .body(MAPPER.writeValueAsString(payload));
     log.info(
         "Expect {} POST '{}' is status code ({})",
-        svc.apiPath() + request,
+        svc.urlWithApiPath() + request,
         description,
         expectedStatus);
     ExpectedResponse response =

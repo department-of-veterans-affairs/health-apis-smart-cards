@@ -12,7 +12,6 @@ import gov.va.api.health.r4.api.bundle.MixedEntry;
 import gov.va.api.health.r4.api.resources.Immunization;
 import gov.va.api.health.r4.api.resources.Immunization.Status;
 import gov.va.api.health.r4.api.resources.Parameters;
-import gov.va.api.health.r4.api.resources.Parameters.Parameter;
 import gov.va.api.health.r4.api.resources.Patient;
 import gov.va.api.health.r4.api.resources.Resource;
 import gov.va.api.health.smartcards.Exceptions;
@@ -21,7 +20,6 @@ import gov.va.api.health.smartcards.MockFhirClient;
 import gov.va.api.health.smartcards.R4MixedBundler;
 import gov.va.api.health.smartcards.vc.CredentialType;
 import gov.va.api.health.smartcards.vc.VerifiableCredential;
-import gov.va.api.health.smartcards.vc.VerifiableCredential.CredentialSubject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -76,10 +74,6 @@ public class PatientController {
     return entry.resource().status() == Status.completed;
   }
 
-  private Patient.Bundle findPatientById(String id) {
-    return mockFhirClient.patientBundle(id);
-  }
-
   private Patient getPatientFromBundle(Patient.Bundle bundle, @NonNull String id) {
     var entry = bundle.entry().stream().filter(t -> id.equals(t.resource().id())).findFirst();
     if (entry.isPresent()) {
@@ -93,13 +87,13 @@ public class PatientController {
     dataBinder.initDirectFieldAccess();
   }
 
-  @PostMapping(value = "/{id}/$HealthWallet.issueVc")
   @SneakyThrows
+  @PostMapping(value = "/{id}/$HealthWallet.issueVc")
   ResponseEntity<Parameters> issueVc(
       @PathVariable("id") String id, @Valid @RequestBody Parameters parameters) {
     checkState(!StringUtils.isEmpty(id), "id is required");
     var credentialTypes = validateCredentialType(parameters);
-    Patient.Bundle patients = findPatientById(id);
+    Patient.Bundle patients = mockFhirClient.patientBundle(id);
     Patient patient = getPatientFromBundle(patients, id);
     Immunization.Bundle immunizations = mockFhirClient.immunizationBundle(patient);
     List<MixedEntry> resources = new ArrayList<>();
@@ -140,7 +134,7 @@ public class PatientController {
     var params =
         parameters.parameter().stream()
             .filter(p -> "credentialType".equals(p.name()))
-            .map(Parameter::valueUri)
+            .map(Parameters.Parameter::valueUri)
             .map(CredentialType::fromUri)
             .collect(toList());
     if (params.isEmpty()) {
@@ -166,7 +160,8 @@ public class PatientController {
                     Stream.of("VerifiableCredential"),
                     credentialTypes.stream().map(CredentialType::getUri))
                 .collect(toList()))
-        .credentialSubject(CredentialSubject.builder().fhirBundle(bundle).build())
+        .credentialSubject(
+            VerifiableCredential.CredentialSubject.builder().fhirBundle(bundle).build())
         .build();
   }
 }

@@ -9,6 +9,7 @@ import static java.util.stream.Collectors.toList;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.va.api.health.autoconfig.configuration.JacksonConfig;
 import gov.va.api.health.r4.api.resources.Parameters;
+import gov.va.api.health.r4.api.resources.Resource;
 import gov.va.api.health.sentinel.Environment;
 import gov.va.api.health.sentinel.ExpectedResponse;
 import io.restassured.RestAssured;
@@ -22,7 +23,8 @@ import org.junit.jupiter.api.Test;
 
 @Slf4j
 public class PatientIT {
-  private static final ObjectMapper MAPPER = JacksonConfig.createMapper();
+  private static final ObjectMapper MAPPER =
+      JacksonConfig.createMapper().registerModule(new Resource.ResourceModule());
 
   private static final String ACCESS_TOKEN = System.getProperty("access-token", "unset");
 

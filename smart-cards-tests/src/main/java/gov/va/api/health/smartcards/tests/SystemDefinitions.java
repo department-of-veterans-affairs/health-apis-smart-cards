@@ -27,7 +27,7 @@ class SystemDefinitions {
 
   private static SystemDefinition local() {
     return SystemDefinition.builder()
-        .internal(serviceDefinition("internal", "http://localhost", 8096, "/"))
+        .internal(serviceDefinition("internal", "http://localhost", 8090, "/"))
         .external(serviceDefinition("external", "http://localhost", 8096, "/"))
         .ids(ids())
         .build();

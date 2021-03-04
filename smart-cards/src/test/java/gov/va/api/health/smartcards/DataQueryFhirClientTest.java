@@ -19,8 +19,9 @@ import org.springframework.web.client.RestTemplate;
 public class DataQueryFhirClientTest {
 
   @SneakyThrows
-  private String contentOf(String resource) {
-    return Resources.toString(getClass().getResource(resource), StandardCharsets.UTF_8);
+  public static String contentOf(String resource) {
+    return Resources.toString(
+        DataQueryFhirClientTest.class.getResource(resource), StandardCharsets.UTF_8);
   }
 
   @Test

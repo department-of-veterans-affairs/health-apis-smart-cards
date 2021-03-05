@@ -21,8 +21,8 @@ import org.mockserver.netty.MockServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@Component
 @Slf4j
+@Component
 public class MockServices {
   private final List<String> supportedQueries = new ArrayList<>();
 

@@ -19,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 public class DataQueryFhirClientTest {
-
   @Test
   void makesBadRequest() {
     RestTemplate restTemplate = mock(RestTemplate.class);

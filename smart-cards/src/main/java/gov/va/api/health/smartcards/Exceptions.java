@@ -4,7 +4,6 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class Exceptions {
-
   public static final class BadRequest extends RuntimeException {
     public BadRequest(String message) {
       super(message);

@@ -15,7 +15,6 @@ import org.springframework.web.client.RestTemplate;
 @AllArgsConstructor(onConstructor_ = @Autowired)
 @Component
 public class DataQueryFhirClient implements FhirClient {
-
   RestTemplate restTemplate;
 
   LinkProperties linkProperties;

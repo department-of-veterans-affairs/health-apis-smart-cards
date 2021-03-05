@@ -41,6 +41,7 @@ public class DataQueryFhirClientTest {
     when(restTemplate.exchange(
             any(String.class), eq(HttpMethod.GET), any(HttpEntity.class), eq(Patient.Bundle.class)))
         .thenReturn(response);
-    assertThat(dataQueryFhirClient.patientBundle("123", new HashMap<String, String>())).isNotNull();
+    assertThat(dataQueryFhirClient.patientBundle("123", new HashMap<String, String>()))
+        .isEqualTo(Patient.Bundle.builder().build());
   }
 }

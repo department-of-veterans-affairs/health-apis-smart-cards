@@ -27,8 +27,7 @@ public class DataQueryFhirClient implements FhirClient {
 
   @Override
   @SneakyThrows
-  public Patient.Bundle patientBundle(
-      String icn, Map<String, String> headers) {
+  public Patient.Bundle patientBundle(String icn, Map<String, String> headers) {
     var dqHeaders = new HttpHeaders();
     headers.forEach(dqHeaders::set);
     var entity = new HttpEntity<>(dqHeaders);

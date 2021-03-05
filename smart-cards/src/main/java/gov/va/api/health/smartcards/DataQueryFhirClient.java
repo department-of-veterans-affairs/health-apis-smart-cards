@@ -29,7 +29,8 @@ public class DataQueryFhirClient implements FhirClient {
   @SneakyThrows
   public Patient.Bundle patientBundle(String icn, Map<String, String> headers) {
     var dqHeaders = new HttpHeaders();
-    headers.forEach(dqHeaders::set);
+    dqHeaders.set("Authorization", headers.get("Authorization"));
+    dqHeaders.set("accept", "application/json");
     var entity = new HttpEntity<>(dqHeaders);
     String url = String.format("%s?_id=%s", linkProperties.dataQueryR4ResourceUrl("Patient"), icn);
     var returnedValue = restTemplate.exchange(url, HttpMethod.GET, entity, Patient.Bundle.class);

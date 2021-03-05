@@ -62,9 +62,9 @@ public class PatientControllerTest {
     Patient.IDENTIFIER_MIN_SIZE.set(0);
   }
 
-  static Patient.Bundle mockPatient(String id) {
+  static Patient.Bundle mockPatient(String icn) {
     var mockFhirClient = new MockFhirClient(mock(LinkProperties.class));
-    return mockFhirClient.patientBundle(id, HEADERS);
+    return mockFhirClient.patientBundle(icn, HEADERS);
   }
 
   private static Parameters parametersCovid19() {

@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 public class MockServices {
   private final List<String> supportedQueries = new ArrayList<>();
 
-  @Autowired MockServicesOptions options;
+  @Autowired private MockServicesOptions options;
 
   private MockServer ms;
 

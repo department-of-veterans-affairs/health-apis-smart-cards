@@ -68,10 +68,6 @@ public class PatientController {
     bundle.entry().stream().map(transform).forEachOrdered(target::add);
   }
 
-  private Patient.Bundle findPatientById(String id, String key) {
-    return fhirClient.patientBundle(id, key);
-  }
-
   private Patient getPatientFromBundle(Patient.Bundle bundle, @NonNull String id) {
     var entry = bundle.entry().stream().filter(t -> id.equals(t.resource().id())).findFirst();
     if (entry.isPresent()) {
@@ -93,7 +89,7 @@ public class PatientController {
       @RequestHeader(value = "Authorization") String key) {
     checkState(!StringUtils.isEmpty(id), "id is required");
     var credentialTypes = validateCredentialType(parameters);
-    Patient.Bundle patients = findPatientById(id, key);
+    Patient.Bundle patients = fhirClient.patientBundle(id, key);
     Patient patient = getPatientFromBundle(patients, id);
     Immunization.Bundle immunizations = mockFhirClient.immunizationBundle(patient);
     List<MixedEntry> resources = new ArrayList<>();

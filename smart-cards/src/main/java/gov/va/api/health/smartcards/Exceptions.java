@@ -5,12 +5,6 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class Exceptions {
 
-  public static final class FhirClientConnectionFailure extends RuntimeException {
-    public FhirClientConnectionFailure(String message) {
-      super(message);
-    }
-  }
-
   public static final class BadRequest extends RuntimeException {
     public BadRequest(String message) {
       super(message);
@@ -18,6 +12,12 @@ public class Exceptions {
 
     public BadRequest(String message, Throwable cause) {
       super(message, cause);
+    }
+  }
+
+  public static final class FhirClientConnectionFailure extends RuntimeException {
+    public FhirClientConnectionFailure(String message) {
+      super(message);
     }
   }
 

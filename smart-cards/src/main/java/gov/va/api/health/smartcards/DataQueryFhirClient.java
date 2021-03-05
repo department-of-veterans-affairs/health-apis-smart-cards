@@ -22,24 +22,18 @@ import org.springframework.web.client.RestTemplate;
 @AllArgsConstructor
 @Component
 public class DataQueryFhirClient implements FhirClient {
-  @NonNull @Autowired RestTemplate restTemplate;
+  @Autowired RestTemplate restTemplate;
 
-  @NonNull @Autowired LinkProperties linkProperties;
+  @Autowired LinkProperties linkProperties;
 
   @Override
   public Immunization.Bundle immunizationBundle(Patient patient) {
     return null;
   }
 
-  @InitBinder
-  void initDirectFieldAccess(DataBinder dataBinder) {
-    dataBinder.initDirectFieldAccess();
-  }
-
-  /** Makes patient request to DQ. */
   @Override
   @SneakyThrows
-  public Patient.Bundle patientBundle(String id, String key) { // receive access token?
+  public Patient.Bundle patientBundle(String icn, String key) {
     if (key == null) {
       key = System.getProperty("access-token", "unset");
     }
@@ -48,13 +42,17 @@ public class DataQueryFhirClient implements FhirClient {
     headers.set("Authorization", key);
     var entity = new HttpEntity<>(null, headers);
 
-    String url = String.format("%s?_id=%s", linkProperties.dataQueryR4ResourceUrl("Patient"), id);
+    String url = String.format("%s?_id=%s", linkProperties.dataQueryR4ResourceUrl("Patient"), icn);
 
     var returnedValue = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
     log.info("STATUS CODE: {}", returnedValue.getStatusCode());
     if (!returnedValue.getStatusCode().is2xxSuccessful()) {
       throw new Exceptions.FhirClientConnectionFailure(
-          "Data Query Status Code is " + returnedValue.getStatusCode());
+          String.format(
+              "Data Query Status Code is %s\nData Query Body: %s",
+              returnedValue.getStatusCode(),
+              returnedValue.getBody())
+      );
     }
     ObjectMapper mapper = JacksonMapperConfig.createMapper();
     Patient.Bundle bundle = mapper.readValue(returnedValue.getBody(), Patient.Bundle.class);

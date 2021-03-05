@@ -23,6 +23,12 @@
     </dependency>
     <dependency>
       <groupId>gov.va.api.health</groupId>
+      <artifactId>smart-cards-mock-services</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>gov.va.api.health</groupId>
       <artifactId>sentinel</artifactId>
       <version>${project.parent.version}</version>
     </dependency>
@@ -30,12 +36,6 @@
       <groupId>gov.va.api.health</groupId>
       <artifactId>us-core-r4</artifactId>
       <version>${fhir-resources.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>gov.va.api.health</groupId>
-      <artifactId>smart-cards-mock-services</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>
@@ -96,6 +96,7 @@
               <healthcheckUrl>http://localhost:8096/actuator/health</healthcheckUrl>
               <skip>${sentinel.skipLaunch}</skip>
               <processLogFile>${project.build.directory}/smart-cards.log</processLogFile>
+              <waitAfterLaunch>60</waitAfterLaunch>
               <arguments>
                 <argument>java</argument>
                 <argument>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5090</argument>

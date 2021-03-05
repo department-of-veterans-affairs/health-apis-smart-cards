@@ -15,6 +15,7 @@ import gov.va.api.health.r4.api.resources.Immunization;
 import gov.va.api.health.r4.api.resources.Patient;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -171,7 +172,7 @@ public class MockFhirClient implements FhirClient {
   }
 
   @Override
-  public Patient.Bundle patientBundle(String id, String key) {
+  public Patient.Bundle patientBundle(String id, Map<String, String> headers) {
     var patient = patient(id);
     List<Patient> patients = new ArrayList<>();
     patient.ifPresent(patients::add);

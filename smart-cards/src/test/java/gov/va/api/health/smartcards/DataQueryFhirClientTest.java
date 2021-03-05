@@ -7,7 +7,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.common.io.Resources;
+import gov.va.api.health.autoconfig.configuration.JacksonConfig;
+import gov.va.api.health.r4.api.resources.Patient;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpEntity;
@@ -25,14 +28,19 @@ public class DataQueryFhirClientTest {
   }
 
   @Test
+  @SneakyThrows
   void makesRequests() {
+    var mapper = JacksonConfig.createMapper();
     RestTemplate restTemplate = mock(RestTemplate.class);
     LinkProperties linkProperties = mock(LinkProperties.class);
     DataQueryFhirClient dataQueryFhirClient = new DataQueryFhirClient(restTemplate, linkProperties);
-    var response = new ResponseEntity<>(contentOf("/patient-bundle.json"), HttpStatus.OK);
+    var response =
+        new ResponseEntity<>(
+            mapper.readValue(contentOf("/patient-bundle.json"), Patient.Bundle.class),
+            HttpStatus.OK);
     when(restTemplate.exchange(
-            any(String.class), eq(HttpMethod.GET), any(HttpEntity.class), eq(String.class)))
+            any(String.class), eq(HttpMethod.GET), any(HttpEntity.class), eq(Patient.Bundle.class)))
         .thenReturn(response);
-    assertThat(dataQueryFhirClient.patientBundle("123", "someKey")).isNotNull();
+    assertThat(dataQueryFhirClient.patientBundle("123", new HashMap<String, String>())).isNotNull();
   }
 }

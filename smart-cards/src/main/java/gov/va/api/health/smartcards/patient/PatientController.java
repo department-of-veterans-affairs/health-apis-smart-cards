@@ -22,6 +22,7 @@ import gov.va.api.health.smartcards.vc.CredentialType;
 import gov.va.api.health.smartcards.vc.VerifiableCredential;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import javax.validation.Valid;
@@ -86,10 +87,10 @@ public class PatientController {
   ResponseEntity<Parameters> issueVc(
       @PathVariable("id") String id,
       @Valid @RequestBody Parameters parameters,
-      @RequestHeader(value = "Authorization") String key) {
+      @RequestHeader Map<String, String> headers) {
     checkState(!StringUtils.isEmpty(id), "id is required");
     var credentialTypes = validateCredentialType(parameters);
-    Patient.Bundle patients = fhirClient.patientBundle(id, key);
+    Patient.Bundle patients = fhirClient.patientBundle(id, headers);
     Patient patient = getPatientFromBundle(patients, id);
     Immunization.Bundle immunizations = mockFhirClient.immunizationBundle(patient);
     List<MixedEntry> resources = new ArrayList<>();

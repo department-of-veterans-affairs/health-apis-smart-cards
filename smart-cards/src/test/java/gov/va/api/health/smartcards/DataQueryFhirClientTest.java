@@ -7,7 +7,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.common.io.Resources;
-import gov.va.api.health.autoconfig.configuration.JacksonConfig;
 import gov.va.api.health.r4.api.resources.Patient;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -27,17 +26,17 @@ public class DataQueryFhirClientTest {
         DataQueryFhirClientTest.class.getResource(resource), StandardCharsets.UTF_8);
   }
 
+  // mapper.writeValueAsString(Patient.Bundle.builder().build()),
+  // mapper.readValue(contentOf("/patient-bundle.json"), Patient.Bundle.class)
+
   @Test
   @SneakyThrows
   void makesRequests() {
-    var mapper = JacksonConfig.createMapper();
+    //    var mapper = JacksonMapperConfig.createMapper();
     RestTemplate restTemplate = mock(RestTemplate.class);
     LinkProperties linkProperties = mock(LinkProperties.class);
     DataQueryFhirClient dataQueryFhirClient = new DataQueryFhirClient(restTemplate, linkProperties);
-    var response =
-        new ResponseEntity<>(
-            mapper.readValue(contentOf("/patient-bundle.json"), Patient.Bundle.class),
-            HttpStatus.OK);
+    var response = new ResponseEntity<>(Patient.Bundle.builder().build(), HttpStatus.OK);
     when(restTemplate.exchange(
             any(String.class), eq(HttpMethod.GET), any(HttpEntity.class), eq(Patient.Bundle.class)))
         .thenReturn(response);

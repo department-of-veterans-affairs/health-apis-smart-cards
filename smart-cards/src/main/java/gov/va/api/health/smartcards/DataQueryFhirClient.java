@@ -4,15 +4,12 @@ import gov.va.api.health.r4.api.resources.Immunization;
 import gov.va.api.health.r4.api.resources.Patient;
 import java.util.Map;
 import lombok.AllArgsConstructor;
-import lombok.NonNull;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
-import org.springframework.validation.DataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.client.RestTemplate;
 
 @AllArgsConstructor(onConstructor_ = @Autowired)
@@ -34,16 +31,14 @@ public class DataQueryFhirClient implements FhirClient {
       String icn, Map<String, String> headers) { // receive access token?
     var dqHeaders = new HttpHeaders();
     headers.forEach(dqHeaders::set);
-    var entity = new HttpEntity<>(null, dqHeaders);
+    var entity = new HttpEntity<>(dqHeaders);
     String url = String.format("%s?_id=%s", linkProperties.dataQueryR4ResourceUrl("Patient"), icn);
     var returnedValue = restTemplate.exchange(url, HttpMethod.GET, entity, Patient.Bundle.class);
     if (!returnedValue.getStatusCode().is2xxSuccessful()) {
       throw new Exceptions.FhirClientConnectionFailure(
           String.format(
-              "Data Query Status Code is %s\nData Query Body: %s",
-              returnedValue.getStatusCode(),
-              returnedValue.getBody())
-      );
+              "Data Query Status Code is %s%nData Query Body: %s",
+              returnedValue.getStatusCode(), returnedValue.getBody()));
     }
     return returnedValue.getBody();
   }

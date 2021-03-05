@@ -10,7 +10,6 @@ import static org.mockito.Mockito.when;
 import gov.va.api.health.r4.api.resources.Patient;
 import gov.va.api.health.smartcards.Exceptions.FhirClientConnectionFailure;
 import java.util.HashMap;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -34,7 +33,6 @@ public class DataQueryFhirClientTest {
   }
 
   @Test
-  @SneakyThrows
   void makesRequests() {
     RestTemplate restTemplate = mock(RestTemplate.class);
     LinkProperties linkProperties = mock(LinkProperties.class);

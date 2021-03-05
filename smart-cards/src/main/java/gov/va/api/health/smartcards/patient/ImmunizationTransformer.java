@@ -34,12 +34,10 @@ public class ImmunizationTransformer {
         .fullUrl(entry.fullUrl())
         .resource(
             Immunization.builder()
-                .resourceType("Immunization")
                 .status(entry.resource().status())
                 .vaccineCode(vaccineCode())
                 .patient(patient())
                 .occurrenceDateTime(entry.resource().occurrenceDateTime())
-                .primarySource(entry.resource().primarySource())
                 .location(location())
                 .build())
         .search(Search.builder().mode(SearchMode.match).build())

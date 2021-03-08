@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 
 import gov.va.api.health.r4.api.resources.Patient;
 import gov.va.api.health.smartcards.Exceptions.FhirClientConnectionFailure;
-import java.util.HashMap;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -27,8 +26,7 @@ public class DataQueryFhirClientTest {
     when(restTemplate.exchange(
             any(String.class), eq(HttpMethod.GET), any(HttpEntity.class), eq(Patient.Bundle.class)))
         .thenReturn(response);
-    assertThatThrownBy(
-            () -> dataQueryFhirClient.patientBundle("123", new HashMap<String, String>()))
+    assertThatThrownBy(() -> dataQueryFhirClient.patientBundle("123", ""))
         .isInstanceOf(FhirClientConnectionFailure.class);
   }
 
@@ -41,7 +39,7 @@ public class DataQueryFhirClientTest {
     when(restTemplate.exchange(
             any(String.class), eq(HttpMethod.GET), any(HttpEntity.class), eq(Patient.Bundle.class)))
         .thenReturn(response);
-    assertThat(dataQueryFhirClient.patientBundle("123", new HashMap<String, String>()))
+    assertThat(dataQueryFhirClient.patientBundle("123", ""))
         .isEqualTo(Patient.Bundle.builder().build());
   }
 }

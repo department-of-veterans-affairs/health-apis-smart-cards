@@ -2,7 +2,6 @@ package gov.va.api.health.smartcards;
 
 import gov.va.api.health.r4.api.resources.Immunization;
 import gov.va.api.health.r4.api.resources.Patient;
-import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +26,9 @@ public class DataQueryFhirClient implements FhirClient {
 
   @Override
   @SneakyThrows
-  public Patient.Bundle patientBundle(String icn, Map<String, String> headers) {
+  public Patient.Bundle patientBundle(String icn, String authorization) {
     var dqHeaders = new HttpHeaders();
-    dqHeaders.set("Authorization", headers.get("Authorization"));
+    dqHeaders.set("Authorization", authorization);
     dqHeaders.set("accept", "application/json");
     var entity = new HttpEntity<>(dqHeaders);
     String url = String.format("%s?_id=%s", linkProperties.dataQueryR4ResourceUrl("Patient"), icn);

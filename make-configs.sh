@@ -35,7 +35,7 @@ checkForUnsetValues() {
 }
 
 makeConfig smart-cards $PROFILE
-configValue smart-cards $PROFILE data-query.r4-base-path 'fhir/v0/r4'
+configValue smart-cards $PROFILE data-query.r4-base-path '/'
 configValue smart-cards $PROFILE data-query.internal-url 'http://localhost:8777'
 configValue smart-cards $PROFILE public-r4-base-path 'r4'
 configValue smart-cards $PROFILE public-url 'http://localhost:8096'

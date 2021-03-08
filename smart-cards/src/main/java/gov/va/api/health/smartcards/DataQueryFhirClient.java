@@ -11,10 +11,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-@AllArgsConstructor(onConstructor_ = @Autowired)
 @Component
+@AllArgsConstructor(onConstructor_ = @Autowired)
 public class DataQueryFhirClient implements FhirClient {
-
   final RestTemplate restTemplate;
 
   final LinkProperties linkProperties;
@@ -28,7 +27,9 @@ public class DataQueryFhirClient implements FhirClient {
   @SneakyThrows
   public Patient.Bundle patientBundle(String icn, String authorization) {
     var dqHeaders = new HttpHeaders();
-    dqHeaders.set("Authorization", authorization);
+    if (authorization != null) {
+      dqHeaders.set("Authorization", authorization);
+    }
     dqHeaders.set("accept", "application/json");
     var entity = new HttpEntity<>(dqHeaders);
     String url = String.format("%s?_id=%s", linkProperties.dataQueryR4ResourceUrl("Patient"), icn);

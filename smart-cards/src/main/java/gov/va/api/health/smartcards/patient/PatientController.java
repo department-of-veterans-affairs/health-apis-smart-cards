@@ -86,7 +86,7 @@ public class PatientController {
   ResponseEntity<Parameters> issueVc(
       @PathVariable("id") String id,
       @Valid @RequestBody Parameters parameters,
-      @RequestHeader(name = "Authorization") String authorization) {
+      @RequestHeader(name = "Authorization", required = false) String authorization) {
     checkState(!StringUtils.isEmpty(id), "id is required");
     var credentialTypes = validateCredentialType(parameters);
     Patient.Bundle patients = fhirClient.patientBundle(id, authorization);

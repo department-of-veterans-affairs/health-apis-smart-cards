@@ -36,8 +36,6 @@ import org.springframework.web.client.RestTemplate;
 public class PatientControllerTest {
   public static final ObjectMapper MAPPER = JacksonMapperConfig.createMapper();
 
-  private static final String EMPTY_STRING = "";
-
   private static long countEntriesByType(MixedBundle bundle, String type) {
     checkNotNull(bundle);
     return bundle.entry().stream()
@@ -62,7 +60,7 @@ public class PatientControllerTest {
 
   static Patient.Bundle mockPatient(String icn) {
     var mockFhirClient = new MockFhirClient(mock(LinkProperties.class));
-    return mockFhirClient.patientBundle(icn, EMPTY_STRING);
+    return mockFhirClient.patientBundle(icn, "");
   }
 
   private static Parameters parametersCovid19() {
@@ -110,7 +108,7 @@ public class PatientControllerTest {
   void issueVc() {
     var patientBundleResponse = new ResponseEntity<>(mockPatient("123"), HttpStatus.ACCEPTED);
     var controller = patientController(patientBundleResponse);
-    var result = controller.issueVc("123", parametersCovid19(), EMPTY_STRING).getBody();
+    var result = controller.issueVc("123", parametersCovid19(), "").getBody();
     assertNotNull(result);
     var vc = findVcFromParameters(result);
     assertThat(vc.context()).isEqualTo(List.of("https://www.w3.org/2018/credentials/v1"));
@@ -126,12 +124,11 @@ public class PatientControllerTest {
     var controller = patientController(null);
     // Empty List
     assertThrows(
-        Exceptions.BadRequest.class,
-        () -> controller.issueVc("123", parametersEmpty(), EMPTY_STRING));
+        Exceptions.BadRequest.class, () -> controller.issueVc("123", parametersEmpty(), ""));
     // null List
     assertThrows(
         Exceptions.BadRequest.class,
-        () -> controller.issueVc("123", parametersEmpty().parameter(null), EMPTY_STRING));
+        () -> controller.issueVc("123", parametersEmpty().parameter(null), ""));
   }
 
   @Test
@@ -139,7 +136,7 @@ public class PatientControllerTest {
     var controller = patientController(null);
     assertThrows(
         Exceptions.InvalidCredentialType.class,
-        () -> controller.issueVc("123", parametersWithCredentialType("NOPE"), EMPTY_STRING));
+        () -> controller.issueVc("123", parametersWithCredentialType("NOPE"), ""));
   }
 
   @Test
@@ -147,8 +144,7 @@ public class PatientControllerTest {
     var patientBundleResponse = new ResponseEntity<>(mockPatient("404"), HttpStatus.ACCEPTED);
     var controller = patientController(patientBundleResponse);
     assertThrows(
-        Exceptions.NotFound.class,
-        () -> controller.issueVc("404", parametersCovid19(), EMPTY_STRING));
+        Exceptions.NotFound.class, () -> controller.issueVc("404", parametersCovid19(), ""));
   }
 
   @Test
@@ -158,8 +154,6 @@ public class PatientControllerTest {
         Exceptions.NotImplemented.class,
         () ->
             controller.issueVc(
-                "123",
-                parametersWithCredentialType("https://smarthealth.cards#immunization"),
-                EMPTY_STRING));
+                "123", parametersWithCredentialType("https://smarthealth.cards#immunization"), ""));
   }
 }

@@ -16,6 +16,7 @@ import io.restassured.RestAssured;
 import io.restassured.http.Method;
 import io.restassured.specification.RequestSpecification;
 import java.util.Arrays;
+import java.util.List;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
@@ -130,6 +131,16 @@ public class PatientIT {
         parametersWithCredentialType("NOPE"),
         "issueVc (invalid, bad credentialType)",
         400);
+  }
+
+  @Test
+  void read_invalid_beanValidation() {
+    String id = systemDefinition().ids().patient();
+    String path = String.format("r4/Patient/%s/$HealthWallet.issueVc", id);
+    var svc = systemDefinition().internal();
+    var parameters =
+        Parameters.builder().parameter(List.of(Parameters.Parameter.builder().build())).build();
+    doPost(svc, path, parameters, "issueVc (parameters bean validation)", 400);
   }
 
   @Test

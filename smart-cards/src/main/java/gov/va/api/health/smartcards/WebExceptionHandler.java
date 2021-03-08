@@ -170,6 +170,12 @@ public final class WebExceptionHandler {
     return responseFor("structure", e, request, emptyList(), true);
   }
 
+  @ExceptionHandler({HttpClientErrorException.Forbidden.class})
+  @ResponseStatus(HttpStatus.FORBIDDEN)
+  OperationOutcome handleForbidden(Exception e, HttpServletRequest request) {
+    return responseFor("forbidden", e, request, emptyList(), true);
+  }
+
   @ExceptionHandler({HttpRequestMethodNotSupportedException.class})
   @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
   OperationOutcome handleNotAllowed(Exception e, HttpServletRequest request) {
@@ -204,6 +210,12 @@ public final class WebExceptionHandler {
       return responseFor("database", e, request, emptyList(), false);
     }
     return responseFor("exception", e, request, emptyList(), true);
+  }
+
+  @ExceptionHandler({HttpClientErrorException.Unauthorized.class})
+  @ResponseStatus(HttpStatus.UNAUTHORIZED)
+  OperationOutcome handleUnauthorized(Exception e, HttpServletRequest request) {
+    return responseFor("unauthorized", e, request, emptyList(), true);
   }
 
   /**

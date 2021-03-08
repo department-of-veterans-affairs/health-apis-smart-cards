@@ -181,15 +181,4 @@ public class PatientIT {
         "issueVc (invalid, unimplemented credentialType)",
         501);
   }
-
-  @Test
-  void read_notFound() {
-    String id = systemDefinition().ids().patientNotFound();
-    doPost(
-        systemDefinition().internal(),
-        String.format("r4/Patient/%s/$HealthWallet.issueVc", id),
-        parametersCovid19(),
-        "issuevc (not found)",
-        404);
-  }
 }

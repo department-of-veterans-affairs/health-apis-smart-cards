@@ -1,6 +1,6 @@
 package gov.va.api.health.smartcards;
 
-import gov.va.api.health.r4.api.bundle.AbstractBundle.BundleType;
+import gov.va.api.health.r4.api.bundle.AbstractBundle;
 import gov.va.api.health.r4.api.bundle.MixedBundle;
 import gov.va.api.health.r4.api.bundle.MixedEntry;
 import java.util.List;
@@ -16,7 +16,7 @@ public class R4MixedBundler {
     var bundle =
         MixedBundle.builder()
             .resourceType("Bundle")
-            .type(BundleType.collection)
+            .type(AbstractBundle.BundleType.collection)
             .total(entries.size())
             .entry(entries)
             .build();

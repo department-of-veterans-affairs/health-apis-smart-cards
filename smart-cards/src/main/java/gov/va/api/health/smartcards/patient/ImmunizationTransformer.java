@@ -1,7 +1,6 @@
 package gov.va.api.health.smartcards.patient;
 
-import gov.va.api.health.r4.api.bundle.AbstractEntry.Search;
-import gov.va.api.health.r4.api.bundle.AbstractEntry.SearchMode;
+import gov.va.api.health.r4.api.bundle.AbstractEntry;
 import gov.va.api.health.r4.api.bundle.MixedEntry;
 import gov.va.api.health.r4.api.datatypes.CodeableConcept;
 import gov.va.api.health.r4.api.elements.Reference;
@@ -42,7 +41,7 @@ public class ImmunizationTransformer {
                 .primarySource(entry.resource().primarySource())
                 .location(location())
                 .build())
-        .search(Search.builder().mode(SearchMode.match).build())
+        .search(AbstractEntry.Search.builder().mode(AbstractEntry.SearchMode.match).build())
         .build();
   }
 

@@ -33,13 +33,6 @@ public class DataQueryFhirClient implements FhirClient {
     dqHeaders.set("accept", "application/json");
     var entity = new HttpEntity<>(dqHeaders);
     String url = String.format("%s?_id=%s", linkProperties.dataQueryR4ResourceUrl("Patient"), icn);
-    var returnedValue = restTemplate.exchange(url, HttpMethod.GET, entity, Patient.Bundle.class);
-    if (!returnedValue.getStatusCode().is2xxSuccessful()) {
-      throw new Exceptions.FhirClientConnectionFailure(
-          String.format(
-              "Data Query Status Code is %s%nData Query Body: %s",
-              returnedValue.getStatusCode(), returnedValue.getBody()));
-    }
-    return returnedValue.getBody();
+    return restTemplate.exchange(url, HttpMethod.GET, entity, Patient.Bundle.class).getBody();
   }
 }

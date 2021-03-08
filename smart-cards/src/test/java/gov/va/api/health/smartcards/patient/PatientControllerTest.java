@@ -5,12 +5,16 @@ import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.va.api.health.r4.api.bundle.MixedBundle;
 import gov.va.api.health.r4.api.resources.Parameters;
 import gov.va.api.health.r4.api.resources.Patient;
+import gov.va.api.health.smartcards.DataQueryFhirClient;
 import gov.va.api.health.smartcards.Exceptions;
 import gov.va.api.health.smartcards.JacksonMapperConfig;
 import gov.va.api.health.smartcards.LinkProperties;
@@ -22,7 +26,12 @@ import java.util.List;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.DataBinder;
+import org.springframework.web.client.RestTemplate;
 
 public class PatientControllerTest {
   public static final ObjectMapper MAPPER = JacksonMapperConfig.createMapper();
@@ -49,6 +58,11 @@ public class PatientControllerTest {
     Patient.IDENTIFIER_MIN_SIZE.set(0);
   }
 
+  static Patient.Bundle mockPatient(String icn) {
+    var mockFhirClient = new MockFhirClient(mock(LinkProperties.class));
+    return mockFhirClient.patientBundle(icn, "");
+  }
+
   private static Parameters parametersCovid19() {
     return parametersWithCredentialType("https://smarthealth.cards#covid19");
   }
@@ -66,18 +80,35 @@ public class PatientControllerTest {
         .build();
   }
 
+  private static PatientController patientController(
+      ResponseEntity<Patient.Bundle> patientBundleResponse) {
+    var mockRestTemplate = mock(RestTemplate.class);
+    if (patientBundleResponse != null) {
+      when(mockRestTemplate.exchange(
+              anyString(),
+              any(HttpMethod.class),
+              any(),
+              ArgumentMatchers.<Class<Patient.Bundle>>any()))
+          .thenReturn(patientBundleResponse);
+    }
+    var mockFhirClient = new MockFhirClient(mock(LinkProperties.class));
+    var fhirClient = new DataQueryFhirClient(mockRestTemplate, mock(LinkProperties.class));
+    var bundler = new R4MixedBundler();
+    return new PatientController(fhirClient, mockFhirClient, bundler);
+  }
+
   @Test
   void initDirectFieldAccess() {
-    new PatientController(mock(MockFhirClient.class), mock(R4MixedBundler.class))
+    new PatientController(
+            mock(DataQueryFhirClient.class), mock(MockFhirClient.class), mock(R4MixedBundler.class))
         .initDirectFieldAccess(mock(DataBinder.class));
   }
 
   @Test
   void issueVc() {
-    var fhirClient = new MockFhirClient(mock(LinkProperties.class));
-    var bundler = new R4MixedBundler();
-    var controller = new PatientController(fhirClient, bundler);
-    var result = controller.issueVc("123", parametersCovid19()).getBody();
+    var patientBundleResponse = new ResponseEntity<>(mockPatient("123"), HttpStatus.ACCEPTED);
+    var controller = patientController(patientBundleResponse);
+    var result = controller.issueVc("123", parametersCovid19(), "").getBody();
     assertNotNull(result);
     var vc = findVcFromParameters(result);
     assertThat(vc.context()).isEqualTo(List.of("https://www.w3.org/2018/credentials/v1"));
@@ -90,44 +121,39 @@ public class PatientControllerTest {
 
   @Test
   void issueVc_EmptyParameters() {
-    var fhirClient = new MockFhirClient(mock(LinkProperties.class));
-    var bundler = new R4MixedBundler();
-    var controller = new PatientController(fhirClient, bundler);
+    var controller = patientController(null);
     // Empty List
-    assertThrows(Exceptions.BadRequest.class, () -> controller.issueVc("123", parametersEmpty()));
+    assertThrows(
+        Exceptions.BadRequest.class, () -> controller.issueVc("123", parametersEmpty(), ""));
     // null List
     assertThrows(
         Exceptions.BadRequest.class,
-        () -> controller.issueVc("123", parametersEmpty().parameter(null)));
+        () -> controller.issueVc("123", parametersEmpty().parameter(null), ""));
   }
 
   @Test
   void issueVc_invalidCredentialType() {
-    var fhirClient = new MockFhirClient(mock(LinkProperties.class));
-    var bundler = new R4MixedBundler();
-    var controller = new PatientController(fhirClient, bundler);
+    var controller = patientController(null);
     assertThrows(
         Exceptions.InvalidCredentialType.class,
-        () -> controller.issueVc("123", parametersWithCredentialType("NOPE")));
+        () -> controller.issueVc("123", parametersWithCredentialType("NOPE"), ""));
   }
 
   @Test
   void issueVc_notFound() {
-    var fhirClient = new MockFhirClient(mock(LinkProperties.class));
-    var bundler = new R4MixedBundler();
-    var controller = new PatientController(fhirClient, bundler);
-    assertThrows(Exceptions.NotFound.class, () -> controller.issueVc("404", parametersCovid19()));
+    var patientBundleResponse = new ResponseEntity<>(mockPatient("404"), HttpStatus.ACCEPTED);
+    var controller = patientController(patientBundleResponse);
+    assertThrows(
+        Exceptions.NotFound.class, () -> controller.issueVc("404", parametersCovid19(), ""));
   }
 
   @Test
   void issueVc_unimplementedCredentialType() {
-    var fhirClient = new MockFhirClient(mock(LinkProperties.class));
-    var bundler = new R4MixedBundler();
-    var controller = new PatientController(fhirClient, bundler);
+    var controller = patientController(null);
     assertThrows(
         Exceptions.NotImplemented.class,
         () ->
             controller.issueVc(
-                "123", parametersWithCredentialType("https://smarthealth.cards#immunization")));
+                "123", parametersWithCredentialType("https://smarthealth.cards#immunization"), ""));
   }
 }

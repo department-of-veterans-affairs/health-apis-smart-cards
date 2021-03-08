@@ -14,6 +14,7 @@ import gov.va.api.health.r4.api.resources.Immunization.Status;
 import gov.va.api.health.r4.api.resources.Parameters;
 import gov.va.api.health.r4.api.resources.Patient;
 import gov.va.api.health.r4.api.resources.Resource;
+import gov.va.api.health.smartcards.DataQueryFhirClient;
 import gov.va.api.health.smartcards.Exceptions;
 import gov.va.api.health.smartcards.JacksonMapperConfig;
 import gov.va.api.health.smartcards.MockFhirClient;
@@ -38,6 +39,7 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -55,6 +57,8 @@ public class PatientController {
           CredentialType.IMMUNIZATION,
           CredentialType.PRESENTATION_CONTEXT_ONLINE,
           CredentialType.PRESENTATION_CONTEXT_IN_PERSON);
+
+  private final DataQueryFhirClient fhirClient;
 
   private final MockFhirClient mockFhirClient;
 
@@ -90,10 +94,12 @@ public class PatientController {
   @SneakyThrows
   @PostMapping(value = "/{id}/$HealthWallet.issueVc")
   ResponseEntity<Parameters> issueVc(
-      @PathVariable("id") String id, @Valid @RequestBody Parameters parameters) {
+      @PathVariable("id") String id,
+      @Valid @RequestBody Parameters parameters,
+      @RequestHeader(name = "Authorization", required = false) String authorization) {
     checkState(!StringUtils.isEmpty(id), "id is required");
     var credentialTypes = validateCredentialType(parameters);
-    Patient.Bundle patients = mockFhirClient.patientBundle(id);
+    Patient.Bundle patients = fhirClient.patientBundle(id, authorization);
     Patient patient = getPatientFromBundle(patients, id);
     Immunization.Bundle immunizations = mockFhirClient.immunizationBundle(patient);
     List<MixedEntry> resources = new ArrayList<>();

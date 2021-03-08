@@ -198,8 +198,8 @@ public class MockFhirClient implements FhirClient {
   }
 
   @Override
-  public Patient.Bundle patientBundle(String id) {
-    var patient = patient(id);
+  public Patient.Bundle patientBundle(String icn, String authorization) {
+    var patient = patient(icn);
     List<Patient> patients = new ArrayList<>();
     patient.ifPresent(patients::add);
     return Patient.Bundle.builder()
@@ -210,7 +210,7 @@ public class MockFhirClient implements FhirClient {
                     .relation(BundleLink.LinkRelation.self)
                     .url(
                         String.format(
-                            "%s?_id=%s", linkProperties.dataQueryR4ResourceUrl("Patient"), id))
+                            "%s?_id=%s", linkProperties.dataQueryR4ResourceUrl("Patient"), icn))
                     .build()))
         .total(patients.size())
         .entry(

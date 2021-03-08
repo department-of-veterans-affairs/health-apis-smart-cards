@@ -35,8 +35,8 @@ checkForUnsetValues() {
 }
 
 makeConfig smart-cards $PROFILE
-configValue smart-cards $PROFILE data-query.r4-base-path 'r4'
-configValue smart-cards $PROFILE data-query.internal-url 'http://localhost:8090'
+configValue smart-cards $PROFILE data-query.r4-base-path '/'
+configValue smart-cards $PROFILE data-query.internal-url 'http://localhost:8777'
 configValue smart-cards $PROFILE public-r4-base-path 'r4'
 configValue smart-cards $PROFILE public-url 'http://localhost:8096'
 configValue smart-cards $PROFILE web-exception-key '-sharktopus-v-pteracuda-'

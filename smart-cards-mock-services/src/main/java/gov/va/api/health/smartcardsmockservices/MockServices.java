@@ -55,7 +55,7 @@ public class MockServices {
   }
 
   private void addPatientBundle(MockServerClient mock) {
-    mock.when(addQuery("/fhir/v0/r4/Patient?_id=1011537977V693883"))
+    mock.when(addQuery("/Patient?_id=1011537977V693883"))
         .respond(
             response()
                 .withStatusCode(200)

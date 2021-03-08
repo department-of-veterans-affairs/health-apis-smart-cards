@@ -2,15 +2,13 @@ package gov.va.api.health.smartcards.patient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import gov.va.api.health.r4.api.bundle.AbstractEntry.Search;
-import gov.va.api.health.r4.api.bundle.AbstractEntry.SearchMode;
+import gov.va.api.health.r4.api.bundle.AbstractEntry;
 import gov.va.api.health.r4.api.bundle.MixedEntry;
 import gov.va.api.health.r4.api.datatypes.Annotation;
 import gov.va.api.health.r4.api.datatypes.CodeableConcept;
 import gov.va.api.health.r4.api.datatypes.Coding;
 import gov.va.api.health.r4.api.elements.Reference;
 import gov.va.api.health.r4.api.resources.Immunization;
-import gov.va.api.health.r4.api.resources.Immunization.Status;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +23,7 @@ public class ImmunizationTransformerTest {
                 .resource(
                     Immunization.builder()
                         .resourceType("Immunization")
-                        .status(Status.completed)
+                        .status(Immunization.Status.completed)
                         .vaccineCode(
                             CodeableConcept.builder()
                                 .coding(
@@ -43,7 +41,7 @@ public class ImmunizationTransformerTest {
                                 .reference("https://foo.com/r4/Location/loc-1")
                                 .build())
                         .build())
-                .search(Search.builder().mode(SearchMode.match).build())
+                .search(AbstractEntry.Search.builder().mode(AbstractEntry.SearchMode.match).build())
                 .build());
   }
 
@@ -54,7 +52,7 @@ public class ImmunizationTransformerTest {
             Immunization.builder()
                 .resourceType("Immunization")
                 .id("imm-1")
-                .status(Status.completed)
+                .status(Immunization.Status.completed)
                 .vaccineCode(
                     CodeableConcept.builder()
                         .coding(

@@ -23,6 +23,12 @@
     </dependency>
     <dependency>
       <groupId>gov.va.api.health</groupId>
+      <artifactId>smart-cards-mock-services</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>gov.va.api.health</groupId>
       <artifactId>sentinel</artifactId>
       <version>${project.parent.version}</version>
     </dependency>
@@ -45,7 +51,7 @@
             </goals>
             <configuration>
               <outputDirectory>${project.build.directory}</outputDirectory>
-              <includeArtifactIds>junit-platform-console-standalone,smart-cards</includeArtifactIds>
+              <includeArtifactIds>junit-platform-console-standalone,smart-cards,smart-cards-mock-services</includeArtifactIds>
               <stripVersion>true</stripVersion>
             </configuration>
           </execution>
@@ -60,6 +66,26 @@
         <version>${process-exec-maven-plugin.version}</version>
         <executions>
           <execution>
+            <id>smart-cards-mock-services-process</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>start</goal>
+            </goals>
+            <configuration>
+              <name>smart-cards-mock-services</name>
+              <healthcheckUrl>http://localhost:8777/help</healthcheckUrl>
+              <skip>${sentinel.skipLaunch}</skip>
+              <processLogFile>${project.build.directory}/smart-cards-mock-services.log</processLogFile>
+              <waitForInterrupt>false</waitForInterrupt>
+              <waitAfterLaunch>60</waitAfterLaunch>
+              <arguments>
+                <argument>java</argument>
+                <argument>-jar</argument>
+                <argument>smart-cards-mock-services.jar</argument>
+              </arguments>
+            </configuration>
+          </execution>
+          <execution>
             <id>smart-cards-process</id>
             <phase>pre-integration-test</phase>
             <goals>
@@ -70,6 +96,7 @@
               <healthcheckUrl>http://localhost:8096/actuator/health</healthcheckUrl>
               <skip>${sentinel.skipLaunch}</skip>
               <processLogFile>${project.build.directory}/smart-cards.log</processLogFile>
+              <waitAfterLaunch>60</waitAfterLaunch>
               <arguments>
                 <argument>java</argument>
                 <argument>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5090</argument>
@@ -77,8 +104,8 @@
                 <argument>smart-cards.jar</argument>
                 <argument>-Dloader=gov.va.api.health.smartcards.Application</argument>
                 <argument>-Dlogging.level.root=INFO</argument>
-                <argument>-Ddata-query.internal-url=http://localhost:8090</argument>
-                <argument>-Ddata-query.r4-base-path=r4</argument>
+                <argument>-Ddata-query.internal-url=http://localhost:8777</argument>
+                <argument>-Ddata-query.r4-base-path=/</argument>
                 <argument>-Dpublic-r4-base-path=r4</argument>
                 <argument>-Dpublic-url=http://localhost:8096</argument>
                 <argument>-Dweb-exception-key=-sharktopus-v-pteracuda-</argument>

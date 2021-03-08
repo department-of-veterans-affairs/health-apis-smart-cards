@@ -30,6 +30,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.UnsatisfiedServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -161,11 +162,18 @@ public final class WebExceptionHandler {
     Exceptions.BadRequest.class,
     Exceptions.InvalidCredentialType.class,
     HttpMessageNotReadableException.class,
+    MethodArgumentNotValidException.class,
     UnsatisfiedServletRequestParameterException.class
   })
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   OperationOutcome handleBadRequest(Exception e, HttpServletRequest request) {
     return responseFor("structure", e, request, emptyList(), true);
+  }
+
+  @ExceptionHandler({HttpClientErrorException.Forbidden.class})
+  @ResponseStatus(HttpStatus.FORBIDDEN)
+  OperationOutcome handleForbidden(Exception e, HttpServletRequest request) {
+    return responseFor("forbidden", e, request, emptyList(), true);
   }
 
   @ExceptionHandler({HttpRequestMethodNotSupportedException.class})
@@ -182,7 +190,7 @@ public final class WebExceptionHandler {
 
   @ExceptionHandler({Exceptions.NotImplemented.class})
   @ResponseStatus(HttpStatus.NOT_IMPLEMENTED)
-  public OperationOutcome handleNotImplemented(Exception e, HttpServletRequest request) {
+  OperationOutcome handleNotImplemented(Exception e, HttpServletRequest request) {
     return responseFor("not-implemented", e, request, emptyList(), true);
   }
 
@@ -202,6 +210,12 @@ public final class WebExceptionHandler {
       return responseFor("database", e, request, emptyList(), false);
     }
     return responseFor("exception", e, request, emptyList(), true);
+  }
+
+  @ExceptionHandler({HttpClientErrorException.Unauthorized.class})
+  @ResponseStatus(HttpStatus.UNAUTHORIZED)
+  OperationOutcome handleUnauthorized(Exception e, HttpServletRequest request) {
+    return responseFor("unauthorized", e, request, emptyList(), true);
   }
 
   /**

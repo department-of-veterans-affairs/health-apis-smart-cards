@@ -2,7 +2,6 @@ package gov.va.api.health.smartcards.patient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import gov.va.api.health.r4.api.bundle.AbstractEntry;
 import gov.va.api.health.r4.api.bundle.MixedEntry;
 import gov.va.api.health.r4.api.datatypes.Annotation;
 import gov.va.api.health.r4.api.datatypes.CodeableConcept;
@@ -41,7 +40,6 @@ public class ImmunizationTransformerTest {
                                 .reference("https://foo.com/r4/Location/loc-1")
                                 .build())
                         .build())
-                .search(AbstractEntry.Search.builder().mode(AbstractEntry.SearchMode.match).build())
                 .build());
   }
 

@@ -2,7 +2,6 @@ package gov.va.api.health.smartcards.patient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import gov.va.api.health.r4.api.bundle.AbstractEntry;
 import gov.va.api.health.r4.api.bundle.MixedEntry;
 import gov.va.api.health.r4.api.datatypes.CodeableConcept;
 import gov.va.api.health.r4.api.datatypes.Coding;
@@ -82,7 +81,6 @@ public class PatientTransformerTest {
                         .gender(Patient.Gender.unknown)
                         .birthDate("1955-01-01")
                         .build())
-                .search(AbstractEntry.Search.builder().mode(AbstractEntry.SearchMode.match).build())
                 .build());
     assertThat(Validation.buildDefaultValidatorFactory().getValidator().validate(transformed))
         .isEmpty();

@@ -7,11 +7,14 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.va.api.health.r4.api.bundle.MixedBundle;
+import gov.va.api.health.r4.api.datatypes.HumanName;
+import gov.va.api.health.r4.api.resources.Immunization;
 import gov.va.api.health.r4.api.resources.Parameters;
 import gov.va.api.health.r4.api.resources.Patient;
 import gov.va.api.health.smartcards.DataQueryFhirClient;
@@ -26,7 +29,6 @@ import java.util.List;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -58,6 +60,13 @@ public class PatientControllerTest {
     Patient.IDENTIFIER_MIN_SIZE.set(0);
   }
 
+  static Immunization.Bundle mockImmunization(String patientIcn) {
+    var mockFhirClient = new MockFhirClient(mock(LinkProperties.class));
+    var patient =
+        Patient.builder().id(patientIcn).name(List.of(HumanName.builder().build())).build();
+    return mockFhirClient.immunizationBundle(patient, "");
+  }
+
   static Patient.Bundle mockPatient(String icn) {
     var mockFhirClient = new MockFhirClient(mock(LinkProperties.class));
     return mockFhirClient.patientBundle(icn, "");
@@ -81,33 +90,36 @@ public class PatientControllerTest {
   }
 
   private static PatientController patientController(
-      ResponseEntity<Patient.Bundle> patientBundleResponse) {
+      ResponseEntity<Patient.Bundle> patientBundleResponse,
+      ResponseEntity<Immunization.Bundle> immunizationBundleResponse) {
     var mockRestTemplate = mock(RestTemplate.class);
     if (patientBundleResponse != null) {
       when(mockRestTemplate.exchange(
-              anyString(),
-              any(HttpMethod.class),
-              any(),
-              ArgumentMatchers.<Class<Patient.Bundle>>any()))
+              anyString(), any(HttpMethod.class), any(), same(Patient.Bundle.class)))
           .thenReturn(patientBundleResponse);
     }
-    var mockFhirClient = new MockFhirClient(mock(LinkProperties.class));
+    if (immunizationBundleResponse != null) {
+      when(mockRestTemplate.exchange(
+              anyString(), any(HttpMethod.class), any(), same(Immunization.Bundle.class)))
+          .thenReturn(immunizationBundleResponse);
+    }
     var fhirClient = new DataQueryFhirClient(mockRestTemplate, mock(LinkProperties.class));
     var bundler = new R4MixedBundler();
-    return new PatientController(fhirClient, mockFhirClient, bundler);
+    return new PatientController(fhirClient, bundler);
   }
 
   @Test
   void initDirectFieldAccess() {
-    new PatientController(
-            mock(DataQueryFhirClient.class), mock(MockFhirClient.class), mock(R4MixedBundler.class))
+    new PatientController(mock(DataQueryFhirClient.class), mock(R4MixedBundler.class))
         .initDirectFieldAccess(mock(DataBinder.class));
   }
 
   @Test
   void issueVc() {
     var patientBundleResponse = new ResponseEntity<>(mockPatient("123"), HttpStatus.ACCEPTED);
-    var controller = patientController(patientBundleResponse);
+    var immunizationBundleResponse =
+        new ResponseEntity<>(mockImmunization("123"), HttpStatus.ACCEPTED);
+    var controller = patientController(patientBundleResponse, immunizationBundleResponse);
     var result = controller.issueVc("123", parametersCovid19(), "").getBody();
     assertNotNull(result);
     var vc = findVcFromParameters(result);
@@ -121,7 +133,7 @@ public class PatientControllerTest {
 
   @Test
   void issueVc_EmptyParameters() {
-    var controller = patientController(null);
+    var controller = patientController(null, null);
     // Empty List
     assertThrows(
         Exceptions.BadRequest.class, () -> controller.issueVc("123", parametersEmpty(), ""));
@@ -133,7 +145,7 @@ public class PatientControllerTest {
 
   @Test
   void issueVc_invalidCredentialType() {
-    var controller = patientController(null);
+    var controller = patientController(null, null);
     assertThrows(
         Exceptions.InvalidCredentialType.class,
         () -> controller.issueVc("123", parametersWithCredentialType("NOPE"), ""));
@@ -142,14 +154,14 @@ public class PatientControllerTest {
   @Test
   void issueVc_notFound() {
     var patientBundleResponse = new ResponseEntity<>(mockPatient("404"), HttpStatus.ACCEPTED);
-    var controller = patientController(patientBundleResponse);
+    var controller = patientController(patientBundleResponse, null);
     assertThrows(
         Exceptions.NotFound.class, () -> controller.issueVc("404", parametersCovid19(), ""));
   }
 
   @Test
   void issueVc_unimplementedCredentialType() {
-    var controller = patientController(null);
+    var controller = patientController(null, null);
     assertThrows(
         Exceptions.NotImplemented.class,
         () ->

@@ -19,8 +19,17 @@ public class DataQueryFhirClient implements FhirClient {
   final LinkProperties linkProperties;
 
   @Override
-  public Immunization.Bundle immunizationBundle(Patient patient) {
-    throw new Exceptions.NotImplemented("not-implemented");
+  public Immunization.Bundle immunizationBundle(Patient patient, String authorization) {
+    var dqHeaders = new HttpHeaders();
+    if (authorization != null) {
+      dqHeaders.set("Authorization", authorization);
+    }
+    dqHeaders.set("accept", "application/json");
+    var entity = new HttpEntity<>(dqHeaders);
+    String url =
+        String.format(
+            "%s?patient=%s", linkProperties.dataQueryR4ResourceUrl("Immunization"), patient.id());
+    return restTemplate.exchange(url, HttpMethod.GET, entity, Immunization.Bundle.class).getBody();
   }
 
   @Override

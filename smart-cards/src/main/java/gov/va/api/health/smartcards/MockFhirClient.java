@@ -29,7 +29,7 @@ public class MockFhirClient implements FhirClient {
   private final LinkProperties linkProperties;
 
   @Override
-  public Immunization.Bundle immunizationBundle(Patient patient) {
+  public Immunization.Bundle immunizationBundle(Patient patient, String authorization) {
     var immunizations = immunizations(patient);
     return Immunization.Bundle.builder()
         .type(AbstractBundle.BundleType.searchset)

@@ -37,9 +37,8 @@ public class InsecureRestTemplateProvider {
         .build();
   }
 
-  /** Create RestTemplate with SSL disabled. */
   @Bean
-  public RestTemplate restTemplate(@Autowired RestTemplateBuilder restTemplateBuilder) {
+  RestTemplate restTemplate(@Autowired RestTemplateBuilder restTemplateBuilder) {
     log.info("Using {}", getClass().getSimpleName());
     return restTemplateBuilder
         .requestFactory(bufferingRequestFactory(httpClientWithoutSsl()))

@@ -1,6 +1,7 @@
 package gov.va.api.health.smartcards;
 
 import gov.va.api.health.r4.api.resources.Immunization;
+import gov.va.api.health.r4.api.resources.Location.Bundle;
 import gov.va.api.health.r4.api.resources.Patient;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -20,6 +21,11 @@ public class DataQueryFhirClient implements FhirClient {
 
   @Override
   public Immunization.Bundle immunizationBundle(Patient patient) {
+    throw new Exceptions.NotImplemented("not-implemented");
+  }
+
+  @Override
+  public Bundle locationBundle(String id) {
     throw new Exceptions.NotImplemented("not-implemented");
   }
 

@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.va.api.health.r4.api.bundle.MixedBundle;
+import gov.va.api.health.r4.api.resources.Immunization;
 import gov.va.api.health.r4.api.resources.Parameters;
 import gov.va.api.health.r4.api.resources.Patient;
 import gov.va.api.health.smartcards.DataQueryFhirClient;
@@ -36,11 +37,26 @@ import org.springframework.web.client.RestTemplate;
 public class PatientControllerTest {
   public static final ObjectMapper MAPPER = JacksonMapperConfig.createMapper();
 
+  private static LinkProperties _linkProperties() {
+    return LinkProperties.builder()
+        .dqInternalUrl("http://dq.foo")
+        .dqInternalR4BasePath("r4")
+        .baseUrl("http://sc.bar")
+        .r4BasePath("r4")
+        .build();
+  }
+
   private static long countEntriesByType(MixedBundle bundle, String type) {
     checkNotNull(bundle);
     return bundle.entry().stream()
         .filter(e -> e.resource().getClass().getSimpleName().equals(type))
         .count();
+  }
+
+  private static List<Parameters.Parameter> findResourceLinksFromParameters(Parameters parameters) {
+    return parameters.parameter().stream()
+        .filter(p -> "resourceLink".equals(p.name()))
+        .collect(toList());
   }
 
   @SneakyThrows
@@ -59,7 +75,7 @@ public class PatientControllerTest {
   }
 
   static Patient.Bundle mockPatient(String icn) {
-    var mockFhirClient = new MockFhirClient(mock(LinkProperties.class));
+    var mockFhirClient = new MockFhirClient(_linkProperties());
     return mockFhirClient.patientBundle(icn, "");
   }
 
@@ -91,8 +107,8 @@ public class PatientControllerTest {
               ArgumentMatchers.<Class<Patient.Bundle>>any()))
           .thenReturn(patientBundleResponse);
     }
-    var mockFhirClient = new MockFhirClient(mock(LinkProperties.class));
-    var fhirClient = new DataQueryFhirClient(mockRestTemplate, mock(LinkProperties.class));
+    var mockFhirClient = new MockFhirClient(_linkProperties());
+    var fhirClient = new DataQueryFhirClient(mockRestTemplate, _linkProperties());
     var bundler = new R4MixedBundler();
     return new PatientController(fhirClient, mockFhirClient, bundler);
   }
@@ -115,8 +131,34 @@ public class PatientControllerTest {
     assertThat(vc.type()).contains("VerifiableCredential", "https://smarthealth.cards#covid19");
     var fhirBundle = vc.credentialSubject().fhirBundle();
     assertThat(fhirBundle.entry()).hasSize(fhirBundle.total());
+    assertThat(fhirBundle.total()).isEqualTo(4);
     assertThat(countEntriesByType(fhirBundle, "Patient")).isEqualTo(1);
     assertThat(countEntriesByType(fhirBundle, "Immunization")).isEqualTo(2);
+    assertThat(countEntriesByType(fhirBundle, "Location")).isEqualTo(1);
+    // verify full urls are "resource:N"
+    for (int i = 0; i < fhirBundle.entry().size(); i++) {
+      assertThat(fhirBundle.entry().get(i).fullUrl()).isEqualTo("resource:" + i);
+    }
+    // verify Immunization references
+    long immValidated =
+        fhirBundle.entry().stream()
+            .filter(e -> e.resource() instanceof Immunization)
+            .map(e -> (Immunization) e.resource())
+            .peek(
+                imm -> {
+                  assertThat(imm.patient().reference()).isEqualTo("resource:0");
+                  assertThat(imm.location().reference()).isEqualTo("resource:3");
+                })
+            .count();
+    assertThat(immValidated).isEqualTo(2);
+    // Verify Parameter resourceLinks
+    assertThat(findResourceLinksFromParameters(result))
+        .isEqualTo(
+            List.of(
+                resourceLink("resource:0", "http://dq.foo/r4/Patient/123"),
+                resourceLink("resource:1", "http://dq.foo/r4/Immunization/imm-1-123"),
+                resourceLink("resource:2", "http://dq.foo/r4/Immunization/imm-2-123"),
+                resourceLink("resource:3", "http://dq.foo/r4/Location/loc-123")));
   }
 
   @Test
@@ -155,5 +197,15 @@ public class PatientControllerTest {
         () ->
             controller.issueVc(
                 "123", parametersWithCredentialType("https://smarthealth.cards#immunization"), ""));
+  }
+
+  private Parameters.Parameter resourceLink(String resource, String url) {
+    return Parameters.Parameter.builder()
+        .name("resourceLink")
+        .part(
+            List.of(
+                Parameters.Parameter.builder().name("bundledResource").valueUri(resource).build(),
+                Parameters.Parameter.builder().name("hostedResource").valueUri(url).build()))
+        .build();
   }
 }

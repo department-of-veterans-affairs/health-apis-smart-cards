@@ -5,14 +5,19 @@ import static java.util.stream.Collectors.toList;
 import gov.va.api.health.r4.api.bundle.AbstractBundle;
 import gov.va.api.health.r4.api.bundle.AbstractEntry;
 import gov.va.api.health.r4.api.bundle.BundleLink;
+import gov.va.api.health.r4.api.datatypes.Address;
 import gov.va.api.health.r4.api.datatypes.Annotation;
 import gov.va.api.health.r4.api.datatypes.CodeableConcept;
 import gov.va.api.health.r4.api.datatypes.Coding;
+import gov.va.api.health.r4.api.datatypes.ContactPoint;
+import gov.va.api.health.r4.api.datatypes.ContactPoint.ContactPointSystem;
 import gov.va.api.health.r4.api.datatypes.HumanName;
 import gov.va.api.health.r4.api.datatypes.Identifier;
 import gov.va.api.health.r4.api.elements.Reference;
 import gov.va.api.health.r4.api.resources.Immunization;
 import gov.va.api.health.r4.api.resources.Immunization.Status;
+import gov.va.api.health.r4.api.resources.Location;
+import gov.va.api.health.r4.api.resources.Location.Mode;
 import gov.va.api.health.r4.api.resources.Patient;
 import java.util.ArrayList;
 import java.util.List;
@@ -124,8 +129,7 @@ public class MockFhirClient implements FhirClient {
                             "Dose #2 of 2 of COVID-19, mRNA, LNP-S, PF, 100 mcg/ 0.5 mL dose "
                                 + "vaccine administered.")
                         .build()))
-            .build(),
-        // 'not_done' Immunization to verify filters
+            .build(), // 'not_done' Immunization to verify filters
         Immunization.builder()
             .resourceType("Immunization")
             .id(String.format("imm-3-%s", patient.id()))
@@ -151,6 +155,68 @@ public class MockFhirClient implements FhirClient {
                     .display("Location for " + patient.id())
                     .build())
             .build());
+  }
+
+  @Override
+  public Location.Bundle locationBundle(String id) {
+    Location location =
+        Location.builder()
+            .id(id)
+            .status(Location.Status.active)
+            .name("Location with id " + id)
+            .description("Description for id " + id)
+            .mode(Mode.instance)
+            .type(
+                List.of(
+                    CodeableConcept.builder()
+                        .coding(List.of(Coding.builder().display("SOME CODING").build()))
+                        .text("SOME TEXT")
+                        .build()))
+            .telecom(
+                List.of(
+                    ContactPoint.builder()
+                        .system(ContactPointSystem.phone)
+                        .value("123-456-7890 x0001")
+                        .build()))
+            .address(
+                Address.builder()
+                    .text("1901 VETERANS MEMORIAL DRIVE TEMPLE TEXAS 76504")
+                    .line(List.of("1901 VETERANS MEMORIAL DRIVE"))
+                    .city("TEMPLE")
+                    .state("TEXAS")
+                    .postalCode("76504")
+                    .build())
+            .physicalType(
+                CodeableConcept.builder()
+                    .coding(List.of(Coding.builder().display("PHYS TYPE CODING").build()))
+                    .text("PHYS TYPE TEXT")
+                    .build())
+            .managingOrganization(
+                Reference.builder()
+                    .reference(linkProperties.dataQueryR4ResourceUrl("Organization") + "/org-" + id)
+                    .display("MNG ORG VA MEDICAL")
+                    .build())
+            .build();
+    return Location.Bundle.builder()
+        .type(AbstractBundle.BundleType.searchset)
+        .link(
+            List.of(
+                BundleLink.builder()
+                    .relation(BundleLink.LinkRelation.self)
+                    .url(
+                        String.format(
+                            "%s?_id=%s", linkProperties.dataQueryR4ResourceUrl("Location"), id))
+                    .build()))
+        .total(1)
+        .entry(
+            List.of(
+                Location.Entry.builder()
+                    .fullUrl(linkProperties.dataQueryR4ReadUrl(location))
+                    .resource(location)
+                    .search(
+                        AbstractEntry.Search.builder().mode(AbstractEntry.SearchMode.match).build())
+                    .build()))
+        .build();
   }
 
   private Identifier mpi(String id) {

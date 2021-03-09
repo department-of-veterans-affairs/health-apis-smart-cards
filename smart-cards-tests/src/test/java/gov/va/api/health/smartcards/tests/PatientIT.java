@@ -54,6 +54,16 @@ public class PatientIT {
             .header("Authorization", "Bearer " + ACCESS_TOKEN)
             .header("Content-Type", "application/json")
             .body(MAPPER.writeValueAsString(payload));
+    return doPost(svc, spec, request, payload, description, expectedStatus);
+  }
+
+  private static ExpectedResponse doPost(
+      SystemDefinitions.Service svc,
+      RequestSpecification spec,
+      String request,
+      Object payload,
+      String description,
+      Integer expectedStatus) {
     log.info(
         "Expect {} POST '{}' is status code ({})",
         svc.urlWithApiPath() + request,
@@ -61,7 +71,8 @@ public class PatientIT {
         expectedStatus);
     ExpectedResponse response =
         ExpectedResponse.of(spec.request(Method.POST, svc.urlWithApiPath() + request))
-            .logAction(logAllWithTruncatedBody(2000));
+            .logAction(logAllWithTruncatedBody(2000))
+            .mapper(MAPPER);
     if (expectedStatus != null) {
       response.expect(expectedStatus);
     }
@@ -70,10 +81,6 @@ public class PatientIT {
 
   private static Parameters parametersCovid19() {
     return parametersWithCredentialType("https://smarthealth.cards#covid19");
-  }
-
-  private static Parameters parametersEmpty() {
-    return Parameters.builder().build();
   }
 
   private static Parameters parametersWithCredentialType(String... credentialType) {
@@ -161,11 +168,46 @@ public class PatientIT {
   }
 
   @Test
+  @SneakyThrows
+  void read_invalid_noToken() {
+    assumeEnvironmentNotIn(Environment.LOCAL);
+    String id = systemDefinition().ids().patient();
+    var svc = systemDefinition().internal();
+    Parameters payload = parametersCovid19();
+    RequestSpecification spec =
+        RestAssured.given()
+            .baseUri(svc.url())
+            .port(svc.port())
+            .relaxedHTTPSValidation()
+            .header("Content-Type", "application/json")
+            .body(MAPPER.writeValueAsString(payload));
+    doPost(
+        systemDefinition().internal(),
+        spec,
+        String.format("r4/Patient/%s/$HealthWallet.issueVc", id),
+        payload,
+        "issueVc (no token)",
+        401);
+  }
+
+  @Test
   void read_invalid_parametersEmpty() {
     String id = systemDefinition().ids().patient();
     String path = String.format("r4/Patient/%s/$HealthWallet.issueVc", id);
     var svc = systemDefinition().internal();
-    doPost(svc, path, parametersEmpty(), "issueVc (invalid, no parameters)", 400);
+    var empty = Parameters.builder().build();
+    doPost(svc, path, empty, "issueVc (invalid, no parameters)", 400);
+  }
+
+  @Test
+  void read_invalid_patientNotMe() {
+    assumeEnvironmentNotIn(Environment.LOCAL);
+    doPost(
+        systemDefinition().internal(),
+        String.format("r4/Patient/%s/$HealthWallet.issueVc", "5555555555555"),
+        parametersCovid19(),
+        "issueVc (patient not-me)",
+        403);
   }
 
   @Test

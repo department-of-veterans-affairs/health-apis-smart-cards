@@ -1,5 +1,0 @@
-====
-
-    ${Ansi.BLUE}Smart Cards API ${Ansi.BOLD}${Ansi.YELLOW}Mock Services ${Ansi.NORMAL}${Ansi.BLUE}${application.version}${Ansi.NORMAL}
-
-====

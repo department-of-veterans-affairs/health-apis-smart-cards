@@ -34,7 +34,7 @@ public class ImmunizationTransformerTest {
                                 .build())
                         .patient(
                             Reference.builder().reference("https://foo.com/r4/Patient/x").build())
-                        .occurrenceDateTime("2020-12-18T12:24:55Z")
+                        .occurrenceDateTime("2020-12-18")
                         .location(
                             Reference.builder()
                                 .reference("https://foo.com/r4/Location/loc-1")

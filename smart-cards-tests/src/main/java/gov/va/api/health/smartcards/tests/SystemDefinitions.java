@@ -10,7 +10,7 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 class SystemDefinitions {
   private static Ids ids() {
-    return Ids.builder().patient("1011537977V693883").patientNotFound("404").build();
+    return Ids.builder().patient("1011537977V693883").build();
   }
 
   private static SystemDefinition lab() {
@@ -111,8 +111,6 @@ class SystemDefinitions {
   @Builder
   static final class Ids {
     @NonNull String patient;
-
-    @NonNull String patientNotFound;
   }
 
   @Value

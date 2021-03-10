@@ -533,10 +533,10 @@
           "coding" : [
             {
               "system" : "http://hl7.org/fhir/sid/cvx",
-              "code" : "114"
+              "code" : "207"
             }
           ],
-          "text" : "meningococcal MCV4P"
+          "text" : "COVID-19 Vaccine"
         },
         "patient" : {
           "reference" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Patient/1011537977V693883",
@@ -550,7 +550,7 @@
         },
         "note" : [
           {
-            "text" : "Dose #2 of 3 of meningococcal MCV4P vaccine administered."
+            "text" : "Moderna COVID-19 Vaccine."
           }
         ],
         "reaction" : [

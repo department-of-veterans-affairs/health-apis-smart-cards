@@ -11,40 +11,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 @Component
 @AllArgsConstructor(onConstructor_ = @Autowired)
 public class DataQueryFhirClient implements FhirClient {
-
-  private static final Integer MODERNA_VACCINE_CODE = 207;
-
-  private static final Integer PFIZER_VACCINE_CODE = 208;
-
-  private static final Integer AZTRA_ZENACA_VACCINE_CODE = 210;
-
-  private static final Integer JANSSEN_VACCINE_CODE = 212;
+  private static final List<String> COVID19_VACCINE_CODES = List.of("207", "208", "210", "212");
 
   final RestTemplate restTemplate;
 
   final LinkProperties linkProperties;
 
+  private <T> ResponseEntity<T> doGet(String url, String authorization, Class<T> responseType) {
+    HttpEntity<HttpHeaders> entity = prepareHeaders(authorization);
+    return restTemplate.exchange(url, HttpMethod.GET, entity, responseType);
+  }
+
   @Override
   public Immunization.Bundle immunizationBundle(Patient patient, String authorization) {
-    var entity = prepareHeaders(authorization);
     String url =
         String.format(
             "%s?patient=%s&_count=100",
             linkProperties.dataQueryR4ResourceUrl("Immunization"), patient.id());
-    var immunizationBundle =
-        restTemplate.exchange(url, HttpMethod.GET, entity, Immunization.Bundle.class).getBody();
-    List<Integer> covidVaccines =
-        List.of(
-            MODERNA_VACCINE_CODE,
-            PFIZER_VACCINE_CODE,
-            AZTRA_ZENACA_VACCINE_CODE,
-            JANSSEN_VACCINE_CODE);
+    var immunizationBundle = doGet(url, authorization, Immunization.Bundle.class).getBody();
     if (immunizationBundle != null && immunizationBundle.entry() != null) {
       immunizationBundle.entry(
           immunizationBundle.entry().stream()
@@ -52,8 +43,7 @@ public class DataQueryFhirClient implements FhirClient {
                   entry -> {
                     var codingList =
                         entry.resource().vaccineCode().coding().stream()
-                            .filter(
-                                coding -> covidVaccines.contains(Integer.parseInt(coding.code())))
+                            .filter(coding -> COVID19_VACCINE_CODES.contains(coding.code()))
                             .collect(toList());
                     return !codingList.isEmpty();
                   })
@@ -68,9 +58,8 @@ public class DataQueryFhirClient implements FhirClient {
   @Override
   @SneakyThrows
   public Patient.Bundle patientBundle(String icn, String authorization) {
-    var entity = prepareHeaders(authorization);
     String url = String.format("%s?_id=%s", linkProperties.dataQueryR4ResourceUrl("Patient"), icn);
-    return restTemplate.exchange(url, HttpMethod.GET, entity, Patient.Bundle.class).getBody();
+    return doGet(url, authorization, Patient.Bundle.class).getBody();
   }
 
   private HttpEntity<HttpHeaders> prepareHeaders(String authorization) {

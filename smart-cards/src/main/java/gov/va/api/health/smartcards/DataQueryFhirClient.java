@@ -45,14 +45,11 @@ public class DataQueryFhirClient implements FhirClient {
     }
     immunizationBundle.entry(
         immunizationBundle.entry().stream()
+            .filter(entry -> entry.resource().status() == Immunization.Status.completed)
             .filter(
-                entry -> {
-                  var codingList =
-                      entry.resource().vaccineCode().coding().stream()
-                          .filter(coding -> COVID19_VACCINE_CODES.contains(coding.code()))
-                          .collect(toList());
-                  return !codingList.isEmpty();
-                })
+                entry ->
+                    entry.resource().vaccineCode().coding().stream()
+                        .anyMatch(coding -> COVID19_VACCINE_CODES.contains(coding.code())))
             .collect(toList()));
     immunizationBundle.total(immunizationBundle.entry().size());
     return immunizationBundle;

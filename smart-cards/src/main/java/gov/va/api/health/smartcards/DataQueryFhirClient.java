@@ -53,7 +53,7 @@ public class DataQueryFhirClient implements FhirClient {
                   return !codingList.isEmpty();
                 })
             .collect(toList()));
-    immunizationBundle.total((int) immunizationBundle.entry().stream().count());
+    immunizationBundle.total(immunizationBundle.entry().size());
     return immunizationBundle;
   }
 

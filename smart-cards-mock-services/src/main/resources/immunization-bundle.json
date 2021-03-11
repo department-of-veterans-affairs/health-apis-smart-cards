@@ -1,27 +1,27 @@
 {
   "resourceType" : "Bundle",
   "type" : "searchset",
-  "total" : 16,
+  "total" : 18,
   "link" : [
     {
       "relation" : "first",
-      "url" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Immunization?patient=1011537977V693883&page=1&_count=30"
+      "url" : "http://localhost:8090/r4/Immunization?patient=43000199&page=1&_count=30"
     },
     {
       "relation" : "self",
-      "url" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Immunization?patient=1011537977V693883&page=1&_count=30"
+      "url" : "http://localhost:8090/r4/Immunization?patient=43000199&page=1&_count=30"
     },
     {
       "relation" : "last",
-      "url" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Immunization?patient=1011537977V693883&page=1&_count=30"
+      "url" : "http://localhost:8090/r4/Immunization?patient=43000199&page=1&_count=30"
     }
   ],
   "entry" : [
     {
-      "fullUrl" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Immunization/I2-RHQZNPSQTIV3MBW2EOGBXMAMPM000000",
+      "fullUrl" : "http://localhost:8090/r4/Immunization/I2-SUIW57VEBLELRLBDYF3LKXB5ZA000000",
       "resource" : {
         "resourceType" : "Immunization",
-        "id" : "I2-RHQZNPSQTIV3MBW2EOGBXMAMPM000000",
+        "id" : "I2-SUIW57VEBLELRLBDYF3LKXB5ZA000000",
         "status" : "completed",
         "vaccineCode" : {
           "coding" : [
@@ -33,7 +33,7 @@
           "text" : "Tdap"
         },
         "patient" : {
-          "reference" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Patient/1011537977V693883",
+          "reference" : "http://localhost:8090/r4/Patient/43000199",
           "display" : "Ms. Carlita746 Kautzer186"
         },
         "occurrenceDateTime" : "2009-02-03T01:43:31Z",
@@ -49,12 +49,6 @@
               "display" : "Convulsions"
             }
           }
-        ],
-        "protocolApplied" : [
-          {
-            "doseNumberString" : "Series 1",
-            "seriesDosesPositiveInt" : 1
-          }
         ]
       },
       "search" : {
@@ -62,10 +56,10 @@
       }
     },
     {
-      "fullUrl" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Immunization/I2-URZ5UVXAZ2YA2IFW4BXFDWDXSU000000",
+      "fullUrl" : "http://localhost:8090/r4/Immunization/I2-G2LZEVNQALV5SAM7EKWCPOVHX4000000",
       "resource" : {
         "resourceType" : "Immunization",
-        "id" : "I2-URZ5UVXAZ2YA2IFW4BXFDWDXSU000000",
+        "id" : "I2-G2LZEVNQALV5SAM7EKWCPOVHX4000000",
         "status" : "completed",
         "vaccineCode" : {
           "coding" : [
@@ -77,7 +71,7 @@
           "text" : "Influenza  seasonal  injectable  preservative free"
         },
         "patient" : {
-          "reference" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Patient/1011537977V693883",
+          "reference" : "http://localhost:8090/r4/Patient/43000199",
           "display" : "Ms. Carlita746 Kautzer186"
         },
         "occurrenceDateTime" : "2009-02-03T01:43:31Z",
@@ -93,12 +87,6 @@
               "display" : "Convulsions"
             }
           }
-        ],
-        "protocolApplied" : [
-          {
-            "doseNumberString" : "Booster",
-            "seriesDosesPositiveInt" : 1
-          }
         ]
       },
       "search" : {
@@ -106,10 +94,10 @@
       }
     },
     {
-      "fullUrl" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Immunization/I2-4JUZT3MJSZNSBPCL6KL3EGWFNA000000",
+      "fullUrl" : "http://localhost:8090/r4/Immunization/I2-O47LKWTGTUWFPRZENHL5QMCK7M000000",
       "resource" : {
         "resourceType" : "Immunization",
-        "id" : "I2-4JUZT3MJSZNSBPCL6KL3EGWFNA000000",
+        "id" : "I2-O47LKWTGTUWFPRZENHL5QMCK7M000000",
         "status" : "completed",
         "vaccineCode" : {
           "coding" : [
@@ -121,13 +109,13 @@
           "text" : "HPV  quadrivalent"
         },
         "patient" : {
-          "reference" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Patient/1011537977V693883",
+          "reference" : "http://localhost:8090/r4/Patient/43000199",
           "display" : "Ms. Carlita746 Kautzer186"
         },
         "occurrenceDateTime" : "2009-02-03T01:43:31Z",
         "primarySource" : true,
         "location" : {
-          "reference" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Location/I2-2FPCKUIXVR7RJLLG34XVWGZERM000000",
+          "reference" : "http://localhost:8090/r4/Location/I2-7Q2IQADBCYM2BLJFCUUND7ITEE000000",
           "display" : "MENTAL HEALTH SERVICES"
         },
         "note" : [
@@ -141,12 +129,6 @@
               "display" : "Other"
             }
           }
-        ],
-        "protocolApplied" : [
-          {
-            "doseNumberString" : "Series 1",
-            "seriesDosesPositiveInt" : 2
-          }
         ]
       },
       "search" : {
@@ -154,10 +136,10 @@
       }
     },
     {
-      "fullUrl" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Immunization/I2-BLUFWHRNFG23FE26AOQTTUCK3E000000",
+      "fullUrl" : "http://localhost:8090/r4/Immunization/I2-G6VA7J24JE3BFEDAXSYWCDRKLM000000",
       "resource" : {
         "resourceType" : "Immunization",
-        "id" : "I2-BLUFWHRNFG23FE26AOQTTUCK3E000000",
+        "id" : "I2-G6VA7J24JE3BFEDAXSYWCDRKLM000000",
         "status" : "completed",
         "vaccineCode" : {
           "coding" : [
@@ -169,7 +151,7 @@
           "text" : "meningococcal MCV4P"
         },
         "patient" : {
-          "reference" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Patient/1011537977V693883",
+          "reference" : "http://localhost:8090/r4/Patient/43000199",
           "display" : "Ms. Carlita746 Kautzer186"
         },
         "occurrenceDateTime" : "2009-02-03T01:43:31Z",
@@ -185,12 +167,6 @@
               "display" : "Other"
             }
           }
-        ],
-        "protocolApplied" : [
-          {
-            "doseNumberString" : "Series 1",
-            "seriesDosesPositiveInt" : 2
-          }
         ]
       },
       "search" : {
@@ -198,10 +174,10 @@
       }
     },
     {
-      "fullUrl" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Immunization/I2-2H2WBX466PIM2AD5KRBOU7CMVY000000",
+      "fullUrl" : "http://localhost:8090/r4/Immunization/I2-BCOTPJOWKXIP3CUCE6DBZCSMUY000000",
       "resource" : {
         "resourceType" : "Immunization",
-        "id" : "I2-2H2WBX466PIM2AD5KRBOU7CMVY000000",
+        "id" : "I2-BCOTPJOWKXIP3CUCE6DBZCSMUY000000",
         "status" : "completed",
         "vaccineCode" : {
           "coding" : [
@@ -213,13 +189,13 @@
           "text" : "Influenza  seasonal  injectable  preservative free"
         },
         "patient" : {
-          "reference" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Patient/1011537977V693883",
+          "reference" : "http://localhost:8090/r4/Patient/43000199",
           "display" : "Ms. Carlita746 Kautzer186"
         },
         "occurrenceDateTime" : "2010-02-09T01:43:31Z",
         "primarySource" : true,
         "location" : {
-          "reference" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Location/I2-2FPCKUIXVR7RJLLG34XVWGZERM000000",
+          "reference" : "http://localhost:8090/r4/Location/I2-7Q2IQADBCYM2BLJFCUUND7ITEE000000",
           "display" : "MENTAL HEALTH SERVICES"
         },
         "note" : [
@@ -240,10 +216,10 @@
       }
     },
     {
-      "fullUrl" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Immunization/I2-XQJ3ADYHGMBCEZRKU767LEJYME000000",
+      "fullUrl" : "http://localhost:8090/r4/Immunization/I2-EHHOPHPNAQDFZMUZ44HATCU3PI000000",
       "resource" : {
         "resourceType" : "Immunization",
-        "id" : "I2-XQJ3ADYHGMBCEZRKU767LEJYME000000",
+        "id" : "I2-EHHOPHPNAQDFZMUZ44HATCU3PI000000",
         "status" : "completed",
         "vaccineCode" : {
           "coding" : [
@@ -255,13 +231,13 @@
           "text" : "HPV  quadrivalent"
         },
         "patient" : {
-          "reference" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Patient/1011537977V693883",
+          "reference" : "http://localhost:8090/r4/Patient/43000199",
           "display" : "Ms. Carlita746 Kautzer186"
         },
         "occurrenceDateTime" : "2010-02-09T01:43:31Z",
         "primarySource" : true,
         "location" : {
-          "reference" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Location/I2-2FPCKUIXVR7RJLLG34XVWGZERM000000",
+          "reference" : "http://localhost:8090/r4/Location/I2-7Q2IQADBCYM2BLJFCUUND7ITEE000000",
           "display" : "MENTAL HEALTH SERVICES"
         },
         "note" : [
@@ -275,12 +251,6 @@
               "display" : "Anaphylaxis or collapse"
             }
           }
-        ],
-        "protocolApplied" : [
-          {
-            "doseNumberString" : "Series 1",
-            "seriesDosesPositiveInt" : 2
-          }
         ]
       },
       "search" : {
@@ -288,10 +258,10 @@
       }
     },
     {
-      "fullUrl" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Immunization/I2-JGNBZNTLLGWZ2Y5GKOET4AE55M000000",
+      "fullUrl" : "http://localhost:8090/r4/Immunization/I2-EPU6M53J3QZZA63UEAJDV6T4MY000000",
       "resource" : {
         "resourceType" : "Immunization",
-        "id" : "I2-JGNBZNTLLGWZ2Y5GKOET4AE55M000000",
+        "id" : "I2-EPU6M53J3QZZA63UEAJDV6T4MY000000",
         "status" : "completed",
         "vaccineCode" : {
           "coding" : [
@@ -303,13 +273,13 @@
           "text" : "Influenza  seasonal  injectable  preservative free"
         },
         "patient" : {
-          "reference" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Patient/1011537977V693883",
+          "reference" : "http://localhost:8090/r4/Patient/43000199",
           "display" : "Ms. Carlita746 Kautzer186"
         },
         "occurrenceDateTime" : "2011-02-15T01:43:31Z",
         "primarySource" : true,
         "location" : {
-          "reference" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Location/I2-2FPCKUIXVR7RJLLG34XVWGZERM000000",
+          "reference" : "http://localhost:8090/r4/Location/I2-7Q2IQADBCYM2BLJFCUUND7ITEE000000",
           "display" : "MENTAL HEALTH SERVICES"
         },
         "note" : [
@@ -323,12 +293,6 @@
               "display" : "Vomiting"
             }
           }
-        ],
-        "protocolApplied" : [
-          {
-            "doseNumberString" : "Booster",
-            "seriesDosesPositiveInt" : 1
-          }
         ]
       },
       "search" : {
@@ -336,10 +300,10 @@
       }
     },
     {
-      "fullUrl" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Immunization/I2-T2OAARVTA7VRWQBC4RXT2XMMHI000000",
+      "fullUrl" : "http://localhost:8090/r4/Immunization/I2-V3T57KMYPM36OD4HON43CYHQ7U000000",
       "resource" : {
         "resourceType" : "Immunization",
-        "id" : "I2-T2OAARVTA7VRWQBC4RXT2XMMHI000000",
+        "id" : "I2-V3T57KMYPM36OD4HON43CYHQ7U000000",
         "status" : "completed",
         "vaccineCode" : {
           "coding" : [
@@ -351,13 +315,13 @@
           "text" : "HPV  quadrivalent"
         },
         "patient" : {
-          "reference" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Patient/1011537977V693883",
+          "reference" : "http://localhost:8090/r4/Patient/43000199",
           "display" : "Ms. Carlita746 Kautzer186"
         },
         "occurrenceDateTime" : "2011-02-15T01:43:31Z",
         "primarySource" : true,
         "location" : {
-          "reference" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Location/I2-4KG3N5YUSPTWD3DAFMLMRL5V5U000000",
+          "reference" : "http://localhost:8090/r4/Location/I2-K7WNFKZA3JCXL3CLT6D2HP7RRU000000",
           "display" : "VISUAL IMPAIRMENT SVCS OUTPATIENT REHAB (VISOR)"
         },
         "note" : [
@@ -371,12 +335,6 @@
               "display" : "Fever"
             }
           }
-        ],
-        "protocolApplied" : [
-          {
-            "doseNumberString" : "Booster",
-            "seriesDosesPositiveInt" : 1
-          }
         ]
       },
       "search" : {
@@ -384,10 +342,10 @@
       }
     },
     {
-      "fullUrl" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Immunization/I2-Q56PL3OSSNDFVV6FO3YBLQGJBM000000",
+      "fullUrl" : "http://localhost:8090/r4/Immunization/I2-2R5BVJP2BF2PB6S5ORQSLCWGFU000000",
       "resource" : {
         "resourceType" : "Immunization",
-        "id" : "I2-Q56PL3OSSNDFVV6FO3YBLQGJBM000000",
+        "id" : "I2-2R5BVJP2BF2PB6S5ORQSLCWGFU000000",
         "status" : "completed",
         "vaccineCode" : {
           "coding" : [
@@ -399,7 +357,7 @@
           "text" : "Influenza  seasonal  injectable  preservative free"
         },
         "patient" : {
-          "reference" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Patient/1011537977V693883",
+          "reference" : "http://localhost:8090/r4/Patient/43000199",
           "display" : "Ms. Carlita746 Kautzer186"
         },
         "occurrenceDateTime" : "2012-02-21T01:43:31Z",
@@ -415,12 +373,6 @@
               "display" : "Other"
             }
           }
-        ],
-        "protocolApplied" : [
-          {
-            "doseNumberString" : "Booster",
-            "seriesDosesPositiveInt" : 1
-          }
         ]
       },
       "search" : {
@@ -428,10 +380,10 @@
       }
     },
     {
-      "fullUrl" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Immunization/I2-UDY5UPMZR5OW7VAKTFK2WY4VAA000000",
+      "fullUrl" : "http://localhost:8090/r4/Immunization/I2-CSBMMRK23SXMO75MCXQNS66R6E000000",
       "resource" : {
         "resourceType" : "Immunization",
-        "id" : "I2-UDY5UPMZR5OW7VAKTFK2WY4VAA000000",
+        "id" : "I2-CSBMMRK23SXMO75MCXQNS66R6E000000",
         "status" : "completed",
         "vaccineCode" : {
           "coding" : [
@@ -443,13 +395,13 @@
           "text" : "Influenza  seasonal  injectable  preservative free"
         },
         "patient" : {
-          "reference" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Patient/1011537977V693883",
+          "reference" : "http://localhost:8090/r4/Patient/43000199",
           "display" : "Ms. Carlita746 Kautzer186"
         },
         "occurrenceDateTime" : "2013-02-26T01:43:31Z",
         "primarySource" : true,
         "location" : {
-          "reference" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Location/I2-4KG3N5YUSPTWD3DAFMLMRL5V5U000000",
+          "reference" : "http://localhost:8090/r4/Location/I2-K7WNFKZA3JCXL3CLT6D2HP7RRU000000",
           "display" : "VISUAL IMPAIRMENT SVCS OUTPATIENT REHAB (VISOR)"
         },
         "note" : [
@@ -463,12 +415,6 @@
               "display" : "Arthritis or Arthralgias"
             }
           }
-        ],
-        "protocolApplied" : [
-          {
-            "doseNumberString" : "Booster",
-            "seriesDosesPositiveInt" : 1
-          }
         ]
       },
       "search" : {
@@ -476,10 +422,10 @@
       }
     },
     {
-      "fullUrl" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Immunization/I2-ZZS6O66T2HJTOPI7CRPK2ZYT6Y000000",
+      "fullUrl" : "http://localhost:8090/r4/Immunization/I2-AHAG7WVNXFFQ7LPTZZN7WJOUBA000000",
       "resource" : {
         "resourceType" : "Immunization",
-        "id" : "I2-ZZS6O66T2HJTOPI7CRPK2ZYT6Y000000",
+        "id" : "I2-AHAG7WVNXFFQ7LPTZZN7WJOUBA000000",
         "status" : "completed",
         "vaccineCode" : {
           "coding" : [
@@ -491,13 +437,13 @@
           "text" : "Influenza  seasonal  injectable  preservative free"
         },
         "patient" : {
-          "reference" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Patient/1011537977V693883",
+          "reference" : "http://localhost:8090/r4/Patient/43000199",
           "display" : "Ms. Carlita746 Kautzer186"
         },
         "occurrenceDateTime" : "2014-03-04T01:43:31Z",
         "primarySource" : true,
         "location" : {
-          "reference" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Location/I2-2FPCKUIXVR7RJLLG34XVWGZERM000000",
+          "reference" : "http://localhost:8090/r4/Location/I2-7Q2IQADBCYM2BLJFCUUND7ITEE000000",
           "display" : "MENTAL HEALTH SERVICES"
         },
         "note" : [
@@ -511,12 +457,6 @@
               "display" : "Vomiting"
             }
           }
-        ],
-        "protocolApplied" : [
-          {
-            "doseNumberString" : "Series 1",
-            "seriesDosesPositiveInt" : 2
-          }
         ]
       },
       "search" : {
@@ -524,33 +464,33 @@
       }
     },
     {
-      "fullUrl" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Immunization/I2-D7NHTLI2CQWZ7FMFGMO5YVIB54000000",
+      "fullUrl" : "http://localhost:8090/r4/Immunization/I2-ARJOF3N2YN2WJNSYDWBSD2RBCI000000",
       "resource" : {
         "resourceType" : "Immunization",
-        "id" : "I2-D7NHTLI2CQWZ7FMFGMO5YVIB54000000",
+        "id" : "I2-ARJOF3N2YN2WJNSYDWBSD2RBCI000000",
         "status" : "completed",
         "vaccineCode" : {
           "coding" : [
             {
               "system" : "http://hl7.org/fhir/sid/cvx",
-              "code" : "207"
+              "code" : "114"
             }
           ],
-          "text" : "COVID-19 Vaccine"
+          "text" : "meningococcal MCV4P"
         },
         "patient" : {
-          "reference" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Patient/1011537977V693883",
+          "reference" : "http://localhost:8090/r4/Patient/43000199",
           "display" : "Ms. Carlita746 Kautzer186"
         },
         "occurrenceDateTime" : "2014-03-04T01:43:31Z",
         "primarySource" : true,
         "location" : {
-          "reference" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Location/I2-3JYDMXC6RXTU4H25KRVXATSEJQ000000",
+          "reference" : "http://localhost:8090/r4/Location/I2-JTDSDSJX3KCNMT3D67S3UGJYAU000000",
           "display" : "TEM MH PSO TRS IND93EH 2"
         },
         "note" : [
           {
-            "text" : "Moderna COVID-19 Vaccine."
+            "text" : "Dose #2 of 3 of meningococcal MCV4P vaccine administered."
           }
         ],
         "reaction" : [
@@ -566,10 +506,10 @@
       }
     },
     {
-      "fullUrl" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Immunization/I2-B4VXF7DBCHBXFNIV6ROFHQGXEQ000000",
+      "fullUrl" : "http://localhost:8090/r4/Immunization/I2-QOAAADVYZIFUNYNV2YWRUW5HNU000000",
       "resource" : {
         "resourceType" : "Immunization",
-        "id" : "I2-B4VXF7DBCHBXFNIV6ROFHQGXEQ000000",
+        "id" : "I2-QOAAADVYZIFUNYNV2YWRUW5HNU000000",
         "status" : "completed",
         "vaccineCode" : {
           "coding" : [
@@ -581,13 +521,13 @@
           "text" : "Influenza  seasonal  injectable  preservative free"
         },
         "patient" : {
-          "reference" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Patient/1011537977V693883",
+          "reference" : "http://localhost:8090/r4/Patient/43000199",
           "display" : "Ms. Carlita746 Kautzer186"
         },
         "occurrenceDateTime" : "2015-02-17T01:43:31Z",
         "primarySource" : true,
         "location" : {
-          "reference" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Location/I2-3JYDMXC6RXTU4H25KRVXATSEJQ000000",
+          "reference" : "http://localhost:8090/r4/Location/I2-JTDSDSJX3KCNMT3D67S3UGJYAU000000",
           "display" : "TEM MH PSO TRS IND93EH 2"
         },
         "note" : [
@@ -601,12 +541,6 @@
               "display" : "Arthritis or Arthralgias"
             }
           }
-        ],
-        "protocolApplied" : [
-          {
-            "doseNumberString" : "Booster",
-            "seriesDosesPositiveInt" : 1
-          }
         ]
       },
       "search" : {
@@ -614,10 +548,10 @@
       }
     },
     {
-      "fullUrl" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Immunization/I2-JQIGIG3LV25J7N62SZK4XY7F3Y000000",
+      "fullUrl" : "http://localhost:8090/r4/Immunization/I2-X6WGOBFKZHKUCKFKU4AWXXZ2MI000000",
       "resource" : {
         "resourceType" : "Immunization",
-        "id" : "I2-JQIGIG3LV25J7N62SZK4XY7F3Y000000",
+        "id" : "I2-X6WGOBFKZHKUCKFKU4AWXXZ2MI000000",
         "status" : "completed",
         "vaccineCode" : {
           "coding" : [
@@ -629,13 +563,13 @@
           "text" : "Influenza  seasonal  injectable  preservative free"
         },
         "patient" : {
-          "reference" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Patient/1011537977V693883",
+          "reference" : "http://localhost:8090/r4/Patient/43000199",
           "display" : "Ms. Carlita746 Kautzer186"
         },
         "occurrenceDateTime" : "2015-08-18T00:43:31Z",
         "primarySource" : true,
         "location" : {
-          "reference" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Location/I2-2FPCKUIXVR7RJLLG34XVWGZERM000000",
+          "reference" : "http://localhost:8090/r4/Location/I2-7Q2IQADBCYM2BLJFCUUND7ITEE000000",
           "display" : "MENTAL HEALTH SERVICES"
         },
         "note" : [
@@ -649,12 +583,6 @@
               "display" : "Rash or itching"
             }
           }
-        ],
-        "protocolApplied" : [
-          {
-            "doseNumberString" : "Series 1",
-            "seriesDosesPositiveInt" : 1
-          }
         ]
       },
       "search" : {
@@ -662,10 +590,10 @@
       }
     },
     {
-      "fullUrl" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Immunization/I2-55SQNNDBJUHYLVNXKTTYZSIVQE000000",
+      "fullUrl" : "http://localhost:8090/r4/Immunization/I2-ZHDWUIIUHJ5Q3KNK5AX33G67H4000000",
       "resource" : {
         "resourceType" : "Immunization",
-        "id" : "I2-55SQNNDBJUHYLVNXKTTYZSIVQE000000",
+        "id" : "I2-ZHDWUIIUHJ5Q3KNK5AX33G67H4000000",
         "status" : "completed",
         "vaccineCode" : {
           "coding" : [
@@ -677,13 +605,13 @@
           "text" : "Influenza  seasonal  injectable  preservative free"
         },
         "patient" : {
-          "reference" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Patient/1011537977V693883",
+          "reference" : "http://localhost:8090/r4/Patient/43000199",
           "display" : "Ms. Carlita746 Kautzer186"
         },
         "occurrenceDateTime" : "2016-08-23T00:43:31Z",
         "primarySource" : true,
         "location" : {
-          "reference" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Location/I2-2FPCKUIXVR7RJLLG34XVWGZERM000000",
+          "reference" : "http://localhost:8090/r4/Location/I2-7Q2IQADBCYM2BLJFCUUND7ITEE000000",
           "display" : "MENTAL HEALTH SERVICES"
         },
         "note" : [
@@ -697,12 +625,6 @@
               "display" : "Arthritis or Arthralgias"
             }
           }
-        ],
-        "protocolApplied" : [
-          {
-            "doseNumberString" : "Booster",
-            "seriesDosesPositiveInt" : 1
-          }
         ]
       },
       "search" : {
@@ -710,10 +632,10 @@
       }
     },
     {
-      "fullUrl" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Immunization/I2-TZF2BZINYXJR3PZ2EBDXGYCBGI000000",
+      "fullUrl" : "http://localhost:8090/r4/Immunization/I2-MWUVX24OPJCQCINZF7QS66FKRE000000",
       "resource" : {
         "resourceType" : "Immunization",
-        "id" : "I2-TZF2BZINYXJR3PZ2EBDXGYCBGI000000",
+        "id" : "I2-MWUVX24OPJCQCINZF7QS66FKRE000000",
         "status" : "completed",
         "vaccineCode" : {
           "coding" : [
@@ -725,13 +647,13 @@
           "text" : "Influenza  seasonal  injectable  preservative free"
         },
         "patient" : {
-          "reference" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Patient/1011537977V693883",
+          "reference" : "http://localhost:8090/r4/Patient/43000199",
           "display" : "Ms. Carlita746 Kautzer186"
         },
         "occurrenceDateTime" : "2017-08-29T00:43:31Z",
         "primarySource" : true,
         "location" : {
-          "reference" : "https://sandbox-api.va.gov/services/fhir/v0/r4/Location/I2-3JYDMXC6RXTU4H25KRVXATSEJQ000000",
+          "reference" : "http://localhost:8090/r4/Location/I2-JTDSDSJX3KCNMT3D67S3UGJYAU000000",
           "display" : "TEM MH PSO TRS IND93EH 2"
         },
         "note" : [
@@ -745,11 +667,75 @@
               "display" : "Vomiting"
             }
           }
-        ],
-        "protocolApplied" : [
+        ]
+      },
+      "search" : {
+        "mode" : "match"
+      }
+    },
+    {
+      "fullUrl" : "http://localhost:8090/r4/Immunization/I2-CA5C4BZN25PERCGL3AN2NSCLWE000000",
+      "resource" : {
+        "resourceType" : "Immunization",
+        "id" : "I2-CA5C4BZN25PERCGL3AN2NSCLWE000000",
+        "status" : "completed",
+        "vaccineCode" : {
+          "coding" : [
+            {
+              "system" : "http://hl7.org/fhir/sid/cvx",
+              "code" : "207"
+            }
+          ],
+          "text" : "COVID-19, mRNA, LNP-S, PF, 100 mcg/ 0.5 mL dose"
+        },
+        "patient" : {
+          "reference" : "http://localhost:8090/r4/Patient/43000199",
+          "display" : "Ms. Carlita746 Kautzer186"
+        },
+        "occurrenceDateTime" : "2021-01-14T09:30:21Z",
+        "primarySource" : true,
+        "location" : {
+          "reference" : "http://localhost:8090/r4/Location/I2-JTDSDSJX3KCNMT3D67S3UGJYAU000000",
+          "display" : "TEM MH PSO TRS IND93EH 2"
+        },
+        "note" : [
           {
-            "doseNumberString" : "Series 1",
-            "seriesDosesPositiveInt" : 1
+            "text" : "Dose #1 of 2 of COVID-19, mRNA, LNP-S, PF, 100 mcg/ 0.5 mL dose vaccine administered."
+          }
+        ]
+      },
+      "search" : {
+        "mode" : "match"
+      }
+    },
+    {
+      "fullUrl" : "http://localhost:8090/r4/Immunization/I2-E56RA55DH4KLXQBCZ6L2F2JKSM000000",
+      "resource" : {
+        "resourceType" : "Immunization",
+        "id" : "I2-E56RA55DH4KLXQBCZ6L2F2JKSM000000",
+        "status" : "completed",
+        "vaccineCode" : {
+          "coding" : [
+            {
+              "system" : "http://hl7.org/fhir/sid/cvx",
+              "code" : "207"
+            }
+          ],
+          "text" : "COVID-19, mRNA, LNP-S, PF, 100 mcg/ 0.5 mL dose"
+        },
+        "patient" : {
+          "reference" : "http://localhost:8090/r4/Patient/43000199",
+          "display" : "Ms. Carlita746 Kautzer186"
+        },
+        "occurrenceDateTime" : "2021-01-28T10:33:51Z",
+        "primarySource" : true,
+        "location" : {
+          "reference" : "http://localhost:8090/r4/Location/I2-JTDSDSJX3KCNMT3D67S3UGJYAU000000",
+          "display" : "TEM MH PSO TRS IND93EH 2"
+        },
+        "note" : [
+          {
+            "text" : "Dose #2 of 2 of COVID-19, mRNA, LNP-S, PF, 100 mcg/ 0.5 mL dose vaccine administered."
           }
         ]
       },

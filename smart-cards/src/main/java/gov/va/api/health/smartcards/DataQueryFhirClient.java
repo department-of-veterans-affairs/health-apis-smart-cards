@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toList;
 
 import gov.va.api.health.r4.api.resources.Immunization;
 import gov.va.api.health.r4.api.resources.Patient;
+import gov.va.api.health.smartcards.Exceptions.FhirConnectionFailure;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -38,23 +39,22 @@ public class DataQueryFhirClient implements FhirClient {
             "%s?patient=%s&_count=100",
             linkProperties.dataQueryR4ResourceUrl("Immunization"), patient.id());
     var immunizationBundle = doGet(url, authorization, Immunization.Bundle.class).getBody();
-    if (immunizationBundle != null && immunizationBundle.entry() != null) {
-      immunizationBundle.entry(
-          immunizationBundle.entry().stream()
-              .filter(
-                  entry -> {
-                    var codingList =
-                        entry.resource().vaccineCode().coding().stream()
-                            .filter(coding -> COVID19_VACCINE_CODES.contains(coding.code()))
-                            .collect(toList());
-                    return !codingList.isEmpty();
-                  })
-              .collect(toList()));
-      immunizationBundle.total((int) immunizationBundle.entry().stream().count());
-      return immunizationBundle;
-    } else {
-      return null;
+    if (immunizationBundle == null) {
+      throw new FhirConnectionFailure("No bundle found");
     }
+    immunizationBundle.entry(
+        immunizationBundle.entry().stream()
+            .filter(
+                entry -> {
+                  var codingList =
+                      entry.resource().vaccineCode().coding().stream()
+                          .filter(coding -> COVID19_VACCINE_CODES.contains(coding.code()))
+                          .collect(toList());
+                  return !codingList.isEmpty();
+                })
+            .collect(toList()));
+    immunizationBundle.total((int) immunizationBundle.entry().stream().count());
+    return immunizationBundle;
   }
 
   @Override

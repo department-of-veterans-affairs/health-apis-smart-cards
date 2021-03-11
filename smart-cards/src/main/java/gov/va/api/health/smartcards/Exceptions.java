@@ -14,6 +14,12 @@ public class Exceptions {
     }
   }
 
+  public static final class FhirConnectionFailure extends RuntimeException {
+    public FhirConnectionFailure(String message) {
+      super(String.format("Fhir Connection error: %s", message));
+    }
+  }
+
   public static final class InvalidCredentialType extends RuntimeException {
     public InvalidCredentialType(String value) {
       super(String.format("Invalid credentialType %s", value));

@@ -12,10 +12,10 @@ import gov.va.api.health.r4.api.bundle.MixedEntry;
 import gov.va.api.health.r4.api.resources.Immunization;
 import gov.va.api.health.r4.api.resources.Immunization.Status;
 import gov.va.api.health.r4.api.resources.Location;
+import gov.va.api.health.r4.api.resources.Location.Bundle;
 import gov.va.api.health.r4.api.resources.Parameters;
 import gov.va.api.health.r4.api.resources.Patient;
 import gov.va.api.health.r4.api.resources.Resource;
-import gov.va.api.health.smartcards.Controllers;
 import gov.va.api.health.smartcards.DataQueryFhirClient;
 import gov.va.api.health.smartcards.Exceptions;
 import gov.va.api.health.smartcards.JacksonMapperConfig;
@@ -24,7 +24,10 @@ import gov.va.api.health.smartcards.R4MixedBundler;
 import gov.va.api.health.smartcards.vc.CredentialType;
 import gov.va.api.health.smartcards.vc.VerifiableCredential;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -78,17 +81,6 @@ public class PatientController {
     bundle.entry().stream().filter(filter).map(transform).forEachOrdered(target::add);
   }
 
-  private <R extends Resource, E extends AbstractEntry<R>, B extends AbstractBundle<E>>
-      void consumeBundle(
-          List<B> bundles,
-          List<MixedEntry> target,
-          Predicate<E> filter,
-          Function<E, MixedEntry> transform) {
-    for (B bundle : bundles) {
-      consumeBundle(bundle, target, filter, transform);
-    }
-  }
-
   private boolean filter(Immunization.Entry entry) {
     return entry.resource().status() == Status.completed;
   }
@@ -120,9 +112,8 @@ public class PatientController {
       entry.fullUrl(RESOURCE_PREFIX + urls.indexOf(entry.fullUrl()));
       if (entry.resource() instanceof Immunization) {
         Immunization imm = (Immunization) entry.resource();
-        List<String> references = List.of(imm.patient().reference(), imm.location().reference());
+        List<String> references = List.of(imm.patient().reference());
         references.stream().filter(r -> !urls.contains(r)).forEachOrdered(urls::add);
-        imm.location().reference(RESOURCE_PREFIX + urls.indexOf(imm.location().reference()));
         imm.patient().reference(RESOURCE_PREFIX + urls.indexOf(imm.patient().reference()));
       }
     }
@@ -146,11 +137,10 @@ public class PatientController {
     Patient.Bundle patients = fhirClient.patientBundle(id, authorization);
     Patient patient = getPatientFromBundle(patients, id);
     Immunization.Bundle immunizations = mockFhirClient.immunizationBundle(patient);
-    List<Location.Bundle> locations = lookupLocations(immunizations);
+    lookupLocations(immunizations);
     List<MixedEntry> resources = new ArrayList<>();
     consumeBundle(patients, resources, x -> true, this::transform);
     consumeBundle(immunizations, resources, this::filter, this::transform);
-    consumeBundle(locations, resources, x -> true, this::transform);
     // Index unique URLs and replace with 'resource:X' scheme
     List<String> urls = indexAndReplaceUrls(resources);
     MixedBundle bundle = toBundle(resources);
@@ -159,16 +149,20 @@ public class PatientController {
     return ResponseEntity.ok(parametersResponse);
   }
 
-  private List<Location.Bundle> lookupLocations(Immunization.Bundle immunizations) {
+  private void lookupLocations(Immunization.Bundle immunizations) {
     // keep track of locations we already looked up
-    List<String> uniqueLocations = new ArrayList<>();
-    return immunizations.entry().stream()
-        .map(i -> i.resource().location().reference())
-        .map(Controllers::resourceId)
-        .filter(l -> !uniqueLocations.contains(l))
-        .peek(uniqueLocations::add)
-        .map(mockFhirClient::locationBundle)
-        .collect(toList());
+    Map<String, Bundle> locations = new HashMap<>();
+    for (Immunization.Entry entry : immunizations.entry()) {
+      Immunization imm = entry.resource();
+      String locationResourceId = imm.location().reference();
+      Location.Bundle locationBundle = locations.get(locationResourceId);
+      if (locationBundle == null) {
+        locationBundle = mockFhirClient.locationBundle(locationResourceId);
+        locations.put(locationResourceId, locationBundle);
+      }
+      Optional<Location.Entry> maybeEntry = locationBundle.entry().stream().findFirst();
+      maybeEntry.ifPresent(value -> imm.contained(List.of(value.resource())));
+    }
   }
 
   private List<Parameters.Parameter> parameterResourceLinks(List<String> urls) {
@@ -217,10 +211,6 @@ public class PatientController {
 
   private MixedEntry transform(Immunization.Entry entry) {
     return ImmunizationTransformer.builder().entry(entry).build().transform();
-  }
-
-  private MixedEntry transform(Location.Entry entry) {
-    return LocationTransformer.builder().entry(entry).build().transform();
   }
 
   private List<CredentialType> validateCredentialTypes(List<CredentialType> credentials) {

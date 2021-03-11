@@ -6,8 +6,12 @@ import gov.va.api.health.r4.api.bundle.MixedEntry;
 import gov.va.api.health.r4.api.datatypes.CodeableConcept;
 import gov.va.api.health.r4.api.elements.Reference;
 import gov.va.api.health.r4.api.resources.Immunization;
+import gov.va.api.health.r4.api.resources.Location;
+import java.util.List;
 import lombok.Builder;
 import lombok.NonNull;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 @Builder
 public class ImmunizationTransformer {
@@ -15,13 +19,6 @@ public class ImmunizationTransformer {
 
   static Reference referenceOnly(@NonNull Reference reference) {
     return Reference.builder().reference(reference.reference()).build();
-  }
-
-  Reference location() {
-    if (entry.resource().location() == null) {
-      return null;
-    }
-    return referenceOnly(entry.resource().location());
   }
 
   String occurrenceDateTime() {
@@ -39,6 +36,29 @@ public class ImmunizationTransformer {
     return referenceOnly(entry.resource().patient());
   }
 
+  List<Immunization.Performer> performer() {
+    if (CollectionUtils.isEmpty(entry.resource().contained())) {
+      return null;
+    }
+    Location location =
+        entry.resource().contained().stream()
+            .filter(r -> r instanceof Location)
+            .map(r -> (Location) r)
+            .findFirst()
+            .orElse(null);
+    if (location == null) {
+      return null;
+    }
+    Reference org = location.managingOrganization();
+    if (StringUtils.isEmpty(org.display())) {
+      return null;
+    }
+    return List.of(
+        Immunization.Performer.builder()
+            .actor(Reference.builder().display(org.display()).build())
+            .build());
+  }
+
   MixedEntry transform() {
     return MixedEntry.builder()
         .fullUrl(entry.fullUrl())
@@ -48,7 +68,7 @@ public class ImmunizationTransformer {
                 .vaccineCode(vaccineCode())
                 .patient(patient())
                 .occurrenceDateTime(occurrenceDateTime())
-                .location(location())
+                .performer(performer())
                 .build())
         .build();
   }

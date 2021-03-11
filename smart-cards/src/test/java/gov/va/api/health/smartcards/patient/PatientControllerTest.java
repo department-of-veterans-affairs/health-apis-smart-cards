@@ -131,10 +131,9 @@ public class PatientControllerTest {
     assertThat(vc.type()).contains("VerifiableCredential", "https://smarthealth.cards#covid19");
     var fhirBundle = vc.credentialSubject().fhirBundle();
     assertThat(fhirBundle.entry()).hasSize(fhirBundle.total());
-    assertThat(fhirBundle.total()).isEqualTo(4);
+    assertThat(fhirBundle.total()).isEqualTo(3);
     assertThat(countEntriesByType(fhirBundle, "Patient")).isEqualTo(1);
     assertThat(countEntriesByType(fhirBundle, "Immunization")).isEqualTo(2);
-    assertThat(countEntriesByType(fhirBundle, "Location")).isEqualTo(1);
     // verify full urls are "resource:N"
     for (int i = 0; i < fhirBundle.entry().size(); i++) {
       assertThat(fhirBundle.entry().get(i).fullUrl()).isEqualTo("resource:" + i);
@@ -147,7 +146,6 @@ public class PatientControllerTest {
             .peek(
                 imm -> {
                   assertThat(imm.patient().reference()).isEqualTo("resource:0");
-                  assertThat(imm.location().reference()).isEqualTo("resource:3");
                 })
             .count();
     assertThat(immValidated).isEqualTo(2);
@@ -157,8 +155,7 @@ public class PatientControllerTest {
             List.of(
                 resourceLink("resource:0", "http://dq.foo/r4/Patient/123"),
                 resourceLink("resource:1", "http://dq.foo/r4/Immunization/imm-1-123"),
-                resourceLink("resource:2", "http://dq.foo/r4/Immunization/imm-2-123"),
-                resourceLink("resource:3", "http://dq.foo/r4/Location/loc-123")));
+                resourceLink("resource:2", "http://dq.foo/r4/Immunization/imm-2-123")));
   }
 
   @Test

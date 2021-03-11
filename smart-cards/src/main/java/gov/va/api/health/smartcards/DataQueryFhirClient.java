@@ -18,6 +18,8 @@ import org.springframework.web.client.RestTemplate;
 @Component
 @AllArgsConstructor(onConstructor_ = @Autowired)
 public class DataQueryFhirClient implements FhirClient {
+  // Vaccine Code reference here:
+  // https://www.cdc.gov/vaccines/programs/iis/COVID-19-related-codes.html
   private static final List<String> COVID19_VACCINE_CODES = List.of("207", "208", "210", "212");
 
   final RestTemplate restTemplate;

@@ -40,7 +40,7 @@ public class DataQueryFhirClient implements FhirClient {
             linkProperties.dataQueryR4ResourceUrl("Immunization"), patient.id());
     var immunizationBundle = doGet(url, authorization, Immunization.Bundle.class).getBody();
     if (immunizationBundle == null) {
-      throw new FhirConnectionFailure("No bundle found");
+      throw new FhirConnectionFailure(String.format("Received null response body for %s", url));
     }
     immunizationBundle.entry(
         immunizationBundle.entry().stream()

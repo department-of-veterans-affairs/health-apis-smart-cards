@@ -3,7 +3,7 @@ package gov.va.api.health.smartcards;
 import static java.util.stream.Collectors.toList;
 
 import gov.va.api.health.r4.api.resources.Immunization;
-import gov.va.api.health.r4.api.resources.Location.Bundle;
+import gov.va.api.health.r4.api.resources.Location;
 import gov.va.api.health.r4.api.resources.Patient;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -64,8 +64,9 @@ public class DataQueryFhirClient implements FhirClient {
   }
 
   @Override
-  public Bundle locationBundle(String id) {
-    throw new Exceptions.NotImplemented("not-implemented");
+  public Location.Bundle locationBundle(String id, String authorization) {
+    String url = String.format("%s?_id=%s", linkProperties.dataQueryR4ResourceUrl("Location"), id);
+    return doGet(url, authorization, Location.Bundle.class).getBody();
   }
 
   @Override

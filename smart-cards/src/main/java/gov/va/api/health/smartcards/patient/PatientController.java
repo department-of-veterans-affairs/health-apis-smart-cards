@@ -16,6 +16,7 @@ import gov.va.api.health.r4.api.resources.Location.Bundle;
 import gov.va.api.health.r4.api.resources.Parameters;
 import gov.va.api.health.r4.api.resources.Patient;
 import gov.va.api.health.r4.api.resources.Resource;
+import gov.va.api.health.smartcards.Controllers;
 import gov.va.api.health.smartcards.DataQueryFhirClient;
 import gov.va.api.health.smartcards.Exceptions;
 import gov.va.api.health.smartcards.JacksonMapperConfig;
@@ -134,7 +135,7 @@ public class PatientController {
     Patient.Bundle patients = fhirClient.patientBundle(id, authorization);
     Patient patient = getPatientFromBundle(patients, id);
     Immunization.Bundle immunizations = fhirClient.immunizationBundle(patient, authorization);
-    lookupLocations(immunizations);
+    lookupLocations(immunizations, authorization);
     List<MixedEntry> resources = new ArrayList<>();
     consumeBundle(patients, resources, x -> true, this::transform);
     consumeBundle(immunizations, resources, this::filter, this::transform);
@@ -146,15 +147,15 @@ public class PatientController {
     return ResponseEntity.ok(parametersResponse);
   }
 
-  private void lookupLocations(Immunization.Bundle immunizations) {
+  private void lookupLocations(Immunization.Bundle immunizations, String authorization) {
     // keep track of locations we already looked up
     Map<String, Bundle> locations = new HashMap<>();
     for (Immunization.Entry entry : immunizations.entry()) {
       Immunization imm = entry.resource();
-      String locationResourceId = imm.location().reference();
+      String locationResourceId = Controllers.resourceId(imm.location().reference());
       Location.Bundle locationBundle = locations.get(locationResourceId);
       if (locationBundle == null) {
-        locationBundle = fhirClient.locationBundle(locationResourceId);
+        locationBundle = fhirClient.locationBundle(locationResourceId, authorization);
         locations.put(locationResourceId, locationBundle);
       }
       Optional<Location.Entry> maybeEntry = locationBundle.entry().stream().findFirst();

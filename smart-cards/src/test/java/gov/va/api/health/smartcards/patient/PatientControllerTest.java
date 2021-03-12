@@ -16,14 +16,18 @@ import gov.va.api.health.r4.api.bundle.AbstractBundle;
 import gov.va.api.health.r4.api.bundle.AbstractEntry;
 import gov.va.api.health.r4.api.bundle.BundleLink;
 import gov.va.api.health.r4.api.bundle.MixedBundle;
+import gov.va.api.health.r4.api.datatypes.Address;
 import gov.va.api.health.r4.api.datatypes.Annotation;
-import gov.va.api.health.r4.api.resources.Immunization;
 import gov.va.api.health.r4.api.datatypes.CodeableConcept;
 import gov.va.api.health.r4.api.datatypes.Coding;
+import gov.va.api.health.r4.api.datatypes.ContactPoint;
+import gov.va.api.health.r4.api.datatypes.ContactPoint.ContactPointSystem;
 import gov.va.api.health.r4.api.datatypes.HumanName;
 import gov.va.api.health.r4.api.datatypes.Identifier;
 import gov.va.api.health.r4.api.elements.Reference;
 import gov.va.api.health.r4.api.resources.Immunization;
+import gov.va.api.health.r4.api.resources.Location;
+import gov.va.api.health.r4.api.resources.Location.Mode;
 import gov.va.api.health.r4.api.resources.Parameters;
 import gov.va.api.health.r4.api.resources.Patient;
 import gov.va.api.health.smartcards.DataQueryFhirClient;
@@ -79,7 +83,7 @@ public class PatientControllerTest {
   }
 
   static Immunization.Bundle immunizationBundle(String icn) {
-    LinkProperties linkProperties = mock(LinkProperties.class);
+    LinkProperties linkProperties = _linkProperties();
     var patient = Patient.builder().id(icn).name(List.of(HumanName.builder().build())).build();
     String vaccineSystem = "http://hl7.org/fhir/sid/cvx";
     List<Immunization> immunizations =
@@ -147,7 +151,7 @@ public class PatientControllerTest {
                                 "Dose #2 of 2 of COVID-19, mRNA, LNP-S, PF, 100 mcg/ 0.5 mL dose "
                                     + "vaccine administered.")
                             .build()))
-                .build(), // 'not_done' Immunization to verify filters
+                .build(),
             Immunization.builder()
                 .resourceType("Immunization")
                 .id(String.format("imm-3-%s", patient.id()))
@@ -206,6 +210,68 @@ public class PatientControllerTest {
     Patient.IDENTIFIER_MIN_SIZE.set(0);
   }
 
+  static Location.Bundle locationBundle(String id) {
+    LinkProperties linkProperties = _linkProperties();
+    Location location =
+        Location.builder()
+            .id(id)
+            .status(Location.Status.active)
+            .name("Location with id " + id)
+            .description("Description for id " + id)
+            .mode(Mode.instance)
+            .type(
+                List.of(
+                    CodeableConcept.builder()
+                        .coding(List.of(Coding.builder().display("SOME CODING").build()))
+                        .text("SOME TEXT")
+                        .build()))
+            .telecom(
+                List.of(
+                    ContactPoint.builder()
+                        .system(ContactPointSystem.phone)
+                        .value("123-456-7890 x0001")
+                        .build()))
+            .address(
+                Address.builder()
+                    .text("1901 VETERANS MEMORIAL DRIVE TEMPLE TEXAS 76504")
+                    .line(List.of("1901 VETERANS MEMORIAL DRIVE"))
+                    .city("TEMPLE")
+                    .state("TEXAS")
+                    .postalCode("76504")
+                    .build())
+            .physicalType(
+                CodeableConcept.builder()
+                    .coding(List.of(Coding.builder().display("PHYS TYPE CODING").build()))
+                    .text("PHYS TYPE TEXT")
+                    .build())
+            .managingOrganization(
+                Reference.builder()
+                    .reference(linkProperties.dataQueryR4ResourceUrl("Organization") + "/org-" + id)
+                    .display("MNG ORG VA MEDICAL")
+                    .build())
+            .build();
+    return Location.Bundle.builder()
+        .type(AbstractBundle.BundleType.searchset)
+        .link(
+            List.of(
+                BundleLink.builder()
+                    .relation(BundleLink.LinkRelation.self)
+                    .url(
+                        String.format(
+                            "%s?_id=%s", linkProperties.dataQueryR4ResourceUrl("Location"), id))
+                    .build()))
+        .total(1)
+        .entry(
+            List.of(
+                Location.Entry.builder()
+                    .fullUrl(linkProperties.dataQueryR4ReadUrl(location))
+                    .resource(location)
+                    .search(
+                        AbstractEntry.Search.builder().mode(AbstractEntry.SearchMode.match).build())
+                    .build()))
+        .build();
+  }
+
   private static Parameters parametersCovid19() {
     return parametersWithCredentialType("https://smarthealth.cards#covid19");
   }
@@ -224,7 +290,7 @@ public class PatientControllerTest {
   }
 
   static Patient.Bundle patientBundle(String id) {
-    LinkProperties linkProperties = mock(LinkProperties.class);
+    LinkProperties linkProperties = _linkProperties();
     String firstName = "Joe" + id;
     String lastName = "Doe" + id;
     Patient patient =
@@ -286,7 +352,8 @@ public class PatientControllerTest {
 
   private static PatientController patientController(
       ResponseEntity<Patient.Bundle> patientBundleResponse,
-      ResponseEntity<Immunization.Bundle> immunizationBundleResponse) {
+      ResponseEntity<Immunization.Bundle> immunizationBundleResponse,
+      ResponseEntity<Location.Bundle> locationBundleResponse) {
     var mockRestTemplate = mock(RestTemplate.class);
     if (patientBundleResponse != null) {
       when(mockRestTemplate.exchange(
@@ -298,6 +365,12 @@ public class PatientControllerTest {
               anyString(), any(HttpMethod.class), any(), same(Immunization.Bundle.class)))
           .thenReturn(immunizationBundleResponse);
     }
+    if (locationBundleResponse != null) {
+      when(mockRestTemplate.exchange(
+              anyString(), any(HttpMethod.class), any(), same(Location.Bundle.class)))
+          .thenReturn(locationBundleResponse);
+    }
+    var fhirClient = new DataQueryFhirClient(mockRestTemplate, _linkProperties());
     var bundler = new R4MixedBundler();
     return new PatientController(fhirClient, bundler);
   }
@@ -313,7 +386,10 @@ public class PatientControllerTest {
     var patientBundleResponse = new ResponseEntity<>(patientBundle("123"), HttpStatus.ACCEPTED);
     var immunizationBundleResponse =
         new ResponseEntity<>(immunizationBundle("123"), HttpStatus.ACCEPTED);
-    var controller = patientController(patientBundleResponse, immunizationBundleResponse);
+    var locationBundleResponse = new ResponseEntity<>(locationBundle("loc-1"), HttpStatus.ACCEPTED);
+    var controller =
+        patientController(
+            patientBundleResponse, immunizationBundleResponse, locationBundleResponse);
     var result = controller.issueVc("123", parametersCovid19(), "").getBody();
     assertNotNull(result);
     var vc = findVcFromParameters(result);
@@ -350,7 +426,7 @@ public class PatientControllerTest {
 
   @Test
   void issueVc_EmptyParameters() {
-    var controller = patientController(null, null);
+    var controller = patientController(null, null, null);
     // Empty List
     assertThrows(
         Exceptions.BadRequest.class, () -> controller.issueVc("123", parametersEmpty(), ""));
@@ -362,7 +438,7 @@ public class PatientControllerTest {
 
   @Test
   void issueVc_invalidCredentialType() {
-    var controller = patientController(null, null);
+    var controller = patientController(null, null, null);
     assertThrows(
         Exceptions.InvalidCredentialType.class,
         () -> controller.issueVc("123", parametersWithCredentialType("NOPE"), ""));
@@ -370,7 +446,7 @@ public class PatientControllerTest {
 
   @Test
   void issueVc_unimplementedCredentialType() {
-    var controller = patientController(null, null);
+    var controller = patientController(null, null, null);
     assertThrows(
         Exceptions.NotImplemented.class,
         () ->

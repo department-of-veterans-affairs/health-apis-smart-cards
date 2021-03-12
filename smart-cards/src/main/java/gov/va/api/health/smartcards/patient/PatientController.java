@@ -59,7 +59,7 @@ public class PatientController {
 
   private final DataQueryFhirClient fhirClient;
 
-  R4MixedBundler bundler;
+  private final R4MixedBundler bundler;
 
   /** Extracts resources from Bundle entries and pushes them to an existing List. */
   private <R extends Resource, E extends AbstractEntry<R>, B extends AbstractBundle<E>>

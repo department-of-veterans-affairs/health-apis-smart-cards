@@ -54,6 +54,15 @@ public class MockServices {
     log.info("List of supported queries available at http://localhost:{}/help", options.getPort());
   }
 
+  private void addImmunizationBundle(MockServerClient mock) {
+    mock.when(addQuery("/Immunization?patient=1011537977V693883"))
+        .respond(
+            response()
+                .withStatusCode(200)
+                .withHeader(contentApplicationJson())
+                .withBody(contentOf("/immunization-bundle.json")));
+  }
+
   private void addPatientBundle(MockServerClient mock) {
     mock.when(addQuery("/Patient?_id=1011537977V693883"))
         .respond(
@@ -87,6 +96,7 @@ public class MockServices {
     log.info("Starting mock services on port {}", options.getPort());
     ms = new MockServer(options.getPort());
     MockServerClient mock = new MockServerClient("localhost", options.getPort());
+    addImmunizationBundle(mock);
     addPatientBundle(mock);
     addHelp(mock);
   }

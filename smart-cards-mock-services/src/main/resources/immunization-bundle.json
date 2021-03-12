@@ -1,0 +1,747 @@
+{
+  "resourceType" : "Bundle",
+  "type" : "searchset",
+  "total" : 18,
+  "link" : [
+    {
+      "relation" : "first",
+      "url" : "http://localhost:8090/r4/Immunization?patient=43000199&page=1&_count=30"
+    },
+    {
+      "relation" : "self",
+      "url" : "http://localhost:8090/r4/Immunization?patient=43000199&page=1&_count=30"
+    },
+    {
+      "relation" : "last",
+      "url" : "http://localhost:8090/r4/Immunization?patient=43000199&page=1&_count=30"
+    }
+  ],
+  "entry" : [
+    {
+      "fullUrl" : "http://localhost:8090/r4/Immunization/I2-SUIW57VEBLELRLBDYF3LKXB5ZA000000",
+      "resource" : {
+        "resourceType" : "Immunization",
+        "id" : "I2-SUIW57VEBLELRLBDYF3LKXB5ZA000000",
+        "status" : "completed",
+        "vaccineCode" : {
+          "coding" : [
+            {
+              "system" : "http://hl7.org/fhir/sid/cvx",
+              "code" : "115"
+            }
+          ],
+          "text" : "Tdap"
+        },
+        "patient" : {
+          "reference" : "http://localhost:8090/r4/Patient/43000199",
+          "display" : "Ms. Carlita746 Kautzer186"
+        },
+        "occurrenceDateTime" : "2009-02-03T01:43:31Z",
+        "primarySource" : true,
+        "note" : [
+          {
+            "text" : "Dose #1 of 1 of Tdap vaccine administered."
+          }
+        ],
+        "reaction" : [
+          {
+            "detail" : {
+              "display" : "Convulsions"
+            }
+          }
+        ]
+      },
+      "search" : {
+        "mode" : "match"
+      }
+    },
+    {
+      "fullUrl" : "http://localhost:8090/r4/Immunization/I2-G2LZEVNQALV5SAM7EKWCPOVHX4000000",
+      "resource" : {
+        "resourceType" : "Immunization",
+        "id" : "I2-G2LZEVNQALV5SAM7EKWCPOVHX4000000",
+        "status" : "completed",
+        "vaccineCode" : {
+          "coding" : [
+            {
+              "system" : "http://hl7.org/fhir/sid/cvx",
+              "code" : "140"
+            }
+          ],
+          "text" : "Influenza  seasonal  injectable  preservative free"
+        },
+        "patient" : {
+          "reference" : "http://localhost:8090/r4/Patient/43000199",
+          "display" : "Ms. Carlita746 Kautzer186"
+        },
+        "occurrenceDateTime" : "2009-02-03T01:43:31Z",
+        "primarySource" : true,
+        "note" : [
+          {
+            "text" : "Dose #11 of 101 of Influenza  seasonal  injectable  preservative free vaccine administered."
+          }
+        ],
+        "reaction" : [
+          {
+            "detail" : {
+              "display" : "Convulsions"
+            }
+          }
+        ]
+      },
+      "search" : {
+        "mode" : "match"
+      }
+    },
+    {
+      "fullUrl" : "http://localhost:8090/r4/Immunization/I2-O47LKWTGTUWFPRZENHL5QMCK7M000000",
+      "resource" : {
+        "resourceType" : "Immunization",
+        "id" : "I2-O47LKWTGTUWFPRZENHL5QMCK7M000000",
+        "status" : "completed",
+        "vaccineCode" : {
+          "coding" : [
+            {
+              "system" : "http://hl7.org/fhir/sid/cvx",
+              "code" : "62"
+            }
+          ],
+          "text" : "HPV  quadrivalent"
+        },
+        "patient" : {
+          "reference" : "http://localhost:8090/r4/Patient/43000199",
+          "display" : "Ms. Carlita746 Kautzer186"
+        },
+        "occurrenceDateTime" : "2009-02-03T01:43:31Z",
+        "primarySource" : true,
+        "location" : {
+          "reference" : "http://localhost:8090/r4/Location/I2-7Q2IQADBCYM2BLJFCUUND7ITEE000000",
+          "display" : "MENTAL HEALTH SERVICES"
+        },
+        "note" : [
+          {
+            "text" : "Dose #1 of 3 of HPV  quadrivalent vaccine administered."
+          }
+        ],
+        "reaction" : [
+          {
+            "detail" : {
+              "display" : "Other"
+            }
+          }
+        ]
+      },
+      "search" : {
+        "mode" : "match"
+      }
+    },
+    {
+      "fullUrl" : "http://localhost:8090/r4/Immunization/I2-G6VA7J24JE3BFEDAXSYWCDRKLM000000",
+      "resource" : {
+        "resourceType" : "Immunization",
+        "id" : "I2-G6VA7J24JE3BFEDAXSYWCDRKLM000000",
+        "status" : "completed",
+        "vaccineCode" : {
+          "coding" : [
+            {
+              "system" : "http://hl7.org/fhir/sid/cvx",
+              "code" : "114"
+            }
+          ],
+          "text" : "meningococcal MCV4P"
+        },
+        "patient" : {
+          "reference" : "http://localhost:8090/r4/Patient/43000199",
+          "display" : "Ms. Carlita746 Kautzer186"
+        },
+        "occurrenceDateTime" : "2009-02-03T01:43:31Z",
+        "primarySource" : true,
+        "note" : [
+          {
+            "text" : "Dose #1 of 3 of meningococcal MCV4P vaccine administered."
+          }
+        ],
+        "reaction" : [
+          {
+            "detail" : {
+              "display" : "Other"
+            }
+          }
+        ]
+      },
+      "search" : {
+        "mode" : "match"
+      }
+    },
+    {
+      "fullUrl" : "http://localhost:8090/r4/Immunization/I2-BCOTPJOWKXIP3CUCE6DBZCSMUY000000",
+      "resource" : {
+        "resourceType" : "Immunization",
+        "id" : "I2-BCOTPJOWKXIP3CUCE6DBZCSMUY000000",
+        "status" : "completed",
+        "vaccineCode" : {
+          "coding" : [
+            {
+              "system" : "http://hl7.org/fhir/sid/cvx",
+              "code" : "140"
+            }
+          ],
+          "text" : "Influenza  seasonal  injectable  preservative free"
+        },
+        "patient" : {
+          "reference" : "http://localhost:8090/r4/Patient/43000199",
+          "display" : "Ms. Carlita746 Kautzer186"
+        },
+        "occurrenceDateTime" : "2010-02-09T01:43:31Z",
+        "primarySource" : true,
+        "location" : {
+          "reference" : "http://localhost:8090/r4/Location/I2-7Q2IQADBCYM2BLJFCUUND7ITEE000000",
+          "display" : "MENTAL HEALTH SERVICES"
+        },
+        "note" : [
+          {
+            "text" : "Dose #12 of 101 of Influenza  seasonal  injectable  preservative free vaccine administered."
+          }
+        ],
+        "reaction" : [
+          {
+            "detail" : {
+              "display" : "Arthritis or Arthralgias"
+            }
+          }
+        ]
+      },
+      "search" : {
+        "mode" : "match"
+      }
+    },
+    {
+      "fullUrl" : "http://localhost:8090/r4/Immunization/I2-EHHOPHPNAQDFZMUZ44HATCU3PI000000",
+      "resource" : {
+        "resourceType" : "Immunization",
+        "id" : "I2-EHHOPHPNAQDFZMUZ44HATCU3PI000000",
+        "status" : "completed",
+        "vaccineCode" : {
+          "coding" : [
+            {
+              "system" : "http://hl7.org/fhir/sid/cvx",
+              "code" : "62"
+            }
+          ],
+          "text" : "HPV  quadrivalent"
+        },
+        "patient" : {
+          "reference" : "http://localhost:8090/r4/Patient/43000199",
+          "display" : "Ms. Carlita746 Kautzer186"
+        },
+        "occurrenceDateTime" : "2010-02-09T01:43:31Z",
+        "primarySource" : true,
+        "location" : {
+          "reference" : "http://localhost:8090/r4/Location/I2-7Q2IQADBCYM2BLJFCUUND7ITEE000000",
+          "display" : "MENTAL HEALTH SERVICES"
+        },
+        "note" : [
+          {
+            "text" : "Dose #2 of 3 of HPV  quadrivalent vaccine administered."
+          }
+        ],
+        "reaction" : [
+          {
+            "detail" : {
+              "display" : "Anaphylaxis or collapse"
+            }
+          }
+        ]
+      },
+      "search" : {
+        "mode" : "match"
+      }
+    },
+    {
+      "fullUrl" : "http://localhost:8090/r4/Immunization/I2-EPU6M53J3QZZA63UEAJDV6T4MY000000",
+      "resource" : {
+        "resourceType" : "Immunization",
+        "id" : "I2-EPU6M53J3QZZA63UEAJDV6T4MY000000",
+        "status" : "completed",
+        "vaccineCode" : {
+          "coding" : [
+            {
+              "system" : "http://hl7.org/fhir/sid/cvx",
+              "code" : "140"
+            }
+          ],
+          "text" : "Influenza  seasonal  injectable  preservative free"
+        },
+        "patient" : {
+          "reference" : "http://localhost:8090/r4/Patient/43000199",
+          "display" : "Ms. Carlita746 Kautzer186"
+        },
+        "occurrenceDateTime" : "2011-02-15T01:43:31Z",
+        "primarySource" : true,
+        "location" : {
+          "reference" : "http://localhost:8090/r4/Location/I2-7Q2IQADBCYM2BLJFCUUND7ITEE000000",
+          "display" : "MENTAL HEALTH SERVICES"
+        },
+        "note" : [
+          {
+            "text" : "Dose #13 of 101 of Influenza  seasonal  injectable  preservative free vaccine administered."
+          }
+        ],
+        "reaction" : [
+          {
+            "detail" : {
+              "display" : "Vomiting"
+            }
+          }
+        ]
+      },
+      "search" : {
+        "mode" : "match"
+      }
+    },
+    {
+      "fullUrl" : "http://localhost:8090/r4/Immunization/I2-V3T57KMYPM36OD4HON43CYHQ7U000000",
+      "resource" : {
+        "resourceType" : "Immunization",
+        "id" : "I2-V3T57KMYPM36OD4HON43CYHQ7U000000",
+        "status" : "completed",
+        "vaccineCode" : {
+          "coding" : [
+            {
+              "system" : "http://hl7.org/fhir/sid/cvx",
+              "code" : "62"
+            }
+          ],
+          "text" : "HPV  quadrivalent"
+        },
+        "patient" : {
+          "reference" : "http://localhost:8090/r4/Patient/43000199",
+          "display" : "Ms. Carlita746 Kautzer186"
+        },
+        "occurrenceDateTime" : "2011-02-15T01:43:31Z",
+        "primarySource" : true,
+        "location" : {
+          "reference" : "http://localhost:8090/r4/Location/I2-K7WNFKZA3JCXL3CLT6D2HP7RRU000000",
+          "display" : "VISUAL IMPAIRMENT SVCS OUTPATIENT REHAB (VISOR)"
+        },
+        "note" : [
+          {
+            "text" : "Dose #3 of 3 of HPV  quadrivalent vaccine administered."
+          }
+        ],
+        "reaction" : [
+          {
+            "detail" : {
+              "display" : "Fever"
+            }
+          }
+        ]
+      },
+      "search" : {
+        "mode" : "match"
+      }
+    },
+    {
+      "fullUrl" : "http://localhost:8090/r4/Immunization/I2-2R5BVJP2BF2PB6S5ORQSLCWGFU000000",
+      "resource" : {
+        "resourceType" : "Immunization",
+        "id" : "I2-2R5BVJP2BF2PB6S5ORQSLCWGFU000000",
+        "status" : "completed",
+        "vaccineCode" : {
+          "coding" : [
+            {
+              "system" : "http://hl7.org/fhir/sid/cvx",
+              "code" : "140"
+            }
+          ],
+          "text" : "Influenza  seasonal  injectable  preservative free"
+        },
+        "patient" : {
+          "reference" : "http://localhost:8090/r4/Patient/43000199",
+          "display" : "Ms. Carlita746 Kautzer186"
+        },
+        "occurrenceDateTime" : "2012-02-21T01:43:31Z",
+        "primarySource" : true,
+        "note" : [
+          {
+            "text" : "Dose #14 of 101 of Influenza  seasonal  injectable  preservative free vaccine administered."
+          }
+        ],
+        "reaction" : [
+          {
+            "detail" : {
+              "display" : "Other"
+            }
+          }
+        ]
+      },
+      "search" : {
+        "mode" : "match"
+      }
+    },
+    {
+      "fullUrl" : "http://localhost:8090/r4/Immunization/I2-CSBMMRK23SXMO75MCXQNS66R6E000000",
+      "resource" : {
+        "resourceType" : "Immunization",
+        "id" : "I2-CSBMMRK23SXMO75MCXQNS66R6E000000",
+        "status" : "completed",
+        "vaccineCode" : {
+          "coding" : [
+            {
+              "system" : "http://hl7.org/fhir/sid/cvx",
+              "code" : "140"
+            }
+          ],
+          "text" : "Influenza  seasonal  injectable  preservative free"
+        },
+        "patient" : {
+          "reference" : "http://localhost:8090/r4/Patient/43000199",
+          "display" : "Ms. Carlita746 Kautzer186"
+        },
+        "occurrenceDateTime" : "2013-02-26T01:43:31Z",
+        "primarySource" : true,
+        "location" : {
+          "reference" : "http://localhost:8090/r4/Location/I2-K7WNFKZA3JCXL3CLT6D2HP7RRU000000",
+          "display" : "VISUAL IMPAIRMENT SVCS OUTPATIENT REHAB (VISOR)"
+        },
+        "note" : [
+          {
+            "text" : "Dose #15 of 101 of Influenza  seasonal  injectable  preservative free vaccine administered."
+          }
+        ],
+        "reaction" : [
+          {
+            "detail" : {
+              "display" : "Arthritis or Arthralgias"
+            }
+          }
+        ]
+      },
+      "search" : {
+        "mode" : "match"
+      }
+    },
+    {
+      "fullUrl" : "http://localhost:8090/r4/Immunization/I2-AHAG7WVNXFFQ7LPTZZN7WJOUBA000000",
+      "resource" : {
+        "resourceType" : "Immunization",
+        "id" : "I2-AHAG7WVNXFFQ7LPTZZN7WJOUBA000000",
+        "status" : "completed",
+        "vaccineCode" : {
+          "coding" : [
+            {
+              "system" : "http://hl7.org/fhir/sid/cvx",
+              "code" : "140"
+            }
+          ],
+          "text" : "Influenza  seasonal  injectable  preservative free"
+        },
+        "patient" : {
+          "reference" : "http://localhost:8090/r4/Patient/43000199",
+          "display" : "Ms. Carlita746 Kautzer186"
+        },
+        "occurrenceDateTime" : "2014-03-04T01:43:31Z",
+        "primarySource" : true,
+        "location" : {
+          "reference" : "http://localhost:8090/r4/Location/I2-7Q2IQADBCYM2BLJFCUUND7ITEE000000",
+          "display" : "MENTAL HEALTH SERVICES"
+        },
+        "note" : [
+          {
+            "text" : "Dose #16 of 101 of Influenza  seasonal  injectable  preservative free vaccine administered."
+          }
+        ],
+        "reaction" : [
+          {
+            "detail" : {
+              "display" : "Vomiting"
+            }
+          }
+        ]
+      },
+      "search" : {
+        "mode" : "match"
+      }
+    },
+    {
+      "fullUrl" : "http://localhost:8090/r4/Immunization/I2-ARJOF3N2YN2WJNSYDWBSD2RBCI000000",
+      "resource" : {
+        "resourceType" : "Immunization",
+        "id" : "I2-ARJOF3N2YN2WJNSYDWBSD2RBCI000000",
+        "status" : "completed",
+        "vaccineCode" : {
+          "coding" : [
+            {
+              "system" : "http://hl7.org/fhir/sid/cvx",
+              "code" : "114"
+            }
+          ],
+          "text" : "meningococcal MCV4P"
+        },
+        "patient" : {
+          "reference" : "http://localhost:8090/r4/Patient/43000199",
+          "display" : "Ms. Carlita746 Kautzer186"
+        },
+        "occurrenceDateTime" : "2014-03-04T01:43:31Z",
+        "primarySource" : true,
+        "location" : {
+          "reference" : "http://localhost:8090/r4/Location/I2-JTDSDSJX3KCNMT3D67S3UGJYAU000000",
+          "display" : "TEM MH PSO TRS IND93EH 2"
+        },
+        "note" : [
+          {
+            "text" : "Dose #2 of 3 of meningococcal MCV4P vaccine administered."
+          }
+        ],
+        "reaction" : [
+          {
+            "detail" : {
+              "display" : "Vomiting"
+            }
+          }
+        ]
+      },
+      "search" : {
+        "mode" : "match"
+      }
+    },
+    {
+      "fullUrl" : "http://localhost:8090/r4/Immunization/I2-QOAAADVYZIFUNYNV2YWRUW5HNU000000",
+      "resource" : {
+        "resourceType" : "Immunization",
+        "id" : "I2-QOAAADVYZIFUNYNV2YWRUW5HNU000000",
+        "status" : "completed",
+        "vaccineCode" : {
+          "coding" : [
+            {
+              "system" : "http://hl7.org/fhir/sid/cvx",
+              "code" : "140"
+            }
+          ],
+          "text" : "Influenza  seasonal  injectable  preservative free"
+        },
+        "patient" : {
+          "reference" : "http://localhost:8090/r4/Patient/43000199",
+          "display" : "Ms. Carlita746 Kautzer186"
+        },
+        "occurrenceDateTime" : "2015-02-17T01:43:31Z",
+        "primarySource" : true,
+        "location" : {
+          "reference" : "http://localhost:8090/r4/Location/I2-JTDSDSJX3KCNMT3D67S3UGJYAU000000",
+          "display" : "TEM MH PSO TRS IND93EH 2"
+        },
+        "note" : [
+          {
+            "text" : "Dose #17 of 101 of Influenza  seasonal  injectable  preservative free vaccine administered."
+          }
+        ],
+        "reaction" : [
+          {
+            "detail" : {
+              "display" : "Arthritis or Arthralgias"
+            }
+          }
+        ]
+      },
+      "search" : {
+        "mode" : "match"
+      }
+    },
+    {
+      "fullUrl" : "http://localhost:8090/r4/Immunization/I2-X6WGOBFKZHKUCKFKU4AWXXZ2MI000000",
+      "resource" : {
+        "resourceType" : "Immunization",
+        "id" : "I2-X6WGOBFKZHKUCKFKU4AWXXZ2MI000000",
+        "status" : "completed",
+        "vaccineCode" : {
+          "coding" : [
+            {
+              "system" : "http://hl7.org/fhir/sid/cvx",
+              "code" : "140"
+            }
+          ],
+          "text" : "Influenza  seasonal  injectable  preservative free"
+        },
+        "patient" : {
+          "reference" : "http://localhost:8090/r4/Patient/43000199",
+          "display" : "Ms. Carlita746 Kautzer186"
+        },
+        "occurrenceDateTime" : "2015-08-18T00:43:31Z",
+        "primarySource" : true,
+        "location" : {
+          "reference" : "http://localhost:8090/r4/Location/I2-7Q2IQADBCYM2BLJFCUUND7ITEE000000",
+          "display" : "MENTAL HEALTH SERVICES"
+        },
+        "note" : [
+          {
+            "text" : "Dose #18 of 101 of Influenza  seasonal  injectable  preservative free vaccine administered."
+          }
+        ],
+        "reaction" : [
+          {
+            "detail" : {
+              "display" : "Rash or itching"
+            }
+          }
+        ]
+      },
+      "search" : {
+        "mode" : "match"
+      }
+    },
+    {
+      "fullUrl" : "http://localhost:8090/r4/Immunization/I2-ZHDWUIIUHJ5Q3KNK5AX33G67H4000000",
+      "resource" : {
+        "resourceType" : "Immunization",
+        "id" : "I2-ZHDWUIIUHJ5Q3KNK5AX33G67H4000000",
+        "status" : "completed",
+        "vaccineCode" : {
+          "coding" : [
+            {
+              "system" : "http://hl7.org/fhir/sid/cvx",
+              "code" : "140"
+            }
+          ],
+          "text" : "Influenza  seasonal  injectable  preservative free"
+        },
+        "patient" : {
+          "reference" : "http://localhost:8090/r4/Patient/43000199",
+          "display" : "Ms. Carlita746 Kautzer186"
+        },
+        "occurrenceDateTime" : "2016-08-23T00:43:31Z",
+        "primarySource" : true,
+        "location" : {
+          "reference" : "http://localhost:8090/r4/Location/I2-7Q2IQADBCYM2BLJFCUUND7ITEE000000",
+          "display" : "MENTAL HEALTH SERVICES"
+        },
+        "note" : [
+          {
+            "text" : "Dose #19 of 101 of Influenza  seasonal  injectable  preservative free vaccine administered."
+          }
+        ],
+        "reaction" : [
+          {
+            "detail" : {
+              "display" : "Arthritis or Arthralgias"
+            }
+          }
+        ]
+      },
+      "search" : {
+        "mode" : "match"
+      }
+    },
+    {
+      "fullUrl" : "http://localhost:8090/r4/Immunization/I2-MWUVX24OPJCQCINZF7QS66FKRE000000",
+      "resource" : {
+        "resourceType" : "Immunization",
+        "id" : "I2-MWUVX24OPJCQCINZF7QS66FKRE000000",
+        "status" : "completed",
+        "vaccineCode" : {
+          "coding" : [
+            {
+              "system" : "http://hl7.org/fhir/sid/cvx",
+              "code" : "140"
+            }
+          ],
+          "text" : "Influenza  seasonal  injectable  preservative free"
+        },
+        "patient" : {
+          "reference" : "http://localhost:8090/r4/Patient/43000199",
+          "display" : "Ms. Carlita746 Kautzer186"
+        },
+        "occurrenceDateTime" : "2017-08-29T00:43:31Z",
+        "primarySource" : true,
+        "location" : {
+          "reference" : "http://localhost:8090/r4/Location/I2-JTDSDSJX3KCNMT3D67S3UGJYAU000000",
+          "display" : "TEM MH PSO TRS IND93EH 2"
+        },
+        "note" : [
+          {
+            "text" : "Dose #20 of 101 of Influenza  seasonal  injectable  preservative free vaccine administered."
+          }
+        ],
+        "reaction" : [
+          {
+            "detail" : {
+              "display" : "Vomiting"
+            }
+          }
+        ]
+      },
+      "search" : {
+        "mode" : "match"
+      }
+    },
+    {
+      "fullUrl" : "http://localhost:8090/r4/Immunization/I2-CA5C4BZN25PERCGL3AN2NSCLWE000000",
+      "resource" : {
+        "resourceType" : "Immunization",
+        "id" : "I2-CA5C4BZN25PERCGL3AN2NSCLWE000000",
+        "status" : "completed",
+        "vaccineCode" : {
+          "coding" : [
+            {
+              "system" : "http://hl7.org/fhir/sid/cvx",
+              "code" : "207"
+            }
+          ],
+          "text" : "COVID-19, mRNA, LNP-S, PF, 100 mcg/ 0.5 mL dose"
+        },
+        "patient" : {
+          "reference" : "http://localhost:8090/r4/Patient/43000199",
+          "display" : "Ms. Carlita746 Kautzer186"
+        },
+        "occurrenceDateTime" : "2021-01-14T09:30:21Z",
+        "primarySource" : true,
+        "location" : {
+          "reference" : "http://localhost:8090/r4/Location/I2-JTDSDSJX3KCNMT3D67S3UGJYAU000000",
+          "display" : "TEM MH PSO TRS IND93EH 2"
+        },
+        "note" : [
+          {
+            "text" : "Dose #1 of 2 of COVID-19, mRNA, LNP-S, PF, 100 mcg/ 0.5 mL dose vaccine administered."
+          }
+        ]
+      },
+      "search" : {
+        "mode" : "match"
+      }
+    },
+    {
+      "fullUrl" : "http://localhost:8090/r4/Immunization/I2-E56RA55DH4KLXQBCZ6L2F2JKSM000000",
+      "resource" : {
+        "resourceType" : "Immunization",
+        "id" : "I2-E56RA55DH4KLXQBCZ6L2F2JKSM000000",
+        "status" : "completed",
+        "vaccineCode" : {
+          "coding" : [
+            {
+              "system" : "http://hl7.org/fhir/sid/cvx",
+              "code" : "207"
+            }
+          ],
+          "text" : "COVID-19, mRNA, LNP-S, PF, 100 mcg/ 0.5 mL dose"
+        },
+        "patient" : {
+          "reference" : "http://localhost:8090/r4/Patient/43000199",
+          "display" : "Ms. Carlita746 Kautzer186"
+        },
+        "occurrenceDateTime" : "2021-01-28T10:33:51Z",
+        "primarySource" : true,
+        "location" : {
+          "reference" : "http://localhost:8090/r4/Location/I2-JTDSDSJX3KCNMT3D67S3UGJYAU000000",
+          "display" : "TEM MH PSO TRS IND93EH 2"
+        },
+        "note" : [
+          {
+            "text" : "Dose #2 of 2 of COVID-19, mRNA, LNP-S, PF, 100 mcg/ 0.5 mL dose vaccine administered."
+          }
+        ]
+      },
+      "search" : {
+        "mode" : "match"
+      }
+    }
+  ]
+}

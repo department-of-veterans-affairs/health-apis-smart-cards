@@ -19,7 +19,6 @@ import gov.va.api.health.r4.api.resources.Resource;
 import gov.va.api.health.smartcards.DataQueryFhirClient;
 import gov.va.api.health.smartcards.Exceptions;
 import gov.va.api.health.smartcards.JacksonMapperConfig;
-import gov.va.api.health.smartcards.MockFhirClient;
 import gov.va.api.health.smartcards.R4MixedBundler;
 import gov.va.api.health.smartcards.vc.CredentialType;
 import gov.va.api.health.smartcards.vc.VerifiableCredential;
@@ -67,9 +66,7 @@ public class PatientController {
 
   private final DataQueryFhirClient fhirClient;
 
-  private final MockFhirClient mockFhirClient;
-
-  R4MixedBundler bundler;
+  private final R4MixedBundler bundler;
 
   /** Extracts resources from Bundle entries and pushes them to an existing List. */
   private <R extends Resource, E extends AbstractEntry<R>, B extends AbstractBundle<E>>
@@ -136,7 +133,7 @@ public class PatientController {
     validateCredentialTypes(credentialTypes);
     Patient.Bundle patients = fhirClient.patientBundle(id, authorization);
     Patient patient = getPatientFromBundle(patients, id);
-    Immunization.Bundle immunizations = mockFhirClient.immunizationBundle(patient);
+    Immunization.Bundle immunizations = fhirClient.immunizationBundle(patient, authorization);
     lookupLocations(immunizations);
     List<MixedEntry> resources = new ArrayList<>();
     consumeBundle(patients, resources, x -> true, this::transform);
@@ -157,7 +154,7 @@ public class PatientController {
       String locationResourceId = imm.location().reference();
       Location.Bundle locationBundle = locations.get(locationResourceId);
       if (locationBundle == null) {
-        locationBundle = mockFhirClient.locationBundle(locationResourceId);
+        locationBundle = fhirClient.locationBundle(locationResourceId);
         locations.put(locationResourceId, locationBundle);
       }
       Optional<Location.Entry> maybeEntry = locationBundle.entry().stream().findFirst();

@@ -5,7 +5,7 @@ import gov.va.api.health.r4.api.resources.Location;
 import gov.va.api.health.r4.api.resources.Patient;
 
 public interface FhirClient {
-  Immunization.Bundle immunizationBundle(Patient patient);
+  Immunization.Bundle immunizationBundle(Patient patient, String authorization);
 
   Location.Bundle locationBundle(String id);
 

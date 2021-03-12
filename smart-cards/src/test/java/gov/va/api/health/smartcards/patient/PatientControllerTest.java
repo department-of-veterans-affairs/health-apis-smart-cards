@@ -12,8 +12,16 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import gov.va.api.health.r4.api.bundle.AbstractBundle;
+import gov.va.api.health.r4.api.bundle.AbstractEntry;
+import gov.va.api.health.r4.api.bundle.BundleLink;
 import gov.va.api.health.r4.api.bundle.MixedBundle;
+import gov.va.api.health.r4.api.datatypes.Annotation;
+import gov.va.api.health.r4.api.datatypes.CodeableConcept;
+import gov.va.api.health.r4.api.datatypes.Coding;
 import gov.va.api.health.r4.api.datatypes.HumanName;
+import gov.va.api.health.r4.api.datatypes.Identifier;
+import gov.va.api.health.r4.api.elements.Reference;
 import gov.va.api.health.r4.api.resources.Immunization;
 import gov.va.api.health.r4.api.resources.Parameters;
 import gov.va.api.health.r4.api.resources.Patient;
@@ -21,7 +29,6 @@ import gov.va.api.health.smartcards.DataQueryFhirClient;
 import gov.va.api.health.smartcards.Exceptions;
 import gov.va.api.health.smartcards.JacksonMapperConfig;
 import gov.va.api.health.smartcards.LinkProperties;
-import gov.va.api.health.smartcards.MockFhirClient;
 import gov.va.api.health.smartcards.R4MixedBundler;
 import gov.va.api.health.smartcards.vc.VerifiableCredential;
 import java.util.Arrays;
@@ -55,21 +62,132 @@ public class PatientControllerTest {
     return MAPPER.readValue(parameter.valueString(), VerifiableCredential.class);
   }
 
+  static Immunization.Bundle immunizationBundle(String icn) {
+    LinkProperties linkProperties = mock(LinkProperties.class);
+    var patient = Patient.builder().id(icn).name(List.of(HumanName.builder().build())).build();
+    String vaccineSystem = "http://hl7.org/fhir/sid/cvx";
+    List<Immunization> immunizations =
+        List.of(
+            Immunization.builder()
+                .resourceType("Immunization")
+                .id(String.format("imm-1-%s", patient.id()))
+                .status(Immunization.Status.completed)
+                .vaccineCode(
+                    CodeableConcept.builder()
+                        .coding(List.of(Coding.builder().system(vaccineSystem).code("207").build()))
+                        .text("COVID-19, mRNA, LNP-S, PF, 100 mcg/ 0.5 mL dose")
+                        .build())
+                .patient(
+                    Reference.builder()
+                        .reference(linkProperties.dataQueryR4ReadUrl(patient))
+                        .display(patient.name().stream().findFirst().get().text())
+                        .build())
+                .occurrenceDateTime("2020-12-18T12:24:55Z")
+                .primarySource(true)
+                .location(
+                    Reference.builder()
+                        .reference(
+                            String.format(
+                                "%s/loc-%s",
+                                linkProperties.dataQueryR4ResourceUrl("Location"), patient.id()))
+                        .display("Location for " + patient.id())
+                        .build())
+                .note(
+                    List.of(
+                        Annotation.builder()
+                            .text(
+                                "Dose #1 of 2 of COVID-19, mRNA, LNP-S, PF, 100 mcg/ 0.5 mL dose "
+                                    + "vaccine administered.")
+                            .build()))
+                .build(),
+            Immunization.builder()
+                .resourceType("Immunization")
+                .id(String.format("imm-2-%s", patient.id()))
+                .status(Immunization.Status.completed)
+                .vaccineCode(
+                    CodeableConcept.builder()
+                        .coding(List.of(Coding.builder().system(vaccineSystem).code("207").build()))
+                        .text("COVID-19, mRNA, LNP-S, PF, 100 mcg/ 0.5 mL dose")
+                        .build())
+                .patient(
+                    Reference.builder()
+                        .reference(linkProperties.dataQueryR4ReadUrl(patient))
+                        .display(patient.name().stream().findFirst().get().text())
+                        .build())
+                .occurrenceDateTime("2021-01-14T09:30:21Z")
+                .primarySource(true)
+                .location(
+                    Reference.builder()
+                        .reference(
+                            String.format(
+                                "%s/loc-%s",
+                                linkProperties.dataQueryR4ResourceUrl("Location"), patient.id()))
+                        .display("Location for " + patient.id())
+                        .build())
+                .note(
+                    List.of(
+                        Annotation.builder()
+                            .text(
+                                "Dose #2 of 2 of COVID-19, mRNA, LNP-S, PF, 100 mcg/ 0.5 mL dose "
+                                    + "vaccine administered.")
+                            .build()))
+                .build(), // 'not_done' Immunization to verify filters
+            Immunization.builder()
+                .resourceType("Immunization")
+                .id(String.format("imm-3-%s", patient.id()))
+                .status(Immunization.Status.not_done)
+                .vaccineCode(
+                    CodeableConcept.builder()
+                        .coding(List.of(Coding.builder().system(vaccineSystem).code("207").build()))
+                        .text("COVID-19, mRNA, LNP-S, PF, 100 mcg/ 0.5 mL dose")
+                        .build())
+                .patient(
+                    Reference.builder()
+                        .reference(linkProperties.dataQueryR4ReadUrl(patient))
+                        .display(patient.name().stream().findFirst().get().text())
+                        .build())
+                .occurrenceDateTime("2021-01-18T09:30:21Z")
+                .primarySource(true)
+                .location(
+                    Reference.builder()
+                        .reference(
+                            String.format(
+                                "%s/loc-%s",
+                                linkProperties.dataQueryR4ResourceUrl("Location"), patient.id()))
+                        .display("Location for " + patient.id())
+                        .build())
+                .build());
+    return Immunization.Bundle.builder()
+        .type(AbstractBundle.BundleType.searchset)
+        .link(
+            List.of(
+                BundleLink.builder()
+                    .relation(BundleLink.LinkRelation.self)
+                    .url(
+                        String.format(
+                            "%s?patient=%s",
+                            linkProperties.dataQueryR4ResourceUrl("Immunization"), patient.id()))
+                    .build()))
+        .total(immunizations.size())
+        .entry(
+            immunizations.stream()
+                .map(
+                    t ->
+                        Immunization.Entry.builder()
+                            .resource(t)
+                            .fullUrl(linkProperties.dataQueryR4ReadUrl(t))
+                            .search(
+                                AbstractEntry.Search.builder()
+                                    .mode(AbstractEntry.SearchMode.match)
+                                    .build())
+                            .build())
+                .collect(toList()))
+        .build();
+  }
+
   @BeforeAll
   static void init() {
     Patient.IDENTIFIER_MIN_SIZE.set(0);
-  }
-
-  static Immunization.Bundle mockImmunization(String patientIcn) {
-    var mockFhirClient = new MockFhirClient(mock(LinkProperties.class));
-    var patient =
-        Patient.builder().id(patientIcn).name(List.of(HumanName.builder().build())).build();
-    return mockFhirClient.immunizationBundle(patient, "");
-  }
-
-  static Patient.Bundle mockPatient(String icn) {
-    var mockFhirClient = new MockFhirClient(mock(LinkProperties.class));
-    return mockFhirClient.patientBundle(icn, "");
   }
 
   private static Parameters parametersCovid19() {
@@ -86,6 +204,67 @@ public class PatientControllerTest {
             Arrays.stream(credentialType)
                 .map(c -> Parameters.Parameter.builder().name("credentialType").valueUri(c).build())
                 .collect(toList()))
+        .build();
+  }
+
+  static Patient.Bundle patientBundle(String id) {
+    LinkProperties linkProperties = mock(LinkProperties.class);
+    String firstName = "Joe" + id;
+    String lastName = "Doe" + id;
+    Patient patient =
+        Patient.builder()
+            .resourceType("Patient")
+            .id(id)
+            .identifier(
+                List.of(
+                    Identifier.builder().id(id).use(Identifier.IdentifierUse.temp).build(),
+                    Identifier.builder()
+                        .use(Identifier.IdentifierUse.usual)
+                        .type(
+                            CodeableConcept.builder()
+                                .coding(
+                                    List.of(
+                                        Coding.builder()
+                                            .system("http://hl7.org/fhir/v2/0203")
+                                            .code("MR")
+                                            .build()))
+                                .build())
+                        .system("http://va.gov/mpi")
+                        .value(id)
+                        .assigner(Reference.builder().display("Master Patient Index").build())
+                        .build()))
+            .active(true)
+            .name(
+                List.of(
+                    HumanName.builder()
+                        .use(HumanName.NameUse.anonymous)
+                        .text(String.format("%s %s", firstName, lastName))
+                        .family(lastName)
+                        .given(List.of(firstName))
+                        .build()))
+            .gender(Patient.Gender.unknown)
+            .birthDate("1955-01-01")
+            .deceasedBoolean(false)
+            .build();
+    return Patient.Bundle.builder()
+        .type(AbstractBundle.BundleType.searchset)
+        .link(
+            List.of(
+                BundleLink.builder()
+                    .relation(BundleLink.LinkRelation.self)
+                    .url(
+                        String.format(
+                            "%s?_id=%s", linkProperties.dataQueryR4ResourceUrl("Patient"), id))
+                    .build()))
+        .total(1)
+        .entry(
+            List.of(
+                Patient.Entry.builder()
+                    .resource(patient)
+                    .fullUrl(linkProperties.dataQueryR4ReadUrl(patient))
+                    .search(
+                        AbstractEntry.Search.builder().mode(AbstractEntry.SearchMode.match).build())
+                    .build()))
         .build();
   }
 
@@ -116,9 +295,9 @@ public class PatientControllerTest {
 
   @Test
   void issueVc() {
-    var patientBundleResponse = new ResponseEntity<>(mockPatient("123"), HttpStatus.ACCEPTED);
+    var patientBundleResponse = new ResponseEntity<>(patientBundle("123"), HttpStatus.ACCEPTED);
     var immunizationBundleResponse =
-        new ResponseEntity<>(mockImmunization("123"), HttpStatus.ACCEPTED);
+        new ResponseEntity<>(immunizationBundle("123"), HttpStatus.ACCEPTED);
     var controller = patientController(patientBundleResponse, immunizationBundleResponse);
     var result = controller.issueVc("123", parametersCovid19(), "").getBody();
     assertNotNull(result);
@@ -149,14 +328,6 @@ public class PatientControllerTest {
     assertThrows(
         Exceptions.InvalidCredentialType.class,
         () -> controller.issueVc("123", parametersWithCredentialType("NOPE"), ""));
-  }
-
-  @Test
-  void issueVc_notFound() {
-    var patientBundleResponse = new ResponseEntity<>(mockPatient("404"), HttpStatus.ACCEPTED);
-    var controller = patientController(patientBundleResponse, null);
-    assertThrows(
-        Exceptions.NotFound.class, () -> controller.issueVc("404", parametersCovid19(), ""));
   }
 
   @Test

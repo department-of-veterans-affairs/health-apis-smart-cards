@@ -5,20 +5,20 @@
   "link" : [
     {
       "relation" : "first",
-      "url" : "http://localhost:8090/r4/Location?identifier=I2-JTDSDSJX3KCNMT3D67S3UGJYAU000000&page=1&_count=30"
+      "url" : "http://localhost:8777/Location?identifier=I2-JTDSDSJX3KCNMT3D67S3UGJYAU000000&page=1&_count=30"
     },
     {
       "relation" : "self",
-      "url" : "http://localhost:8090/r4/Location?identifier=I2-JTDSDSJX3KCNMT3D67S3UGJYAU000000&page=1&_count=30"
+      "url" : "http://localhost:8777/Location?identifier=I2-JTDSDSJX3KCNMT3D67S3UGJYAU000000&page=1&_count=30"
     },
     {
       "relation" : "last",
-      "url" : "http://localhost:8090/r4/Location?identifier=I2-JTDSDSJX3KCNMT3D67S3UGJYAU000000&page=1&_count=30"
+      "url" : "http://localhost:8777/Location?identifier=I2-JTDSDSJX3KCNMT3D67S3UGJYAU000000&page=1&_count=30"
     }
   ],
   "entry" : [
     {
-      "fullUrl" : "http://localhost:8090/r4/Location/I2-JTDSDSJX3KCNMT3D67S3UGJYAU000000",
+      "fullUrl" : "http://localhost:8777/Location/I2-JTDSDSJX3KCNMT3D67S3UGJYAU000000",
       "resource" : {
         "resourceType" : "Location",
         "id" : "I2-JTDSDSJX3KCNMT3D67S3UGJYAU000000",
@@ -60,7 +60,7 @@
           "text" : "BLDG 146, RM W02"
         },
         "managingOrganization" : {
-          "reference" : "http://localhost:8090/r4/Organization/I2-ZJURFG76GQN5LW7WP56TXADUFM000000",
+          "reference" : "http://localhost:8777/Organization/I2-ZJURFG76GQN5LW7WP56TXADUFM000000",
           "display" : "CHEYENNE VA MEDICAL"
         }
       },

@@ -50,7 +50,7 @@ public class ImmunizationTransformer {
       return null;
     }
     Reference org = location.managingOrganization();
-    if (StringUtils.isEmpty(org.display())) {
+    if (org == null || StringUtils.isEmpty(org.display())) {
       return null;
     }
     return List.of(

@@ -12,7 +12,7 @@
   <packaging>jar</packaging>
   <properties>
     <fhir-resources.version>6.0.6</fhir-resources.version>
-    <swagger-maven-plugin.version>2.1.7</swagger-maven-plugin.version>
+    <swagger-maven-plugin.version>2.1.5</swagger-maven-plugin.version>
   </properties>
   <dependencies>
     <dependency>
@@ -33,7 +33,7 @@
         <version>${swagger-maven-plugin.version}</version>
         <executions>
           <execution>
-            <id>r4-smart-cards-swag</id>
+            <id>r4-open-api</id>
             <phase>compile</phase>
             <goals>
               <goal>resolve</goal>

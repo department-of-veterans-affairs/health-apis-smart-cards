@@ -7,10 +7,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import gov.va.api.health.r4.api.datatypes.HumanName;
 import gov.va.api.health.r4.api.resources.Immunization;
 import gov.va.api.health.r4.api.resources.Patient;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -33,10 +31,7 @@ public class DataQueryFhirClientTest {
     DataQueryFhirClient dataQueryFhirClient =
         new DataQueryFhirClient(restTemplate, mock(LinkProperties.class));
 
-    assertThat(
-            dataQueryFhirClient.immunizationBundle(
-                Patient.builder().id("123").name(List.of(HumanName.builder().build())).build(), ""))
-        .isEqualTo(bundle);
+    assertThat(dataQueryFhirClient.immunizationBundle("123", "")).isEqualTo(bundle);
   }
 
   @Test

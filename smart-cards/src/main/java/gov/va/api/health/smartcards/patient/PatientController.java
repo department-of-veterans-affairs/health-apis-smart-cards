@@ -123,7 +123,7 @@ public class PatientController {
     validateCredentialTypes(credentialTypes);
     Patient.Bundle patients = fhirClient.patientBundle(id, authorization);
     Patient patient = getPatientFromBundle(patients, id);
-    Immunization.Bundle immunizations = fhirClient.immunizationBundle(patient, authorization);
+    Immunization.Bundle immunizations = fhirClient.immunizationBundle(patient.id(), authorization);
     lookupAndAttachLocations(immunizations, authorization);
     List<MixedEntry> resources = new ArrayList<>();
     consumeBundle(patients, resources, this::transform);

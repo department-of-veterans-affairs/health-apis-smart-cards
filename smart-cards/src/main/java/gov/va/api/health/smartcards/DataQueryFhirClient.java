@@ -41,11 +41,10 @@ public class DataQueryFhirClient implements FhirClient {
   }
 
   @Override
-  public Immunization.Bundle immunizationBundle(Patient patient, String authorization) {
+  public Immunization.Bundle immunizationBundle(String icn, String authorization) {
     String url =
         String.format(
-            "%s?patient=%s&_count=100",
-            linkProperties.dataQueryR4ResourceUrl("Immunization"), patient.id());
+            "%s?patient=%s&_count=100", linkProperties.dataQueryR4ResourceUrl("Immunization"), icn);
     var immunizationBundle = doGet(url, authorization, Immunization.Bundle.class).getBody();
     if (immunizationBundle == null) {
       return null;

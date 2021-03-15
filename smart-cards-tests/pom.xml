@@ -106,6 +106,8 @@
                 <argument>-Dlogging.level.root=INFO</argument>
                 <argument>-Ddata-query.internal-url=http://localhost:8777</argument>
                 <argument>-Ddata-query.r4-base-path=/</argument>
+                <argument>-Djwk-set.private-json={\"keys\":[{\"kty\":\"EC\",\"d\":\"5h-A-oFDpePWC9zZ54_sWANZlwDxppu2-DQuAuvW3Bw\",\"use\":\"sig\",\"crv\":\"P-256\",\"kid\":\"gSb6VludekqwZS_0osHNxAK2y2Rua1V_aGWNFaTvgNM\",\"x\":\"WcBuVJRGiCvhEdU6nbKysIxEjQOqzaH-kiIZoIpFNfE\",\"y\":\"FiWqBp6ilDBJ-VEnZsgHTK4fYKmB841n2wNMfvFZB2E\",\"alg\":\"ES256\"}]}</argument>
+                <argument>-Djwk-set.current-key-id=gSb6VludekqwZS_0osHNxAK2y2Rua1V_aGWNFaTvgNM</argument>
                 <argument>-Dpublic-r4-base-path=r4</argument>
                 <argument>-Dpublic-url=http://localhost:8096</argument>
                 <argument>-Dweb-exception-key=-sharktopus-v-pteracuda-</argument>

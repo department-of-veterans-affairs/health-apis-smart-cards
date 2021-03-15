@@ -9,6 +9,7 @@ import com.nimbusds.jose.crypto.ECDSAVerifier;
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.jwk.JWK;
+import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.gen.ECKeyGenerator;
 import gov.va.api.health.r4.api.bundle.AbstractBundle.BundleType;
 import gov.va.api.health.r4.api.bundle.MixedBundle;
@@ -25,6 +26,15 @@ import org.junit.jupiter.api.Test;
 
 public class PayloadSignerTest {
   private static final String JWK_PRIVATE = genEcJwk("123").toJSONString();
+
+  private static final JwksProperties JWKS_PROPERTIES = _jwksProperties();
+
+  @SneakyThrows
+  private static JwksProperties _jwksProperties() {
+    JWKSet jwks = new JWKSet(JWK.parse(JWK_PRIVATE));
+    String jwkSet = jwks.toString(false);
+    return new JwksProperties(jwkSet, "123");
+  }
 
   private static LinkProperties _linkProperties() {
     return LinkProperties.builder()
@@ -74,7 +84,11 @@ public class PayloadSignerTest {
   @SneakyThrows
   @Test
   void signAndDeflate() {
-    PayloadSigner signer = new PayloadSigner(JWK_PRIVATE, _linkProperties());
+    PayloadSigner signer =
+        PayloadSigner.builder()
+            .jwksProperties(JWKS_PROPERTIES)
+            .linkProperties(_linkProperties())
+            .build();
     var vc = vc();
     String jws = signer.sign(vc, true);
 
@@ -98,7 +112,11 @@ public class PayloadSignerTest {
   @SneakyThrows
   @Test
   void signWithoutCompressions() {
-    PayloadSigner signer = new PayloadSigner(JWK_PRIVATE, _linkProperties());
+    PayloadSigner signer =
+        PayloadSigner.builder()
+            .jwksProperties(JWKS_PROPERTIES)
+            .linkProperties(_linkProperties())
+            .build();
     var vc = vc();
     String jws = signer.sign(vc, false);
 
@@ -119,10 +137,8 @@ public class PayloadSignerTest {
     assertThat(claims.verifiableCredential()).isEqualTo(vc);
   }
 
-  @SneakyThrows
   private boolean verify(String jws) {
-    JWK jwkPrivate = JWK.parse(JWK_PRIVATE);
-    return verify(jws, jwkPrivate.toPublicJWK());
+    return verify(jws, JWKS_PROPERTIES.currentPublicJwk());
   }
 
   @SneakyThrows

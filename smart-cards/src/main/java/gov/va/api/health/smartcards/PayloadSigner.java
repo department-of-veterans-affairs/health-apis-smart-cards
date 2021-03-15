@@ -1,7 +1,5 @@
 package gov.va.api.health.smartcards;
 
-import static com.google.common.base.Preconditions.checkState;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
@@ -14,27 +12,14 @@ import gov.va.api.health.smartcards.vc.VerifiableCredential;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import lombok.Builder;
-import lombok.Getter;
 import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Value;
 
-@Getter
+@Builder
 public class PayloadSigner {
   private static final ObjectMapper MAPPER = JacksonMapperConfig.createMapper();
 
-  private final JWK jwkPrivate;
-
+  private final JwksProperties jwksProperties;
   private final LinkProperties linkProperties;
-
-  @Builder
-  @SneakyThrows
-  PayloadSigner(
-      @Value("${payload-signer.jwk-private}") String jwkPrivateJson,
-      LinkProperties linkProperties) {
-    checkState(!"unset".equals(jwkPrivateJson), "payload-signer.jwk-private is unset");
-    this.jwkPrivate = JWK.parse(jwkPrivateJson);
-    this.linkProperties = linkProperties;
-  }
 
   private byte[] deflate(String payload) {
     return Compressors.deflate(payload.getBytes(StandardCharsets.UTF_8));
@@ -62,9 +47,9 @@ public class PayloadSigner {
     byte[] payloadAsBytes =
         deflate ? deflate(payloadStr) : payloadStr.getBytes(StandardCharsets.UTF_8);
     Payload payload = new Payload(payloadAsBytes);
-    JWSHeader header = jwsHeader(jwkPrivate, deflate);
+    JWSHeader header = jwsHeader(jwksProperties.currentPrivateJwk(), deflate);
     JWSObject jwsObject = new JWSObject(header, payload);
-    jwsObject.sign(new ECDSASigner(jwkPrivate.toECKey()));
+    jwsObject.sign(new ECDSASigner(jwksProperties.currentPrivateJwk().toECKey()));
     return jwsObject.serialize();
   }
 }

@@ -12,7 +12,7 @@
   <packaging>jar</packaging>
   <properties>
     <fhir-resources.version>6.0.6</fhir-resources.version>
-    <swagger-maven-plugin.version>2.1.1</swagger-maven-plugin.version>
+    <swagger-maven-plugin.version>2.1.7</swagger-maven-plugin.version>
   </properties>
   <dependencies>
     <dependency>
@@ -39,9 +39,9 @@
               <goal>resolve</goal>
             </goals>
             <configuration>
-              <contextId>r4-openapi</contextId>
+              <contextId>r4-open-api</contextId>
               <resourceClasses>
-                <resourceClass>gov.va.api.health.smartcards.api.R4OpenApi</resourceClass>
+                <resourceClass>gov.va.api.health.smartcards.R4OpenApi</resourceClass>
               </resourceClasses>
               <outputFileName>r4-openapi</outputFileName>
               <outputPath>${project.build.outputDirectory}</outputPath>

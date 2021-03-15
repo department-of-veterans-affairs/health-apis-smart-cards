@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 public interface SmartCardsPatientApi {
   @Operation(summary = "Issues Verfiable Credential")
   @POST
-  @Path("Patient/{id}/HealthWallet.issueVc")
+  @Path("Patient/${id}/HealthWallet.issueVc")
   @ApiResponse(responseCode = "200", description = "Verfiable Credential Received")
   ResponseEntity<Parameters> issueVc(
       @Parameter(
@@ -23,11 +23,5 @@ public interface SmartCardsPatientApi {
               description = "The ID of the patient to issue credentials for.")
           String id,
       @RequestBody(required = true, description = "Parameters used for credential type validation")
-          Parameters parameters,
-      @Parameter(
-              in = ParameterIn.HEADER,
-              name = "authorization",
-              required = true,
-              description = "The Authorization Token for the desired patient.")
-          String authorization);
+          Parameters parameters);
 }

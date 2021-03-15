@@ -1,4 +1,4 @@
-package gov.va.api.health.smartcards.api;
+package gov.va.api.health.smartcards;
 
 import gov.va.api.health.smartcards.patient.SmartCardsPatientApi;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
@@ -10,11 +10,11 @@ import javax.ws.rs.Path;
 @OpenAPIDefinition(
     info = @Info(title = "US Core R4", version = "v1"),
     servers = {
-      @Server(url = "https://sandbox-api.va.gov/services/pgd/v0/r4/", description = "Sandbox")
+      @Server(url = "https://sandbox-api.va.gov/services/fhir/v0/r4/", description = "Sandbox")
     },
     externalDocs =
         @ExternalDocumentation(
-            description = "US Core Implementation Guide",
-            url = "https://build.fhir.org/ig/HL7/US-Core-R4/index.html"))
+            description = "Smart Cards Implementation Guide",
+            url = "https://smarthealth.cards"))
 @Path("/")
 public interface R4OpenApi extends SmartCardsPatientApi {}

@@ -2,12 +2,9 @@ package gov.va.api.health.smartcards;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import gov.va.api.health.r4.api.datatypes.CodeableConcept;
-import gov.va.api.health.r4.api.datatypes.Coding;
 import gov.va.api.health.r4.api.datatypes.ContactDetail;
 import gov.va.api.health.r4.api.datatypes.ContactPoint;
 import gov.va.api.health.r4.api.datatypes.ContactPoint.ContactPointSystem;
-import gov.va.api.health.r4.api.elements.Extension;
 import gov.va.api.health.r4.api.resources.CapabilityStatement;
 import gov.va.api.health.r4.api.resources.CapabilityStatement.CapabilityResource;
 import gov.va.api.health.r4.api.resources.CapabilityStatement.Implementation;
@@ -16,7 +13,6 @@ import gov.va.api.health.r4.api.resources.CapabilityStatement.ReferencePolicy;
 import gov.va.api.health.r4.api.resources.CapabilityStatement.Rest;
 import gov.va.api.health.r4.api.resources.CapabilityStatement.RestMode;
 import gov.va.api.health.r4.api.resources.CapabilityStatement.SearchParamType;
-import gov.va.api.health.r4.api.resources.CapabilityStatement.Security;
 import gov.va.api.health.r4.api.resources.CapabilityStatement.Software;
 import gov.va.api.health.r4.api.resources.CapabilityStatement.Status;
 import gov.va.api.health.r4.api.resources.CapabilityStatement.TypeRestfulInteraction;
@@ -46,12 +42,6 @@ public class R4MetadataControllerTest {
                         .r4BasePath("api/r4")
                         .dqInternalR4BasePath("/r4")
                         .dqInternalUrl("/fhir/v0/r4")
-                        .build(),
-                    R4MetadataProperties.builder()
-                        .endpointToken("http://fake.com/token")
-                        .endpointAuthorize("http://fake.com/authorize")
-                        .endpointManagement("http://fake.com/manage")
-                        .endpointRevocation("http://fake.com/revoke")
                         .build())
                 .read())
         .isEqualTo(
@@ -107,47 +97,6 @@ public class R4MetadataControllerTest {
                                         .referencePolicy(
                                             List.of(ReferencePolicy.literal, ReferencePolicy.local))
                                         .build()))
-                            .security(
-                                Security.builder()
-                                    .cors(true)
-                                    .description("http://docs.smarthealthit.org/")
-                                    .service(
-                                        List.of(
-                                            CodeableConcept.builder()
-                                                .coding(
-                                                    List.of(
-                                                        Coding.builder()
-                                                            .system(
-                                                                "http://terminology.hl7.org/CodeSystem/restful-security-service")
-                                                            .code("SMART-on-FHIR")
-                                                            .display("SMART-on-FHIR")
-                                                            .build()))
-                                                .build()))
-                                    .extension(
-                                        List.of(
-                                            Extension.builder()
-                                                .url(
-                                                    "http://fhir-registry.smarthealthit.org/StructureDefinition/oauth-uris")
-                                                .extension(
-                                                    List.of(
-                                                        Extension.builder()
-                                                            .url("token")
-                                                            .valueUri("http://fake.com/token")
-                                                            .build(),
-                                                        Extension.builder()
-                                                            .url("authorize")
-                                                            .valueUri("http://fake.com/authorize")
-                                                            .build(),
-                                                        Extension.builder()
-                                                            .url("manage")
-                                                            .valueUri("http://fake.com/manage")
-                                                            .build(),
-                                                        Extension.builder()
-                                                            .url("revoke")
-                                                            .valueUri("http://fake.com/revoke")
-                                                            .build()))
-                                                .build()))
-                                    .build())
                             .build()))
                 .build());
   }

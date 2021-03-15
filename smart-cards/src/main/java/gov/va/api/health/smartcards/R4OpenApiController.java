@@ -1,4 +1,4 @@
-package gov.va.api.health.smartcards.api;
+package gov.va.api.health.smartcards;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.InputStream;

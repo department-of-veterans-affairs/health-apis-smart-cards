@@ -1,7 +1,5 @@
 package gov.va.api.health.smartcards.patient;
 
-import com.google.common.base.Splitter;
-import com.google.common.collect.Iterables;
 import gov.va.api.health.r4.api.bundle.MixedEntry;
 import gov.va.api.health.r4.api.datatypes.CodeableConcept;
 import gov.va.api.health.r4.api.elements.Reference;
@@ -26,7 +24,7 @@ public class ImmunizationTransformer {
     String odt = entry.resource().occurrenceDateTime();
     // expect DQ to provide a ISO8601-formatted date
     if (odt.contains("T")) {
-      odt = Iterables.get(Splitter.on('T').split(odt), 0);
+      odt = odt.substring(0, odt.indexOf("T"));
     }
     return odt;
   }

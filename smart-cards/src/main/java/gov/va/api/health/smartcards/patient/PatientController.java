@@ -10,9 +10,7 @@ import gov.va.api.health.r4.api.bundle.AbstractEntry;
 import gov.va.api.health.r4.api.bundle.MixedBundle;
 import gov.va.api.health.r4.api.bundle.MixedEntry;
 import gov.va.api.health.r4.api.resources.Immunization;
-import gov.va.api.health.r4.api.resources.Immunization.Status;
 import gov.va.api.health.r4.api.resources.Location;
-import gov.va.api.health.r4.api.resources.Location.Bundle;
 import gov.va.api.health.r4.api.resources.Parameters;
 import gov.va.api.health.r4.api.resources.Patient;
 import gov.va.api.health.r4.api.resources.Resource;
@@ -29,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 import javax.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -71,16 +68,8 @@ public class PatientController {
 
   /** Extracts resources from Bundle entries and pushes them to an existing List. */
   private <R extends Resource, E extends AbstractEntry<R>, B extends AbstractBundle<E>>
-      void consumeBundle(
-          B bundle,
-          List<MixedEntry> target,
-          Predicate<E> filter,
-          Function<E, MixedEntry> transform) {
-    bundle.entry().stream().filter(filter).map(transform).forEachOrdered(target::add);
-  }
-
-  private boolean filter(Immunization.Entry entry) {
-    return entry.resource().status() == Status.completed;
+      void consumeBundle(B bundle, List<MixedEntry> target, Function<E, MixedEntry> transform) {
+    bundle.entry().stream().map(transform).forEachOrdered(target::add);
   }
 
   private List<CredentialType> getCredentialTypes(Parameters parameters) {
@@ -135,10 +124,10 @@ public class PatientController {
     Patient.Bundle patients = fhirClient.patientBundle(id, authorization);
     Patient patient = getPatientFromBundle(patients, id);
     Immunization.Bundle immunizations = fhirClient.immunizationBundle(patient, authorization);
-    lookupLocations(immunizations, authorization);
+    lookupAndAttachLocations(immunizations, authorization);
     List<MixedEntry> resources = new ArrayList<>();
-    consumeBundle(patients, resources, x -> true, this::transform);
-    consumeBundle(immunizations, resources, this::filter, this::transform);
+    consumeBundle(patients, resources, this::transform);
+    consumeBundle(immunizations, resources, this::transform);
     // Index unique URLs and replace with 'resource:X' scheme
     List<String> urls = indexAndReplaceUrls(resources);
     MixedBundle bundle = toBundle(resources);
@@ -147,9 +136,9 @@ public class PatientController {
     return ResponseEntity.ok(parametersResponse);
   }
 
-  private void lookupLocations(Immunization.Bundle immunizations, String authorization) {
+  private void lookupAndAttachLocations(Immunization.Bundle immunizations, String authorization) {
     // keep track of locations we already looked up
-    Map<String, Bundle> locations = new HashMap<>();
+    Map<String, Location.Bundle> locations = new HashMap<>();
     for (Immunization.Entry entry : immunizations.entry()) {
       Immunization imm = entry.resource();
       String locationResourceId = Controllers.resourceId(imm.location().reference());

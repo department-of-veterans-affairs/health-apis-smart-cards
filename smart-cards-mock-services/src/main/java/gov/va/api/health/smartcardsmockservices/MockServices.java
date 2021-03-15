@@ -106,8 +106,8 @@ public class MockServices {
     ms = new MockServer(options.getPort());
     MockServerClient mock = new MockServerClient("localhost", options.getPort());
     addImmunizationBundle(mock);
-    addPatientBundle(mock);
     addLocationBundle(mock);
+    addPatientBundle(mock);
     addHelp(mock);
   }
 }

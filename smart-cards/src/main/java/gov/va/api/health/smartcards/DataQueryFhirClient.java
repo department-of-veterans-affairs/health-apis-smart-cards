@@ -63,9 +63,9 @@ public class DataQueryFhirClient implements FhirClient {
   }
 
   @Override
-  public Location.Bundle locationBundle(String id, String authorization) {
-    String url = String.format("%s?_id=%s", linkProperties.dataQueryR4ResourceUrl("Location"), id);
-    return doGet(url, authorization, Location.Bundle.class).getBody();
+  public Location location(String id, String authorization) {
+    String url = String.format("%s/%s", linkProperties.dataQueryR4ResourceUrl("Location"), id);
+    return doGet(url, authorization, Location.class).getBody();
   }
 
   @Override

@@ -185,65 +185,44 @@ public class PatientControllerTest {
     Patient.IDENTIFIER_MIN_SIZE.set(0);
   }
 
-  static Location.Bundle locationBundle(String id) {
+  static Location location(String id) {
     LinkProperties linkProperties = _linkProperties();
-    Location location =
-        Location.builder()
-            .id(id)
-            .status(Location.Status.active)
-            .name("Location with id " + id)
-            .description("Description for id " + id)
-            .mode(Mode.instance)
-            .type(
-                List.of(
-                    CodeableConcept.builder()
-                        .coding(List.of(Coding.builder().display("SOME CODING").build()))
-                        .text("SOME TEXT")
-                        .build()))
-            .telecom(
-                List.of(
-                    ContactPoint.builder()
-                        .system(ContactPointSystem.phone)
-                        .value("123-456-7890 x0001")
-                        .build()))
-            .address(
-                Address.builder()
-                    .text("1901 VETERANS MEMORIAL DRIVE TEMPLE TEXAS 76504")
-                    .line(List.of("1901 VETERANS MEMORIAL DRIVE"))
-                    .city("TEMPLE")
-                    .state("TEXAS")
-                    .postalCode("76504")
-                    .build())
-            .physicalType(
+    return Location.builder()
+        .id(id)
+        .status(Location.Status.active)
+        .name("Location with id " + id)
+        .description("Description for id " + id)
+        .mode(Mode.instance)
+        .type(
+            List.of(
                 CodeableConcept.builder()
-                    .coding(List.of(Coding.builder().display("PHYS TYPE CODING").build()))
-                    .text("PHYS TYPE TEXT")
-                    .build())
-            .managingOrganization(
-                Reference.builder()
-                    .reference(linkProperties.dataQueryR4ResourceUrl("Organization") + "/org-" + id)
-                    .display("MNG ORG VA MEDICAL")
-                    .build())
-            .build();
-    return Location.Bundle.builder()
-        .type(AbstractBundle.BundleType.searchset)
-        .link(
-            List.of(
-                BundleLink.builder()
-                    .relation(BundleLink.LinkRelation.self)
-                    .url(
-                        String.format(
-                            "%s?_id=%s", linkProperties.dataQueryR4ResourceUrl("Location"), id))
+                    .coding(List.of(Coding.builder().display("SOME CODING").build()))
+                    .text("SOME TEXT")
                     .build()))
-        .total(1)
-        .entry(
+        .telecom(
             List.of(
-                Location.Entry.builder()
-                    .fullUrl(linkProperties.dataQueryR4ReadUrl(location))
-                    .resource(location)
-                    .search(
-                        AbstractEntry.Search.builder().mode(AbstractEntry.SearchMode.match).build())
+                ContactPoint.builder()
+                    .system(ContactPointSystem.phone)
+                    .value("123-456-7890 x0001")
                     .build()))
+        .address(
+            Address.builder()
+                .text("1901 VETERANS MEMORIAL DRIVE TEMPLE TEXAS 76504")
+                .line(List.of("1901 VETERANS MEMORIAL DRIVE"))
+                .city("TEMPLE")
+                .state("TEXAS")
+                .postalCode("76504")
+                .build())
+        .physicalType(
+            CodeableConcept.builder()
+                .coding(List.of(Coding.builder().display("PHYS TYPE CODING").build()))
+                .text("PHYS TYPE TEXT")
+                .build())
+        .managingOrganization(
+            Reference.builder()
+                .reference(linkProperties.dataQueryR4ResourceUrl("Organization") + "/org-" + id)
+                .display("MNG ORG VA MEDICAL")
+                .build())
         .build();
   }
 
@@ -328,7 +307,7 @@ public class PatientControllerTest {
   private static PatientController patientController(
       ResponseEntity<Patient.Bundle> patientBundleResponse,
       ResponseEntity<Immunization.Bundle> immunizationBundleResponse,
-      ResponseEntity<Location.Bundle> locationBundleResponse) {
+      ResponseEntity<Location> locationResponse) {
     var mockRestTemplate = mock(RestTemplate.class);
     if (patientBundleResponse != null) {
       when(mockRestTemplate.exchange(
@@ -340,10 +319,10 @@ public class PatientControllerTest {
               anyString(), any(HttpMethod.class), any(), same(Immunization.Bundle.class)))
           .thenReturn(immunizationBundleResponse);
     }
-    if (locationBundleResponse != null) {
+    if (locationResponse != null) {
       when(mockRestTemplate.exchange(
-              anyString(), any(HttpMethod.class), any(), same(Location.Bundle.class)))
-          .thenReturn(locationBundleResponse);
+              anyString(), any(HttpMethod.class), any(), same(Location.class)))
+          .thenReturn(locationResponse);
     }
     var fhirClient = new DataQueryFhirClient(mockRestTemplate, _linkProperties());
     var bundler = new R4MixedBundler();
@@ -361,10 +340,9 @@ public class PatientControllerTest {
     var patientBundleResponse = new ResponseEntity<>(patientBundle("123"), HttpStatus.ACCEPTED);
     var immunizationBundleResponse =
         new ResponseEntity<>(immunizationBundle("123"), HttpStatus.ACCEPTED);
-    var locationBundleResponse = new ResponseEntity<>(locationBundle("loc-1"), HttpStatus.ACCEPTED);
+    var locationResponse = new ResponseEntity<>(location("loc-1"), HttpStatus.ACCEPTED);
     var controller =
-        patientController(
-            patientBundleResponse, immunizationBundleResponse, locationBundleResponse);
+        patientController(patientBundleResponse, immunizationBundleResponse, locationResponse);
     var result = controller.issueVc("123", parametersCovid19(), "").getBody();
     assertNotNull(result);
     var vc = findVcFromParameters(result);

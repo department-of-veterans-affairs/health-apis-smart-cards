@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import javax.validation.Valid;
@@ -138,17 +137,20 @@ public class PatientController {
 
   private void lookupAndAttachLocations(Immunization.Bundle immunizations, String authorization) {
     // keep track of locations we already looked up
-    Map<String, Location.Bundle> locations = new HashMap<>();
+    Map<String, Location> locations = new HashMap<>();
     for (Immunization.Entry entry : immunizations.entry()) {
       Immunization imm = entry.resource();
       String locationResourceId = Controllers.resourceId(imm.location().reference());
-      Location.Bundle locationBundle = locations.get(locationResourceId);
-      if (locationBundle == null) {
-        locationBundle = fhirClient.locationBundle(locationResourceId, authorization);
-        locations.put(locationResourceId, locationBundle);
+      Location location = locations.get(locationResourceId);
+      if (location == null) {
+        location = fhirClient.location(locationResourceId, authorization);
+        locations.put(locationResourceId, location);
       }
-      Optional<Location.Entry> maybeEntry = locationBundle.entry().stream().findFirst();
-      maybeEntry.ifPresent(value -> imm.contained(List.of(value.resource())));
+      if (imm.contained() == null) {
+        imm.contained(List.of(location));
+      } else {
+        imm.contained().add(location);
+      }
     }
   }
 

@@ -24,8 +24,7 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 
 public class PayloadSignerTest {
-  private static final String JWK_PRIVATE =
-      "{\"kty\":\"EC\",\"d\":\"5h-A-oFDpePWC9zZ54_sWANZlwDxppu2-DQuAuvW3Bw\",\"use\":\"sig\",\"crv\":\"P-256\",\"kid\":\"gSb6VludekqwZS_0osHNxAK2y2Rua1V_aGWNFaTvgNM\",\"x\":\"WcBuVJRGiCvhEdU6nbKysIxEjQOqzaH-kiIZoIpFNfE\",\"y\":\"FiWqBp6ilDBJ-VEnZsgHTK4fYKmB841n2wNMfvFZB2E\",\"alg\":\"ES256\"}";
+  private static final String JWK_PRIVATE = genEcJwk("123").toJSONString();
 
   private static LinkProperties _linkProperties() {
     return LinkProperties.builder()
@@ -37,10 +36,8 @@ public class PayloadSignerTest {
   }
 
   @SneakyThrows
-  private static JWK genPublicJwk() {
-    // Generate an EC key pair
-    ECKey ecJWK = new ECKeyGenerator(Curve.P_256).keyID("123").generate();
-    return ecJWK.toPublicJWK();
+  private static ECKey genEcJwk(String kid) {
+    return new ECKeyGenerator(Curve.P_256).keyID(kid).generate();
   }
 
   private static VerifiableCredential vc() {
@@ -76,14 +73,14 @@ public class PayloadSignerTest {
 
   @SneakyThrows
   @Test
-  public void signAndDeflate() {
+  void signAndDeflate() {
     PayloadSigner signer = new PayloadSigner(JWK_PRIVATE, _linkProperties());
     var vc = vc();
     String jws = signer.sign(vc, true);
 
     // Verify signature with public key
     assertThat(verify(jws)).isTrue();
-    assertThat(verify(jws, genPublicJwk().toPublicJWK())).isFalse();
+    assertThat(verify(jws, genEcJwk("random").toPublicJWK())).isFalse();
     JWSObject jwsObject = JWSObject.parse(jws);
 
     // Verify header
@@ -100,14 +97,14 @@ public class PayloadSignerTest {
 
   @SneakyThrows
   @Test
-  public void signWithoutCompressions() {
+  void signWithoutCompressions() {
     PayloadSigner signer = new PayloadSigner(JWK_PRIVATE, _linkProperties());
     var vc = vc();
     String jws = signer.sign(vc, false);
 
     // Verify signature with public key
     assertThat(verify(jws)).isTrue();
-    assertThat(verify(jws, genPublicJwk().toPublicJWK())).isFalse();
+    assertThat(verify(jws, genEcJwk("random").toPublicJWK())).isFalse();
     JWSObject jwsObject = JWSObject.parse(jws);
 
     // Verify header

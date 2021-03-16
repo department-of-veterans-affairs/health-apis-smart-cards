@@ -12,15 +12,12 @@ import gov.va.api.health.r4.api.resources.CapabilityStatement.Kind;
 import gov.va.api.health.r4.api.resources.CapabilityStatement.ReferencePolicy;
 import gov.va.api.health.r4.api.resources.CapabilityStatement.Rest;
 import gov.va.api.health.r4.api.resources.CapabilityStatement.RestMode;
-import gov.va.api.health.r4.api.resources.CapabilityStatement.SearchParamType;
 import gov.va.api.health.r4.api.resources.CapabilityStatement.Software;
 import gov.va.api.health.r4.api.resources.CapabilityStatement.Status;
 import gov.va.api.health.r4.api.resources.CapabilityStatement.TypeRestfulInteraction;
 import gov.va.api.health.r4.api.resources.CapabilityStatement.Versioning;
-import gov.va.api.health.smartcards.R4MetadataController.SearchParam;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.info.BuildProperties;
 
@@ -115,7 +112,6 @@ public class R4MetadataControllerTest {
             R4MetadataController.SupportedResource.builder()
                 .type("type")
                 .profileUrl("url")
-                .searches(Set.of(SearchParam._ID))
                 .build()
                 .asResource())
         .isEqualTo(
@@ -128,20 +124,9 @@ public class R4MetadataControllerTest {
                             .code(CapabilityStatement.TypeRestfulInteraction.read)
                             .documentation(
                                 "Implemented per specification. See http://hl7.org/fhir/R4/http.html")
-                            .build(),
-                        CapabilityStatement.ResourceInteraction.builder()
-                            .code(CapabilityStatement.TypeRestfulInteraction.search_type)
-                            .documentation(
-                                "Implemented per specification. See http://hl7.org/fhir/R4/http.html")
                             .build()))
                 .versioning(Versioning.no_version)
                 .referencePolicy(List.of(ReferencePolicy.literal, ReferencePolicy.local))
-                .searchParam(
-                    List.of(
-                        CapabilityStatement.SearchParam.builder()
-                            .name("_id")
-                            .type(SearchParamType.token)
-                            .build()))
                 .build());
   }
 }

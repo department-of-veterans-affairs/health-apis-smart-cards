@@ -11,10 +11,10 @@ import javax.ws.rs.Path;
 import org.springframework.http.ResponseEntity;
 
 public interface SmartCardsPatientApi {
-  @Operation(summary = "Issues Verfiable Credential")
+  @Operation(summary = "Issues Verifiable Credential")
   @POST
   @Path("Patient/${id}/HealthWallet.issueVc")
-  @ApiResponse(responseCode = "200", description = "Verfiable Credential Received")
+  @ApiResponse(responseCode = "200", description = "Verifiable Credential Received")
   ResponseEntity<Parameters> issueVc(
       @Parameter(
               in = ParameterIn.PATH,

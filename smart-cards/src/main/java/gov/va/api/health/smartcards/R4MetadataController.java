@@ -1,17 +1,14 @@
 package gov.va.api.health.smartcards;
 
 import static java.util.stream.Collectors.toList;
-import static org.springframework.util.CollectionUtils.isEmpty;
 
 import gov.va.api.health.r4.api.datatypes.ContactDetail;
 import gov.va.api.health.r4.api.datatypes.ContactPoint;
 import gov.va.api.health.r4.api.resources.CapabilityStatement;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
 import lombok.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.info.BuildProperties;
@@ -103,16 +100,6 @@ public class R4MetadataController {
         .build();
   }
 
-  @Getter
-  @AllArgsConstructor
-  enum SearchParam {
-    _ID("_id", CapabilityStatement.SearchParamType.token);
-
-    private final String param;
-
-    private final CapabilityStatement.SearchParamType type;
-  }
-
   @Value
   @Builder
   static final class SupportedResource {
@@ -120,14 +107,11 @@ public class R4MetadataController {
 
     String profileUrl;
 
-    Set<SearchParam> searches;
-
     CapabilityStatement.CapabilityResource asResource() {
       return CapabilityStatement.CapabilityResource.builder()
           .type(type)
           .profile(profileUrl)
           .interaction(interactions())
-          .searchParam(searchParams())
           .versioning(CapabilityStatement.Versioning.no_version)
           .referencePolicy(
               List.of(
@@ -142,26 +126,7 @@ public class R4MetadataController {
               .code(CapabilityStatement.TypeRestfulInteraction.read)
               .documentation(RESOURCE_DOCUMENTATION)
               .build();
-      if (isEmpty(searches)) {
-        return List.of(readable);
-      }
-      CapabilityStatement.ResourceInteraction searchable =
-          CapabilityStatement.ResourceInteraction.builder()
-              .code(CapabilityStatement.TypeRestfulInteraction.search_type)
-              .documentation(RESOURCE_DOCUMENTATION)
-              .build();
-      return List.of(readable, searchable);
-    }
-
-    private List<CapabilityStatement.SearchParam> searchParams() {
-      if (isEmpty(searches)) {
-        return null;
-      }
-      return searches.stream()
-          .sorted((a, b) -> a.param().compareTo(b.param()))
-          .map(
-              s -> CapabilityStatement.SearchParam.builder().name(s.param()).type(s.type()).build())
-          .collect(toList());
+      return List.of(readable);
     }
   }
 }

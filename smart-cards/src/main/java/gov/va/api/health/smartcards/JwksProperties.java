@@ -49,8 +49,4 @@ public class JwksProperties {
   public JWK currentPublicJwk() {
     return jwksPublic.getKeyByKeyId(currentKeyId);
   }
-
-  public JWKSet jwksPublic() {
-    return jwksPublic;
-  }
 }

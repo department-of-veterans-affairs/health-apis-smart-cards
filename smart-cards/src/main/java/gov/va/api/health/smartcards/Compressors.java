@@ -13,6 +13,7 @@ public class Compressors {
   private static final int BUFFER_SIZE = 1024;
 
   /** Compress a payload with Java's ZLIB implementation. */
+  @SneakyThrows
   public static byte[] deflate(byte[] input) {
     checkNotNull(input);
     Deflater deflater = new Deflater();
@@ -20,16 +21,17 @@ public class Compressors {
     deflater.finish();
 
     byte[] buffer = new byte[BUFFER_SIZE];
-    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    try {
+    byte[] result;
+    try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
       while (!deflater.finished()) {
         var deflated = deflater.deflate(buffer);
         bos.write(buffer, 0, deflated);
       }
+      result = bos.toByteArray();
     } finally {
       deflater.end();
     }
-    return bos.toByteArray();
+    return result;
   }
 
   /** Decompress a payload with Java's ZLIB implementation. */
@@ -39,15 +41,16 @@ public class Compressors {
     Inflater inflater = new Inflater();
     inflater.setInput(input);
     byte[] buffer = new byte[BUFFER_SIZE];
-    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    try {
+    byte[] result;
+    try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
       while (!inflater.finished()) {
         int inflated = inflater.inflate(buffer);
         bos.write(buffer, 0, inflated);
       }
+      result = bos.toByteArray();
     } finally {
       inflater.end();
     }
-    return bos.toByteArray();
+    return result;
   }
 }

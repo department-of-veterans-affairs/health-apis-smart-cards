@@ -8,7 +8,7 @@ import io.swagger.v3.oas.annotations.servers.Server;
 import javax.ws.rs.Path;
 
 @OpenAPIDefinition(
-    info = @Info(title = "US Core R4", version = "v1"),
+    info = @Info(title = "SMART Health Cards", version = "v1"),
     servers = {
       @Server(url = "https://sandbox-api.va.gov/services/fhir/v0/r4/", description = "Sandbox")
     },

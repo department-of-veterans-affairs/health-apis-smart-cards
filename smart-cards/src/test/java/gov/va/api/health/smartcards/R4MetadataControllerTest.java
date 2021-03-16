@@ -22,7 +22,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.info.BuildProperties;
 
 public class R4MetadataControllerTest {
-
   @Test
   void read() {
     Properties properties = new Properties();

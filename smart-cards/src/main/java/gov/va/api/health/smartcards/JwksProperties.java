@@ -38,7 +38,8 @@ public class JwksProperties {
 
   /** Deal with quotes for json provided through CLI properties. */
   private static String cleanupJson(String json) {
-    json = json.trim();
+    json = StringUtils.trim(json);
+    json = StringUtils.replace(json, "\\\"", "\"");
     if (StringUtils.startsWithAny(json, "\"", "'")) {
       return json.substring(1, json.length() - 1);
     }

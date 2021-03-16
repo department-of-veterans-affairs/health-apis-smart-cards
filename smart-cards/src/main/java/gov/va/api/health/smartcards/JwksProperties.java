@@ -12,7 +12,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Component
 @Getter
 public class JwksProperties {
@@ -30,8 +29,6 @@ public class JwksProperties {
     checkState(!"unset".equals(jwksPrivateJson), "jwk-set.private-json is unset");
     checkState(!"unset".equals(currentKeyId), "jwk-set.current-key-id is unset");
     this.currentKeyId = currentKeyId;
-    log.warn("Input {}", jwksPrivateJson);
-    log.warn("Cleaned {}", cleanupJson(jwksPrivateJson));
     jwksPrivate = JWKSet.parse(cleanupJson(jwksPrivateJson));
     jwksPublic = jwksPrivate.toPublicJWKSet();
   }

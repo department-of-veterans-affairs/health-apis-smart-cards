@@ -8,10 +8,11 @@
     <relativePath/>
   </parent>
   <artifactId>smart-cards</artifactId>
-  <version>0.0.19-SNAPSHOT</version>
+  <version>0.0.20-SNAPSHOT</version>
   <packaging>jar</packaging>
   <properties>
     <fhir-resources.version>6.0.6</fhir-resources.version>
+    <swagger-maven-plugin.version>2.1.4</swagger-maven-plugin.version>
   </properties>
   <dependencies>
     <dependency>
@@ -24,4 +25,32 @@
       <version>${fhir-resources.version}</version>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>io.swagger.core.v3</groupId>
+        <artifactId>swagger-maven-plugin</artifactId>
+        <version>${swagger-maven-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>r4-open-api</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>resolve</goal>
+            </goals>
+            <configuration>
+              <contextId>r4-open-api</contextId>
+              <resourceClasses>
+                <resourceClass>gov.va.api.health.smartcards.R4OpenApi</resourceClass>
+              </resourceClasses>
+              <outputFileName>r4-openapi</outputFileName>
+              <outputPath>${project.build.outputDirectory}</outputPath>
+              <outputFormat>JSON</outputFormat>
+              <prettyPrint>true</prettyPrint>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

@@ -35,6 +35,7 @@ import java.util.stream.Stream;
 import javax.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.DataBinder;
@@ -111,6 +112,13 @@ public class PatientController {
       }
     }
     return urls;
+  }
+
+  private static boolean parseBooleanOrTrue(String value) {
+    // not using parseBoolean because we need to default to true
+    value = StringUtils.trimToEmpty(value);
+    value = StringUtils.lowerCase(value);
+    return !"false".equals(value);
   }
 
   private static MixedEntry transform(Patient.Entry entry) {
@@ -240,17 +248,10 @@ public class PatientController {
         .build();
   }
 
-  private boolean parseBoolean(String raw, boolean defaultValue) {
-    if (isBlank(raw)) {
-      return defaultValue;
-    }
-    return Boolean.parseBoolean(raw.trim().toLowerCase());
-  }
-
   @SneakyThrows
   private String signVc(VerifiableCredential vc, String vcJws, String vcCompress) {
-    boolean shouldSign = parseBoolean(vcJws, true);
-    boolean shouldDeflate = parseBoolean(vcCompress, true);
+    boolean shouldSign = parseBooleanOrTrue(vcJws);
+    boolean shouldDeflate = parseBooleanOrTrue(vcCompress);
     if (!shouldSign) {
       return MAPPER.writeValueAsString(vc);
     }

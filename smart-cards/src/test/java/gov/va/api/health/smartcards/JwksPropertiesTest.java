@@ -1,7 +1,6 @@
 package gov.va.api.health.smartcards;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import com.nimbusds.jose.jwk.Curve;
 import com.nimbusds.jose.jwk.ECKey;
@@ -47,11 +46,11 @@ public class JwksPropertiesTest {
     }
   }
 
-  @Test
-  void testCleanupJson() {
-    JWKSet jwks = new JWKSet(List.of(KEY_CURRENT, KEY_OTHER));
-    String json = jwks.toString(false);
-    assertDoesNotThrow(() -> new JwksProperties(String.format("\"%s\"", json), "123"));
-    assertDoesNotThrow(() -> new JwksProperties(String.format("'%s'", json), "123"));
-  }
+  //  @Test
+  //  void testCleanupJson() {
+  //    JWKSet jwks = new JWKSet(List.of(KEY_CURRENT, KEY_OTHER));
+  //    String json = jwks.toString(false);
+  //    assertDoesNotThrow(() -> new JwksProperties(String.format("\"%s\"", json), "123"));
+  //    assertDoesNotThrow(() -> new JwksProperties(String.format("'%s'", json), "123"));
+  //  }
 }

@@ -12,6 +12,8 @@
   <packaging>jar</packaging>
   <properties>
     <fhir-resources.version>6.0.6</fhir-resources.version>
+    <jwk-set.private-json>{"keys":[{"kty":"EC","d":"5h-A-oFDpePWC9zZ54_sWANZlwDxppu2-DQuAuvW3Bw","use":"sig","crv":"P-256","kid":"gSb6VludekqwZS_0osHNxAK2y2Rua1V_aGWNFaTvgNM","x":"WcBuVJRGiCvhEdU6nbKysIxEjQOqzaH-kiIZoIpFNfE","y":"FiWqBp6ilDBJ-VEnZsgHTK4fYKmB841n2wNMfvFZB2E","alg":"ES256"}]}</jwk-set.private-json>
+    <jwk-set.private-json.escape>{\"keys\":[{\"kty\":\"EC\",\"d\":\"5h-A-oFDpePWC9zZ54_sWANZlwDxppu2-DQuAuvW3Bw\",\"use\":\"sig\",\"crv\":\"P-256\",\"kid\":\"gSb6VludekqwZS_0osHNxAK2y2Rua1V_aGWNFaTvgNM\",\"x\":\"WcBuVJRGiCvhEdU6nbKysIxEjQOqzaH-kiIZoIpFNfE\",\"y\":\"FiWqBp6ilDBJ-VEnZsgHTK4fYKmB841n2wNMfvFZB2E\",\"alg\":\"ES256\"}]}</jwk-set.private-json.escape>
     <sentinel.skipLaunch>false</sentinel.skipLaunch>
   </properties>
   <dependencies>
@@ -106,7 +108,7 @@
                 <argument>-Dlogging.level.root=INFO</argument>
                 <argument>-Ddata-query.internal-url=http://localhost:8777</argument>
                 <argument>-Ddata-query.r4-base-path=/</argument>
-                <argument>-Djwk-set.private-json='{\"keys\":[{\"kty\":\"EC\",\"d\":\"5h-A-oFDpePWC9zZ54_sWANZlwDxppu2-DQuAuvW3Bw\",\"use\":\"sig\",\"crv\":\"P-256\",\"kid\":\"gSb6VludekqwZS_0osHNxAK2y2Rua1V_aGWNFaTvgNM\",\"x\":\"WcBuVJRGiCvhEdU6nbKysIxEjQOqzaH-kiIZoIpFNfE\",\"y\":\"FiWqBp6ilDBJ-VEnZsgHTK4fYKmB841n2wNMfvFZB2E\",\"alg\":\"ES256\"}]}'</argument>
+                <argument>-Djwk-set.private-json=${jwk-set.private-json}</argument>
                 <argument>-Djwks-single-quotes='{\"keys\":[{\"kty\":\"EC\",\"d\":\"5h-A-oFDpePWC9zZ54_sWANZlwDxppu2-DQuAuvW3Bw\",\"use\":\"sig\",\"crv\":\"P-256\",\"kid\":\"gSb6VludekqwZS_0osHNxAK2y2Rua1V_aGWNFaTvgNM\",\"x\":\"WcBuVJRGiCvhEdU6nbKysIxEjQOqzaH-kiIZoIpFNfE\",\"y\":\"FiWqBp6ilDBJ-VEnZsgHTK4fYKmB841n2wNMfvFZB2E\",\"alg\":\"ES256\"}]}'</argument>
                 <argument>-Djwks-double-quotes="{\"keys\":[{\"kty\":\"EC\",\"d\":\"5h-A-oFDpePWC9zZ54_sWANZlwDxppu2-DQuAuvW3Bw\",\"use\":\"sig\",\"crv\":\"P-256\",\"kid\":\"gSb6VludekqwZS_0osHNxAK2y2Rua1V_aGWNFaTvgNM\",\"x\":\"WcBuVJRGiCvhEdU6nbKysIxEjQOqzaH-kiIZoIpFNfE\",\"y\":\"FiWqBp6ilDBJ-VEnZsgHTK4fYKmB841n2wNMfvFZB2E\",\"alg\":\"ES256\"}]}"</argument>
                 <argument>-Djwks-no-quotes={"keys":[{"kty":"EC","d":"5h-A-oFDpePWC9zZ54_sWANZlwDxppu2-DQuAuvW3Bw","use":"sig","crv":"P-256","kid":"gSb6VludekqwZS_0osHNxAK2y2Rua1V_aGWNFaTvgNM","x":"WcBuVJRGiCvhEdU6nbKysIxEjQOqzaH-kiIZoIpFNfE","y":"FiWqBp6ilDBJ-VEnZsgHTK4fYKmB841n2wNMfvFZB2E","alg":"ES256"}]}</argument>
@@ -150,6 +152,17 @@
           </plugin>
         </plugins>
       </build>
+    </profile>
+    <profile>
+      <id>platform-windows</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <properties>
+        <jwk-set.private-json>${jwk-set.private-json.escape}</jwk-set.private-json>
+      </properties>
     </profile>
   </profiles>
 </project>

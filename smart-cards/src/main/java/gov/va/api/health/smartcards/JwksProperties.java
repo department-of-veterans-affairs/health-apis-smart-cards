@@ -7,7 +7,6 @@ import com.nimbusds.jose.jwk.JWKSet;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.SneakyThrows;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -34,11 +33,11 @@ public class JwksProperties {
 
   /** Deal with quotes for json provided through CLI properties. */
   private static String cleanupJson(String json) {
-    json = StringUtils.trim(json);
-    json = StringUtils.replace(json, "\\\"", "\"");
-    if (StringUtils.startsWithAny(json, "\"", "'")) {
-      return json.substring(1, json.length() - 1);
-    }
+    //    json = StringUtils.trim(json);
+    //    json = StringUtils.replace(json, "\\\"", "\"");
+    //    if (StringUtils.startsWithAny(json, "\"", "'")) {
+    //      return json.substring(1, json.length() - 1);
+    //    }
     return json;
   }
 

@@ -2,16 +2,16 @@ package gov.va.api.health.smartcards.patient;
 
 import static java.util.stream.Collectors.toList;
 
-import gov.va.api.health.r4.api.bundle.AbstractEntry;
 import gov.va.api.health.r4.api.bundle.MixedEntry;
 import gov.va.api.health.r4.api.datatypes.HumanName;
 import gov.va.api.health.r4.api.resources.Patient;
 import java.util.List;
 import lombok.Builder;
+import lombok.NonNull;
 
 @Builder
 public class PatientTransformer {
-  Patient.Entry entry;
+  @NonNull Patient.Entry entry;
 
   private HumanName name(HumanName name) {
     return HumanName.builder().family(name.family()).given(name.given()).build();
@@ -33,7 +33,6 @@ public class PatientTransformer {
                 .gender(entry.resource().gender())
                 .birthDate(entry.resource().birthDate())
                 .build())
-        .search(AbstractEntry.Search.builder().mode(AbstractEntry.SearchMode.match).build())
         .build();
   }
 }

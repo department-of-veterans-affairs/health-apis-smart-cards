@@ -146,7 +146,10 @@ public class PatientController {
                     credentialTypes.stream().map(CredentialType::getUri))
                 .collect(toList()))
         .credentialSubject(
-            VerifiableCredential.CredentialSubject.builder().fhirBundle(bundle).build())
+            VerifiableCredential.CredentialSubject.builder()
+                .fhirVersion("4.0.1")
+                .fhirBundle(bundle)
+                .build())
         .build();
   }
 

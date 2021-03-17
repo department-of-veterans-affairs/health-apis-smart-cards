@@ -16,7 +16,7 @@ public class Compressors {
   @SneakyThrows
   public static byte[] deflate(byte[] input) {
     checkNotNull(input);
-    Deflater deflater = new Deflater();
+    Deflater deflater = new Deflater(Deflater.DEFLATED, true);
     deflater.setInput(input);
     deflater.finish();
 
@@ -38,7 +38,7 @@ public class Compressors {
   @SneakyThrows
   public static byte[] inflate(byte[] input) {
     checkNotNull(input);
-    Inflater inflater = new Inflater();
+    Inflater inflater = new Inflater(true);
     inflater.setInput(input);
     byte[] buffer = new byte[BUFFER_SIZE];
     byte[] result;

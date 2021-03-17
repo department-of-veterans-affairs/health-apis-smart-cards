@@ -19,6 +19,7 @@ public class PayloadSigner {
   private static final ObjectMapper MAPPER = JacksonMapperConfig.createMapper();
 
   private final JwksProperties jwksProperties;
+
   private final LinkProperties linkProperties;
 
   private byte[] deflate(String payload) {

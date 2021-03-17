@@ -12,8 +12,8 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 
 public class JwksPropertiesTest {
-
   private static final ECKey KEY_CURRENT = genEcJwk("123");
+
   private static final ECKey KEY_OTHER = genEcJwk("456");
 
   @SneakyThrows
@@ -45,12 +45,4 @@ public class JwksPropertiesTest {
       assertThat(jwk.isPrivate()).isFalse();
     }
   }
-
-  //  @Test
-  //  void testCleanupJson() {
-  //    JWKSet jwks = new JWKSet(List.of(KEY_CURRENT, KEY_OTHER));
-  //    String json = jwks.toString(false);
-  //    assertDoesNotThrow(() -> new JwksProperties(String.format("\"%s\"", json), "123"));
-  //    assertDoesNotThrow(() -> new JwksProperties(String.format("'%s'", json), "123"));
-  //  }
 }

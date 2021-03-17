@@ -27,18 +27,8 @@ public class JwksProperties {
     checkState(!"unset".equals(jwksPrivateJson), "jwk-set.private-json is unset");
     checkState(!"unset".equals(currentKeyId), "jwk-set.current-key-id is unset");
     this.currentKeyId = currentKeyId;
-    jwksPrivate = JWKSet.parse(cleanupJson(jwksPrivateJson));
+    jwksPrivate = JWKSet.parse(jwksPrivateJson);
     jwksPublic = jwksPrivate.toPublicJWKSet();
-  }
-
-  /** Deal with quotes for json provided through CLI properties. */
-  private static String cleanupJson(String json) {
-    //    json = StringUtils.trim(json);
-    //    json = StringUtils.replace(json, "\\\"", "\"");
-    //    if (StringUtils.startsWithAny(json, "\"", "'")) {
-    //      return json.substring(1, json.length() - 1);
-    //    }
-    return json;
   }
 
   public JWK currentPrivateJwk() {

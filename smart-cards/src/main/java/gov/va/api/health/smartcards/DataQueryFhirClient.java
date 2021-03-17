@@ -3,6 +3,7 @@ package gov.va.api.health.smartcards;
 import static java.util.stream.Collectors.toList;
 
 import gov.va.api.health.r4.api.resources.Immunization;
+import gov.va.api.health.r4.api.resources.Location;
 import gov.va.api.health.r4.api.resources.Patient;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -40,11 +41,10 @@ public class DataQueryFhirClient implements FhirClient {
   }
 
   @Override
-  public Immunization.Bundle immunizationBundle(Patient patient, String authorization) {
+  public Immunization.Bundle immunizationBundle(String icn, String authorization) {
     String url =
         String.format(
-            "%s?patient=%s&_count=100",
-            linkProperties.dataQueryR4ResourceUrl("Immunization"), patient.id());
+            "%s?patient=%s&_count=100", linkProperties.dataQueryR4ResourceUrl("Immunization"), icn);
     var immunizationBundle = doGet(url, authorization, Immunization.Bundle.class).getBody();
     if (immunizationBundle == null) {
       return null;
@@ -60,6 +60,12 @@ public class DataQueryFhirClient implements FhirClient {
             .collect(toList()));
     immunizationBundle.total(immunizationBundle.entry().size());
     return immunizationBundle;
+  }
+
+  @Override
+  public Location location(String id, String authorization) {
+    String url = String.format("%s/%s", linkProperties.dataQueryR4ResourceUrl("Location"), id);
+    return doGet(url, authorization, Location.class).getBody();
   }
 
   @Override

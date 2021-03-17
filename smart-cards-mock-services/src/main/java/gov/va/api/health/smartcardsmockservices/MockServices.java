@@ -63,6 +63,15 @@ public class MockServices {
                 .withBody(contentOf("/immunization-bundle.json")));
   }
 
+  private void addLocation(MockServerClient mock) {
+    mock.when(addQuery("/Location/I2-JTDSDSJX3KCNMT3D67S3UGJYAU000000"))
+        .respond(
+            response()
+                .withStatusCode(200)
+                .withHeader(contentApplicationJson())
+                .withBody(contentOf("/location.json")));
+  }
+
   private void addPatientBundle(MockServerClient mock) {
     mock.when(addQuery("/Patient?_id=1011537977V693883"))
         .respond(
@@ -97,6 +106,7 @@ public class MockServices {
     ms = new MockServer(options.getPort());
     MockServerClient mock = new MockServerClient("localhost", options.getPort());
     addImmunizationBundle(mock);
+    addLocation(mock);
     addPatientBundle(mock);
     addHelp(mock);
   }

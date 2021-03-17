@@ -3,17 +3,15 @@ package gov.va.api.health.smartcards;
 import gov.va.api.health.r4.api.information.WellKnown;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Validated
 @RestController
 @RequestMapping(
-    value = "/.well-known/smart-configuration",
-    produces = {"application/json", "application/fhir+json"})
-@AllArgsConstructor(onConstructor_ = @Autowired)
+    value = {"/.well-known/smart-configuration"},
+    produces = {"application/json", "application/fhir+json", "application/json+fhir"})
+@AllArgsConstructor(onConstructor = @__({@Autowired}))
 public class WellKnownController {
 
   private final WellKnownProperties wellKnownProperties;

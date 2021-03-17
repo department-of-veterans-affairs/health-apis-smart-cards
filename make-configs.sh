@@ -37,7 +37,14 @@ checkForUnsetValues() {
 makeConfig smart-cards $PROFILE
 configValue smart-cards $PROFILE data-query.r4-base-path '/'
 configValue smart-cards $PROFILE data-query.internal-url 'http://localhost:8777'
+configValue smart-cards $PROFILE metadata.security.token-endpoint 'http://fake.com/token'
+configValue smart-cards $PROFILE metadata.security.authorize-endpoint 'http://fake.com/authorize'
+configValue smart-cards $PROFILE metadata.security.management-endpoint 'http://fake.com/manage'
+configValue smart-cards $PROFILE metadata.security.revocation-endpoint 'http://fake.com/revoke'
 configValue smart-cards $PROFILE public-r4-base-path 'r4'
 configValue smart-cards $PROFILE public-url 'http://localhost:8096'
 configValue smart-cards $PROFILE web-exception-key '-sharktopus-v-pteracuda-'
+configValue smart-cards $PROFILE well-known.capabilities "context-standalone-patient, launch-ehr, permission-offline, permission-patient"
+configValue smart-cards $PROFILE well-known.response "ode, refresh_token"
+configValue smart-cards $PROFILE well-known.scopes-supported "patient/DiagnosticReport.read, patient/Patient.read, offline_access"
 checkForUnsetValues smart-cards $PROFILE

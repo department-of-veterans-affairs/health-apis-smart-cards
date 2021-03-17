@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import gov.va.api.health.autoconfig.configuration.JacksonConfig;
 import gov.va.api.health.r4.api.information.WellKnown;
+import gov.va.api.health.smartcards.MetadataProperties.SecurityProperties;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +30,7 @@ public class WellKnownControllerTest {
   private MetadataProperties conformanceProperties() {
     return MetadataProperties.builder()
         .security(
-            MetadataProperties.SecurityProperties.builder()
+            SecurityProperties.builder()
                 .authorizeEndpoint("https://somevasite.va.gov/authorize")
                 .tokenEndpoint("https://somevasite.va.gov/token")
                 .managementEndpoint("https://somevasite.va.gov/manage")

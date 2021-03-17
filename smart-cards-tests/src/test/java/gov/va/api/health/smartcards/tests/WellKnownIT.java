@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 
 @Slf4j
 public class WellKnownIT {
-  //  http://localhost:8090/r4/.well-known/smart-configuration
+
   @BeforeAll
   static void assumeEnvironment() {
     assumeEnvironmentIn(
@@ -36,15 +36,6 @@ public class WellKnownIT {
             .port(svc.port())
             .relaxedHTTPSValidation()
             .header("Content-Type", "application/json");
-    return doGet(svc, spec, request, description, expectedStatus);
-  }
-
-  private static ExpectedResponse doGet(
-      SystemDefinitions.Service svc,
-      RequestSpecification spec,
-      String request,
-      String description,
-      Integer expectedStatus) {
     log.info(
         "Expect {} GET '{}' is status code ({})",
         svc.urlWithApiPath() + request,

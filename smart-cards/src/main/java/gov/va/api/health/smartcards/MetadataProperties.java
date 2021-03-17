@@ -9,7 +9,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-@SuppressWarnings("DefaultAnnotationParam")
 @Configuration
 @EnableConfigurationProperties
 @ConfigurationProperties("metadata")
@@ -19,7 +18,6 @@ import org.springframework.context.annotation.Configuration;
 @AllArgsConstructor
 @Builder
 public class MetadataProperties {
-
   private SecurityProperties security;
 
   @Data

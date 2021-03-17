@@ -116,9 +116,7 @@ public class PatientController {
 
   private static boolean parseBooleanOrTrue(String value) {
     // not using parseBoolean because we need to default to true
-    value = StringUtils.trimToEmpty(value);
-    value = StringUtils.lowerCase(value);
-    return !"false".equals(value);
+    return !"false".equalsIgnoreCase(StringUtils.trimToEmpty(value));
   }
 
   private static MixedEntry transform(Patient.Entry entry) {

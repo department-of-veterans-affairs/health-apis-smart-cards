@@ -1,19 +1,22 @@
 package gov.va.api.health.smartcards.patient;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.springframework.util.CollectionUtils.isEmpty;
+
 import gov.va.api.health.r4.api.bundle.MixedEntry;
 import gov.va.api.health.r4.api.datatypes.CodeableConcept;
 import gov.va.api.health.r4.api.elements.Reference;
 import gov.va.api.health.r4.api.resources.Immunization;
 import gov.va.api.health.r4.api.resources.Location;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import lombok.Builder;
 import lombok.NonNull;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 @Builder
 public class ImmunizationTransformer {
-  Immunization.Entry entry;
+  @NonNull Immunization.Entry entry;
 
   static Reference referenceOnly(@NonNull Reference reference) {
     return Reference.builder().reference(reference.reference()).build();
@@ -35,25 +38,24 @@ public class ImmunizationTransformer {
   }
 
   List<Immunization.Performer> performer() {
-    if (CollectionUtils.isEmpty(entry.resource().contained())) {
+    if (isEmpty(entry.resource().contained())) {
       return null;
     }
-    Location location =
+    Optional<String> display =
         entry.resource().contained().stream()
             .filter(r -> r instanceof Location)
             .map(r -> (Location) r)
-            .findFirst()
-            .orElse(null);
-    if (location == null) {
-      return null;
-    }
-    Reference org = location.managingOrganization();
-    if (org == null || StringUtils.isEmpty(org.display())) {
+            .map(loc -> loc.managingOrganization())
+            .filter(Objects::nonNull)
+            .map(org -> org.display())
+            .filter(d -> isNotBlank(d))
+            .findFirst();
+    if (display.isEmpty()) {
       return null;
     }
     return List.of(
         Immunization.Performer.builder()
-            .actor(Reference.builder().display(org.display()).build())
+            .actor(Reference.builder().display(display.get()).build())
             .build());
   }
 

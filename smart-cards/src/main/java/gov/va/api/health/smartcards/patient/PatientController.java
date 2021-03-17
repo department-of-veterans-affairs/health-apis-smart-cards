@@ -2,7 +2,10 @@ package gov.va.api.health.smartcards.patient;
 
 import static com.google.common.base.Preconditions.checkState;
 import static gov.va.api.health.smartcards.Controllers.checkRequestState;
+import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.va.api.health.r4.api.bundle.AbstractBundle;
@@ -25,13 +28,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import javax.validation.Valid;
 import lombok.AllArgsConstructor;
-import lombok.NonNull;
 import lombok.SneakyThrows;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.DataBinder;
@@ -66,12 +68,12 @@ public class PatientController {
   private final R4MixedBundler bundler;
 
   /** Extracts resources from Bundle entries and pushes them to an existing List. */
-  private <R extends Resource, E extends AbstractEntry<R>, B extends AbstractBundle<E>>
+  private static <R extends Resource, E extends AbstractEntry<R>, B extends AbstractBundle<E>>
       void consumeBundle(B bundle, List<MixedEntry> target, Function<E, MixedEntry> transform) {
     bundle.entry().stream().map(transform).forEachOrdered(target::add);
   }
 
-  private List<CredentialType> getCredentialTypes(Parameters parameters) {
+  private static List<CredentialType> getCredentialTypes(Parameters parameters) {
     checkRequestState(parameters.parameter() != null, "parameters are required");
     return parameters.parameter().stream()
         .filter(p -> "credentialType".equals(p.name()))
@@ -80,30 +82,69 @@ public class PatientController {
         .collect(toList());
   }
 
-  private Patient getPatientFromBundle(Patient.Bundle bundle, @NonNull String id) {
-    var entry = bundle.entry().stream().filter(t -> id.equals(t.resource().id())).findFirst();
-    if (entry.isPresent()) {
-      return entry.get().resource();
-    }
-    throw new Exceptions.NotFound(id);
-  }
-
-  private List<String> indexAndReplaceUrls(List<MixedEntry> resources) {
-    List<String> urls = new ArrayList<>();
-    resources.stream()
-        .map(AbstractEntry::fullUrl)
-        .filter(u -> !urls.contains(u))
-        .forEachOrdered(urls::add);
-    for (MixedEntry entry : resources) {
+  private static List<String> indexAndReplaceUrls(List<MixedEntry> entries) {
+    List<String> urls =
+        entries.stream()
+            .map(AbstractEntry::fullUrl)
+            .filter(s -> isNotBlank(s))
+            .distinct()
+            .collect(toCollection(ArrayList::new));
+    // Index unique URLs and replace with 'resource:X' scheme
+    for (MixedEntry entry : entries) {
+      if (isBlank(entry.fullUrl())) {
+        continue;
+      }
       entry.fullUrl(RESOURCE_PREFIX + urls.indexOf(entry.fullUrl()));
       if (entry.resource() instanceof Immunization) {
         Immunization imm = (Immunization) entry.resource();
-        List<String> references = List.of(imm.patient().reference());
-        references.stream().filter(r -> !urls.contains(r)).forEachOrdered(urls::add);
-        imm.patient().reference(RESOURCE_PREFIX + urls.indexOf(imm.patient().reference()));
+        String patientRef =
+            Optional.of(imm).map(im -> im.patient()).map(p -> p.reference()).orElse(null);
+        if (patientRef != null) {
+          if (!urls.contains(patientRef)) {
+            urls.add(patientRef);
+          }
+          imm.patient().reference(RESOURCE_PREFIX + urls.indexOf(patientRef));
+        }
       }
     }
     return urls;
+  }
+
+  private static MixedEntry transform(Patient.Entry entry) {
+    return PatientTransformer.builder().entry(entry).build().transform();
+  }
+
+  private static MixedEntry transform(Immunization.Entry entry) {
+    return ImmunizationTransformer.builder().entry(entry).build().transform();
+  }
+
+  private static List<CredentialType> validateCredentialTypes(List<CredentialType> credentials) {
+    if (credentials.isEmpty()) {
+      throw new Exceptions.BadRequest("credentialType parameter is required");
+    }
+    var requestedButUnimplemented =
+        UNIMPLEMENTED_CREDENTIAL_TYPES.stream()
+            .filter(credentials::contains)
+            .map(CredentialType::getUri)
+            .collect(toList());
+    if (!requestedButUnimplemented.isEmpty()) {
+      throw new Exceptions.NotImplemented(
+          String.format("Not yet implemented support for %s", requestedButUnimplemented));
+    }
+    return credentials;
+  }
+
+  private static VerifiableCredential vc(MixedBundle bundle, List<CredentialType> credentialTypes) {
+    return VerifiableCredential.builder()
+        .context(List.of("https://www.w3.org/2018/credentials/v1"))
+        .type(
+            Stream.concat(
+                    Stream.of("VerifiableCredential"),
+                    credentialTypes.stream().map(CredentialType::getUri))
+                .collect(toList()))
+        .credentialSubject(
+            VerifiableCredential.CredentialSubject.builder().fhirBundle(bundle).build())
+        .build();
   }
 
   @InitBinder
@@ -117,20 +158,17 @@ public class PatientController {
       @PathVariable("id") String id,
       @Valid @RequestBody Parameters parameters,
       @RequestHeader(name = "Authorization", required = false) String authorization) {
-    checkState(!StringUtils.isEmpty(id), "id is required");
+    checkState(isNotBlank(id), "id is required");
     var credentialTypes = getCredentialTypes(parameters);
     validateCredentialTypes(credentialTypes);
     Patient.Bundle patients = fhirClient.patientBundle(id, authorization);
-    Patient patient = getPatientFromBundle(patients, id);
-    Immunization.Bundle immunizations = fhirClient.immunizationBundle(patient.id(), authorization);
+    Immunization.Bundle immunizations = fhirClient.immunizationBundle(id, authorization);
     lookupAndAttachLocations(immunizations, authorization);
     List<MixedEntry> resources = new ArrayList<>();
-    consumeBundle(patients, resources, this::transform);
-    consumeBundle(immunizations, resources, this::transform);
-    // Index unique URLs and replace with 'resource:X' scheme
+    consumeBundle(patients, resources, PatientController::transform);
+    consumeBundle(immunizations, resources, PatientController::transform);
     List<String> urls = indexAndReplaceUrls(resources);
-    MixedBundle bundle = toBundle(resources);
-    var vc = vc(bundle, credentialTypes);
+    var vc = vc(bundler.bundle(resources), credentialTypes);
     var parametersResponse = parameters(vc, urls);
     return ResponseEntity.ok(parametersResponse);
   }
@@ -140,17 +178,20 @@ public class PatientController {
     Map<String, Location> locations = new HashMap<>();
     for (Immunization.Entry entry : immunizations.entry()) {
       Immunization imm = entry.resource();
-      String locationResourceId = Controllers.resourceId(imm.location().reference());
-      Location location = locations.get(locationResourceId);
+      String locId = Controllers.resourceId(imm.location());
+      if (locId == null) {
+        continue;
+      }
+      Location location = locations.get(locId);
       if (location == null) {
-        location = fhirClient.location(locationResourceId, authorization);
-        locations.put(locationResourceId, location);
+        location = fhirClient.location(locId, authorization);
+        locations.put(locId, location);
       }
-      if (imm.contained() == null) {
-        imm.contained(List.of(location));
-      } else {
-        imm.contained().add(location);
-      }
+      imm.contained(
+          Stream.concat(
+                  Optional.ofNullable(imm.contained()).map(c -> c.stream()).orElse(Stream.empty()),
+                  Stream.of(location))
+              .collect(toList()));
     }
   }
 
@@ -187,47 +228,6 @@ public class PatientController {
                         .stream(),
                     parameterResourceLinks(urls).stream())
                 .collect(toList()))
-        .build();
-  }
-
-  private MixedBundle toBundle(List<MixedEntry> resources) {
-    return bundler.bundle(resources);
-  }
-
-  private MixedEntry transform(Patient.Entry entry) {
-    return PatientTransformer.builder().entry(entry).build().transform();
-  }
-
-  private MixedEntry transform(Immunization.Entry entry) {
-    return ImmunizationTransformer.builder().entry(entry).build().transform();
-  }
-
-  private List<CredentialType> validateCredentialTypes(List<CredentialType> credentials) {
-    if (credentials.isEmpty()) {
-      throw new Exceptions.BadRequest("credentialType parameter is required");
-    }
-    var requestedButUnimplemented =
-        UNIMPLEMENTED_CREDENTIAL_TYPES.stream()
-            .filter(credentials::contains)
-            .map(CredentialType::getUri)
-            .collect(toList());
-    if (!requestedButUnimplemented.isEmpty()) {
-      throw new Exceptions.NotImplemented(
-          String.format("Not yet implemented support for %s", requestedButUnimplemented));
-    }
-    return credentials;
-  }
-
-  private VerifiableCredential vc(MixedBundle bundle, List<CredentialType> credentialTypes) {
-    return VerifiableCredential.builder()
-        .context(List.of("https://www.w3.org/2018/credentials/v1"))
-        .type(
-            Stream.concat(
-                    Stream.of("VerifiableCredential"),
-                    credentialTypes.stream().map(CredentialType::getUri))
-                .collect(toList()))
-        .credentialSubject(
-            VerifiableCredential.CredentialSubject.builder().fhirBundle(bundle).build())
         .build();
   }
 }

@@ -50,13 +50,9 @@ import org.springframework.web.client.RestTemplate;
 public class PatientControllerTest {
   public static final ObjectMapper MAPPER = JacksonMapperConfig.createMapper();
 
-  private static LinkProperties _linkProperties() {
-    return LinkProperties.builder()
-        .dqInternalUrl("http://dq.foo")
-        .dqInternalR4BasePath("r4")
-        .baseUrl("http://sc.bar")
-        .r4BasePath("r4")
-        .build();
+  @BeforeAll
+  static void _init() {
+    Patient.IDENTIFIER_MIN_SIZE.set(0);
   }
 
   private static long countEntriesByType(MixedBundle bundle, String type) {
@@ -83,7 +79,7 @@ public class PatientControllerTest {
   }
 
   static Immunization.Bundle immunizationBundle(String icn) {
-    LinkProperties linkProperties = _linkProperties();
+    LinkProperties linkProperties = linkProperties();
     var patient = Patient.builder().id(icn).name(List.of(HumanName.builder().build())).build();
     String vaccineSystem = "http://hl7.org/fhir/sid/cvx";
     List<Immunization> immunizations =
@@ -180,13 +176,17 @@ public class PatientControllerTest {
         .build();
   }
 
-  @BeforeAll
-  static void init() {
-    Patient.IDENTIFIER_MIN_SIZE.set(0);
+  private static LinkProperties linkProperties() {
+    return LinkProperties.builder()
+        .dqInternalUrl("http://dq.foo")
+        .dqInternalR4BasePath("r4")
+        .baseUrl("http://sc.bar")
+        .r4BasePath("r4")
+        .build();
   }
 
   static Location location(String id) {
-    LinkProperties linkProperties = _linkProperties();
+    LinkProperties linkProperties = linkProperties();
     return Location.builder()
         .id(id)
         .status(Location.Status.active)
@@ -244,7 +244,7 @@ public class PatientControllerTest {
   }
 
   static Patient.Bundle patientBundle(String id) {
-    LinkProperties linkProperties = _linkProperties();
+    LinkProperties linkProperties = linkProperties();
     String firstName = "Joe" + id;
     String lastName = "Doe" + id;
     Patient patient =
@@ -324,9 +324,19 @@ public class PatientControllerTest {
               anyString(), any(HttpMethod.class), any(), same(Location.class)))
           .thenReturn(locationResponse);
     }
-    var fhirClient = new DataQueryFhirClient(mockRestTemplate, _linkProperties());
+    var fhirClient = new DataQueryFhirClient(mockRestTemplate, linkProperties());
     var bundler = new R4MixedBundler();
     return new PatientController(fhirClient, bundler);
+  }
+
+  private static Parameters.Parameter resourceLink(String resource, String url) {
+    return Parameters.Parameter.builder()
+        .name("resourceLink")
+        .part(
+            List.of(
+                Parameters.Parameter.builder().name("bundledResource").valueUri(resource).build(),
+                Parameters.Parameter.builder().name("hostedResource").valueUri(url).build()))
+        .build();
   }
 
   @Test
@@ -405,15 +415,5 @@ public class PatientControllerTest {
         () ->
             controller.issueVc(
                 "123", parametersWithCredentialType("https://smarthealth.cards#immunization"), ""));
-  }
-
-  private Parameters.Parameter resourceLink(String resource, String url) {
-    return Parameters.Parameter.builder()
-        .name("resourceLink")
-        .part(
-            List.of(
-                Parameters.Parameter.builder().name("bundledResource").valueUri(resource).build(),
-                Parameters.Parameter.builder().name("hostedResource").valueUri(url).build()))
-        .build();
   }
 }

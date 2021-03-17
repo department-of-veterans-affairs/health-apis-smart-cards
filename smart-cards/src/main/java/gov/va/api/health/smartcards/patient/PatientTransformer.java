@@ -7,10 +7,11 @@ import gov.va.api.health.r4.api.datatypes.HumanName;
 import gov.va.api.health.r4.api.resources.Patient;
 import java.util.List;
 import lombok.Builder;
+import lombok.NonNull;
 
 @Builder
 public class PatientTransformer {
-  Patient.Entry entry;
+  @NonNull Patient.Entry entry;
 
   private HumanName name(HumanName name) {
     return HumanName.builder().family(name.family()).given(name.given()).build();

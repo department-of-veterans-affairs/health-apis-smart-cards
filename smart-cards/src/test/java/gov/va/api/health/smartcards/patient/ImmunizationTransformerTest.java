@@ -17,40 +17,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 public class ImmunizationTransformerTest {
-  @Test
-  public void basic() {
-    var immunization = immunization();
-    assertThat(ImmunizationTransformer.builder().entry(immunization).build().transform())
-        .isEqualTo(
-            MixedEntry.builder()
-                .fullUrl("http://example.com/r4/Immunization/imm-1")
-                .resource(
-                    Immunization.builder()
-                        .resourceType("Immunization")
-                        .status(Immunization.Status.completed)
-                        .vaccineCode(
-                            CodeableConcept.builder()
-                                .coding(
-                                    List.of(
-                                        Coding.builder()
-                                            .system("http://hl7.org/fhir/sid/cvx")
-                                            .code("207")
-                                            .build()))
-                                .build())
-                        .patient(
-                            Reference.builder().reference("https://foo.com/r4/Patient/x").build())
-                        .occurrenceDateTime("2020-12-18")
-                        .performer(
-                            List.of(
-                                Immunization.Performer.builder()
-                                    .actor(
-                                        Reference.builder().display("MNG ORG VA MEDICAL").build())
-                                    .build()))
-                        .build())
-                .build());
-  }
-
-  private Immunization.Entry immunization() {
+  private static Immunization.Entry immunization() {
     return Immunization.Entry.builder()
         .fullUrl("http://example.com/r4/Immunization/imm-1")
         .resource(
@@ -92,7 +59,7 @@ public class ImmunizationTransformerTest {
         .build();
   }
 
-  private Location location() {
+  private static Location location() {
     return Location.builder()
         .id("loc-1")
         .status(Location.Status.active)
@@ -130,5 +97,38 @@ public class ImmunizationTransformerTest {
                 .display("MNG ORG VA MEDICAL")
                 .build())
         .build();
+  }
+
+  @Test
+  public void basic() {
+    var immunization = immunization();
+    assertThat(ImmunizationTransformer.builder().entry(immunization).build().transform())
+        .isEqualTo(
+            MixedEntry.builder()
+                .fullUrl("http://example.com/r4/Immunization/imm-1")
+                .resource(
+                    Immunization.builder()
+                        .resourceType("Immunization")
+                        .status(Immunization.Status.completed)
+                        .vaccineCode(
+                            CodeableConcept.builder()
+                                .coding(
+                                    List.of(
+                                        Coding.builder()
+                                            .system("http://hl7.org/fhir/sid/cvx")
+                                            .code("207")
+                                            .build()))
+                                .build())
+                        .patient(
+                            Reference.builder().reference("https://foo.com/r4/Patient/x").build())
+                        .occurrenceDateTime("2020-12-18")
+                        .performer(
+                            List.of(
+                                Immunization.Performer.builder()
+                                    .actor(
+                                        Reference.builder().display("MNG ORG VA MEDICAL").build())
+                                    .build()))
+                        .build())
+                .build());
   }
 }

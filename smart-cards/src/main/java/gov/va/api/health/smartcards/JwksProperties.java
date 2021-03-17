@@ -19,9 +19,10 @@ public class JwksProperties {
 
   final JWKSet jwksPublic;
 
+  /** Default Constructor. */
   @Builder
   @SneakyThrows
-  JwksProperties(
+  public JwksProperties(
       @Value("${jwk-set.private-json}") String jwksPrivateJson,
       @Value("${jwk-set.current-key-id}") String currentKeyId) {
     checkState(!"unset".equals(jwksPrivateJson), "jwk-set.private-json is unset");

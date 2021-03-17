@@ -11,10 +11,15 @@ import gov.va.api.health.smartcards.vc.PayloadClaimsWrapper;
 import gov.va.api.health.smartcards.vc.VerifiableCredential;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@AllArgsConstructor(onConstructor_ = @Autowired)
 @Builder
+@Component
 public class PayloadSigner {
   private static final ObjectMapper MAPPER = JacksonMapperConfig.createMapper();
 

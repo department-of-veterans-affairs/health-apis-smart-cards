@@ -16,7 +16,9 @@ import io.restassured.RestAssured;
 import io.restassured.http.Method;
 import io.restassured.specification.RequestSpecification;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
@@ -46,22 +48,33 @@ public class PatientIT {
       Object payload,
       String description,
       Integer expectedStatus) {
+    return doPost(svc, request, payload, description, expectedStatus, new HashMap<>());
+  }
+
+  @SneakyThrows
+  private static ExpectedResponse doPost(
+      SystemDefinitions.Service svc,
+      String request,
+      Object payload,
+      String description,
+      Integer expectedStatus,
+      Map<String, String> additionalHeaders) {
     RequestSpecification spec =
         RestAssured.given()
             .baseUri(svc.url())
             .port(svc.port())
             .relaxedHTTPSValidation()
+            .headers(additionalHeaders)
             .header("Authorization", "Bearer " + ACCESS_TOKEN)
             .header("Content-Type", "application/json")
             .body(MAPPER.writeValueAsString(payload));
-    return doPost(svc, spec, request, payload, description, expectedStatus);
+    return doPost(svc, spec, request, description, expectedStatus);
   }
 
   private static ExpectedResponse doPost(
       SystemDefinitions.Service svc,
       RequestSpecification spec,
       String request,
-      Object payload,
       String description,
       Integer expectedStatus) {
     log.info(
@@ -101,6 +114,31 @@ public class PatientIT {
         parametersCovid19(),
         "issuevc",
         200);
+  }
+
+  @Test
+  void readButDoNotCompress() {
+    String id = systemDefinition().ids().patient();
+    var response =
+        doPost(
+            systemDefinition().internal(),
+            String.format("r4/Patient/%s/$HealthWallet.issueVc", id),
+            parametersCovid19(),
+            "issuevc",
+            200,
+            Map.of("x-vc-compress", "false"));
+  }
+
+  @Test
+  void readButDoNotSign() {
+    String id = systemDefinition().ids().patient();
+    doPost(
+        systemDefinition().internal(),
+        String.format("r4/Patient/%s/$HealthWallet.issueVc", id),
+        parametersCovid19(),
+        "issuevc",
+        200,
+        Map.of("x-vc-jws", "false"));
   }
 
   @Test
@@ -185,7 +223,6 @@ public class PatientIT {
         systemDefinition().internal(),
         spec,
         String.format("r4/Patient/%s/$HealthWallet.issueVc", id),
-        payload,
         "issueVc (no token)",
         401);
   }

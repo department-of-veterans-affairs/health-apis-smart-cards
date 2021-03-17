@@ -21,6 +21,7 @@ import gov.va.api.health.smartcards.Controllers;
 import gov.va.api.health.smartcards.DataQueryFhirClient;
 import gov.va.api.health.smartcards.Exceptions;
 import gov.va.api.health.smartcards.JacksonMapperConfig;
+import gov.va.api.health.smartcards.PayloadSigner;
 import gov.va.api.health.smartcards.R4MixedBundler;
 import gov.va.api.health.smartcards.vc.CredentialType;
 import gov.va.api.health.smartcards.vc.VerifiableCredential;
@@ -64,6 +65,8 @@ public class PatientController {
   private static final String RESOURCE_PREFIX = "resource:";
 
   private final DataQueryFhirClient fhirClient;
+
+  private final PayloadSigner payloadSigner;
 
   private final R4MixedBundler bundler;
 
@@ -157,7 +160,9 @@ public class PatientController {
   ResponseEntity<Parameters> issueVc(
       @PathVariable("id") String id,
       @Valid @RequestBody Parameters parameters,
-      @RequestHeader(name = "Authorization", required = false) String authorization) {
+      @RequestHeader(name = "Authorization", required = false) String authorization,
+      @RequestHeader(name = "x-vc-jws", required = false) String vcJws,
+      @RequestHeader(name = "x-vc-compress", required = false) String vcCompress) {
     checkState(isNotBlank(id), "id is required");
     var credentialTypes = getCredentialTypes(parameters);
     validateCredentialTypes(credentialTypes);
@@ -169,7 +174,8 @@ public class PatientController {
     consumeBundle(immunizations, resources, PatientController::transform);
     List<String> urls = indexAndReplaceUrls(resources);
     var vc = vc(bundler.bundle(resources), credentialTypes);
-    var parametersResponse = parameters(vc, urls);
+    var signedVc = signVc(vc, vcJws, vcCompress);
+    var parametersResponse = parameters(signedVc, urls);
     return ResponseEntity.ok(parametersResponse);
   }
 
@@ -216,18 +222,35 @@ public class PatientController {
   }
 
   @SneakyThrows
-  private Parameters parameters(VerifiableCredential vc, List<String> urls) {
+  private Parameters parameters(String vc, List<String> urls) {
     return Parameters.builder()
         .parameter(
             Stream.concat(
                     List.of(
                         Parameters.Parameter.builder()
                             .name("verifiableCredential")
-                            .valueString(MAPPER.writeValueAsString(vc))
+                            .valueString(vc)
                             .build())
                         .stream(),
                     parameterResourceLinks(urls).stream())
                 .collect(toList()))
         .build();
+  }
+
+  private boolean parseBoolean(String raw, boolean defaultValue) {
+    if (isBlank(raw)) {
+      return defaultValue;
+    }
+    return Boolean.parseBoolean(raw.trim().toLowerCase());
+  }
+
+  @SneakyThrows
+  private String signVc(VerifiableCredential vc, String vcJws, String vcCompress) {
+    boolean shouldSign = parseBoolean(vcJws, true);
+    boolean shouldDeflate = parseBoolean(vcCompress, true);
+    if (!shouldSign) {
+      return MAPPER.writeValueAsString(vc);
+    }
+    return payloadSigner.sign(vc, shouldDeflate);
   }
 }

@@ -55,6 +55,23 @@
               <prettyPrint>true</prettyPrint>
             </configuration>
           </execution>
+          <execution>
+            <id>dstu2-open-api</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>resolve</goal>
+            </goals>
+            <configuration>
+              <contextId>dstu2-open-api</contextId>
+              <resourceClasses>
+                <resourceClass>gov.va.api.health.smartcards.Dstu2OpenApi</resourceClass>
+              </resourceClasses>
+              <outputFileName>dstu2-openapi</outputFileName>
+              <outputPath>${project.build.outputDirectory}</outputPath>
+              <outputFormat>JSON</outputFormat>
+              <prettyPrint>true</prettyPrint>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
     </plugins>

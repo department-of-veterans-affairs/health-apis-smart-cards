@@ -55,25 +55,24 @@ import org.springframework.web.bind.annotation.RestController;
 public class PatientController {
   private static final ObjectMapper MAPPER = JacksonMapperConfig.createMapper();
 
+  private static final String RESOURCE_PREFIX = "resource:";
+
   private static final List<CredentialType> UNIMPLEMENTED_CREDENTIAL_TYPES =
       List.of(
           CredentialType.IMMUNIZATION,
           CredentialType.PRESENTATION_CONTEXT_ONLINE,
           CredentialType.PRESENTATION_CONTEXT_IN_PERSON);
 
-  private static final String RESOURCE_PREFIX = "resource:";
-
   private final DataQueryFhirClient fhirClient;
 
   private final R4MixedBundler bundler;
 
-  /** Extracts resources from Bundle entries and pushes them to an existing List. */
   private static <R extends Resource, E extends AbstractEntry<R>, B extends AbstractBundle<E>>
       void consumeBundle(B bundle, List<MixedEntry> target, Function<E, MixedEntry> transform) {
     bundle.entry().stream().map(transform).forEachOrdered(target::add);
   }
 
-  private static List<CredentialType> getCredentialTypes(Parameters parameters) {
+  private static List<CredentialType> credentialTypes(Parameters parameters) {
     checkRequestState(parameters.parameter() != null, "parameters are required");
     return parameters.parameter().stream()
         .filter(p -> "credentialType".equals(p.name()))
@@ -108,6 +107,42 @@ public class PatientController {
       }
     }
     return urls;
+  }
+
+  private static List<Parameters.Parameter> parameterResourceLinks(List<String> urls) {
+    return urls.stream()
+        .map(
+            url ->
+                Parameters.Parameter.builder()
+                    .name("resourceLink")
+                    .part(
+                        List.of(
+                            Parameters.Parameter.builder()
+                                .name("bundledResource")
+                                .valueUri("resource:" + urls.indexOf(url))
+                                .build(),
+                            Parameters.Parameter.builder()
+                                .name("hostedResource")
+                                .valueUri(url)
+                                .build()))
+                    .build())
+        .collect(toList());
+  }
+
+  @SneakyThrows
+  private static Parameters parameters(VerifiableCredential vc, List<String> urls) {
+    return Parameters.builder()
+        .parameter(
+            Stream.concat(
+                    List.of(
+                        Parameters.Parameter.builder()
+                            .name("verifiableCredential")
+                            .valueString(MAPPER.writeValueAsString(vc))
+                            .build())
+                        .stream(),
+                    parameterResourceLinks(urls).stream())
+                .collect(toList()))
+        .build();
   }
 
   private static MixedEntry transform(Patient.Entry entry) {
@@ -147,19 +182,13 @@ public class PatientController {
         .build();
   }
 
-  @InitBinder
-  void initDirectFieldAccess(DataBinder dataBinder) {
-    dataBinder.initDirectFieldAccess();
-  }
-
-  @SneakyThrows
-  @PostMapping(value = "/{id}/$HealthWallet.issueVc")
-  ResponseEntity<Parameters> issueVc(
+  @PostMapping(value = "/{id}/$health-cards-issue")
+  ResponseEntity<Parameters> healthCardsIssue(
       @PathVariable("id") String id,
       @Valid @RequestBody Parameters parameters,
       @RequestHeader(name = "Authorization", required = false) String authorization) {
     checkState(isNotBlank(id), "id is required");
-    var credentialTypes = getCredentialTypes(parameters);
+    var credentialTypes = credentialTypes(parameters);
     validateCredentialTypes(credentialTypes);
     Patient.Bundle patients = fhirClient.patientBundle(id, authorization);
     Immunization.Bundle immunizations = fhirClient.immunizationBundle(id, authorization);
@@ -171,6 +200,11 @@ public class PatientController {
     var vc = vc(bundler.bundle(resources), credentialTypes);
     var parametersResponse = parameters(vc, urls);
     return ResponseEntity.ok(parametersResponse);
+  }
+
+  @InitBinder
+  void initDirectFieldAccess(DataBinder dataBinder) {
+    dataBinder.initDirectFieldAccess();
   }
 
   private void lookupAndAttachLocations(Immunization.Bundle immunizations, String authorization) {
@@ -193,41 +227,5 @@ public class PatientController {
                   Stream.of(location))
               .collect(toList()));
     }
-  }
-
-  private List<Parameters.Parameter> parameterResourceLinks(List<String> urls) {
-    return urls.stream()
-        .map(
-            url ->
-                Parameters.Parameter.builder()
-                    .name("resourceLink")
-                    .part(
-                        List.of(
-                            Parameters.Parameter.builder()
-                                .name("bundledResource")
-                                .valueUri("resource:" + urls.indexOf(url))
-                                .build(),
-                            Parameters.Parameter.builder()
-                                .name("hostedResource")
-                                .valueUri(url)
-                                .build()))
-                    .build())
-        .collect(toList());
-  }
-
-  @SneakyThrows
-  private Parameters parameters(VerifiableCredential vc, List<String> urls) {
-    return Parameters.builder()
-        .parameter(
-            Stream.concat(
-                    List.of(
-                        Parameters.Parameter.builder()
-                            .name("verifiableCredential")
-                            .valueString(MAPPER.writeValueAsString(vc))
-                            .build())
-                        .stream(),
-                    parameterResourceLinks(urls).stream())
-                .collect(toList()))
-        .build();
   }
 }

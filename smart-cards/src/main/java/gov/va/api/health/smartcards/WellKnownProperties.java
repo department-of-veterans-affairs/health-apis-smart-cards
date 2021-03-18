@@ -19,7 +19,23 @@ import org.springframework.context.annotation.Configuration;
 @AllArgsConstructor
 @Builder
 public class WellKnownProperties {
-  private List<String> capabilities;
-  private List<String> responseTypeSupported;
-  private List<String> scopesSupported;
+  @Builder.Default
+  private List<String> capabilities =
+      List.of(
+          "health-cards",
+          "launch-standalone",
+          "context-standalone-patient",
+          "client-confidential-symmetric");
+
+  @Builder.Default private List<String> responseTypeSupported = List.of("code, refresh_token");
+
+  @Builder.Default
+  private List<String> scopesSupported =
+      List.of(
+          "launch",
+          "launch/patient",
+          "patient/Patient.read",
+          "patient/Immunization.read",
+          "patient/Location.read",
+          "offline_access");
 }

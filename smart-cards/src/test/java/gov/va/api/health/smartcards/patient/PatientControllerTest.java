@@ -78,7 +78,7 @@ public class PatientControllerTest {
     return MAPPER.readValue(parameter.valueString(), VerifiableCredential.class);
   }
 
-  static Immunization.Bundle immunizationBundle(String icn) {
+  private static Immunization.Bundle immunizationBundle(String icn) {
     LinkProperties linkProperties = linkProperties();
     var patient = Patient.builder().id(icn).name(List.of(HumanName.builder().build())).build();
     String vaccineSystem = "http://hl7.org/fhir/sid/cvx";
@@ -185,7 +185,7 @@ public class PatientControllerTest {
         .build();
   }
 
-  static Location location(String id) {
+  private static Location location(String id) {
     LinkProperties linkProperties = linkProperties();
     return Location.builder()
         .id(id)
@@ -243,7 +243,7 @@ public class PatientControllerTest {
         .build();
   }
 
-  static Patient.Bundle patientBundle(String id) {
+  private static Patient.Bundle patientBundle(String id) {
     LinkProperties linkProperties = linkProperties();
     String firstName = "Joe" + id;
     String lastName = "Doe" + id;
@@ -340,20 +340,14 @@ public class PatientControllerTest {
   }
 
   @Test
-  void initDirectFieldAccess() {
-    new PatientController(mock(DataQueryFhirClient.class), mock(R4MixedBundler.class))
-        .initDirectFieldAccess(mock(DataBinder.class));
-  }
-
-  @Test
-  void issueVc() {
+  void healthCardsIssue() {
     var patientBundleResponse = new ResponseEntity<>(patientBundle("123"), HttpStatus.ACCEPTED);
     var immunizationBundleResponse =
         new ResponseEntity<>(immunizationBundle("123"), HttpStatus.ACCEPTED);
     var locationResponse = new ResponseEntity<>(location("loc-1"), HttpStatus.ACCEPTED);
     var controller =
         patientController(patientBundleResponse, immunizationBundleResponse, locationResponse);
-    var result = controller.issueVc("123", parametersCovid19(), "").getBody();
+    var result = controller.healthCardsIssue("123", parametersCovid19(), "").getBody();
     assertNotNull(result);
     var vc = findVcFromParameters(result);
     assertThat(vc.context()).isEqualTo(List.of("https://www.w3.org/2018/credentials/v1"));
@@ -388,32 +382,39 @@ public class PatientControllerTest {
   }
 
   @Test
-  void issueVc_EmptyParameters() {
+  void healthCardsIssue_EmptyParameters() {
     var controller = patientController(null, null, null);
     // Empty List
     assertThrows(
-        Exceptions.BadRequest.class, () -> controller.issueVc("123", parametersEmpty(), ""));
+        Exceptions.BadRequest.class,
+        () -> controller.healthCardsIssue("123", parametersEmpty(), ""));
     // null List
     assertThrows(
         Exceptions.BadRequest.class,
-        () -> controller.issueVc("123", parametersEmpty().parameter(null), ""));
+        () -> controller.healthCardsIssue("123", parametersEmpty().parameter(null), ""));
   }
 
   @Test
-  void issueVc_invalidCredentialType() {
+  void healthCardsIssue_invalidCredentialType() {
     var controller = patientController(null, null, null);
     assertThrows(
         Exceptions.InvalidCredentialType.class,
-        () -> controller.issueVc("123", parametersWithCredentialType("NOPE"), ""));
+        () -> controller.healthCardsIssue("123", parametersWithCredentialType("NOPE"), ""));
   }
 
   @Test
-  void issueVc_unimplementedCredentialType() {
+  void healthCardsIssue_unimplementedCredentialType() {
     var controller = patientController(null, null, null);
     assertThrows(
         Exceptions.NotImplemented.class,
         () ->
-            controller.issueVc(
+            controller.healthCardsIssue(
                 "123", parametersWithCredentialType("https://smarthealth.cards#immunization"), ""));
+  }
+
+  @Test
+  void initDirectFieldAccess() {
+    new PatientController(mock(DataQueryFhirClient.class), mock(R4MixedBundler.class))
+        .initDirectFieldAccess(mock(DataBinder.class));
   }
 }

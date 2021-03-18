@@ -13,9 +13,9 @@ import org.springframework.http.ResponseEntity;
 public interface SmartCardsPatientApi {
   @POST
   @Operation(summary = "Issues Verifiable Credential")
-  @Path("Patient/{id}/$HealthWallet.issueVc")
+  @Path("Patient/{id}/$health-cards-issue")
   @ApiResponse(responseCode = "200", description = "Verifiable Credential Received")
-  ResponseEntity<Parameters> issueVc(
+  ResponseEntity<Parameters> healthCardsIssue(
       @Parameter(
               in = ParameterIn.PATH,
               name = "id",

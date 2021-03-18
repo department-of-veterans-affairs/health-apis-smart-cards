@@ -138,12 +138,11 @@ public class PatientController {
     return Parameters.builder()
         .parameter(
             Stream.concat(
-                    List.of(
+                    Stream.of(
                         Parameters.Parameter.builder()
                             .name("verifiableCredential")
                             .valueString(vc)
-                            .build())
-                        .stream(),
+                            .build()),
                     parameterResourceLinks(urls).stream())
                 .collect(toList()))
         .build();

@@ -19,6 +19,8 @@ public class JwksProperties {
 
   final JWKSet jwksPublic;
 
+  final String jwksPublicJson;
+
   @Builder
   @SneakyThrows
   JwksProperties(
@@ -29,6 +31,7 @@ public class JwksProperties {
     this.currentKeyId = currentKeyId;
     jwksPrivate = JWKSet.parse(jwksPrivateJson);
     jwksPublic = jwksPrivate.toPublicJWKSet();
+    jwksPublicJson = jwksPublic.toString();
   }
 
   public JWK currentPrivateJwk() {

@@ -57,6 +57,7 @@ public class WellKnownJwksIT {
   }
 
   @Test
+  @Disabled
   public void jwks_internal() {
     var internal = systemDefinition().internal();
     doGet(internal, ".well-known/jwks.json", 200);

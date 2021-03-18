@@ -14,7 +14,7 @@ public class Compressors {
 
   /** Compress a payload with Java's ZLIB implementation. */
   @SneakyThrows
-  public static byte[] deflate(byte[] input) {
+  public static byte[] compress(byte[] input) {
     checkNotNull(input);
     Deflater deflater = new Deflater(Deflater.DEFLATED, true);
     deflater.setInput(input);
@@ -36,7 +36,7 @@ public class Compressors {
 
   /** Decompress a payload with Java's ZLIB implementation. */
   @SneakyThrows
-  public static byte[] inflate(byte[] input) {
+  public static byte[] uncompress(byte[] input) {
     checkNotNull(input);
     Inflater inflater = new Inflater(true);
     inflater.setInput(input);

@@ -19,7 +19,7 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class JwsHelpers {
   public static String decompress(byte[] input) {
-    return new String(Compressors.inflate(input), StandardCharsets.UTF_8);
+    return new String(Compressors.uncompress(input), StandardCharsets.UTF_8);
   }
 
   @SneakyThrows

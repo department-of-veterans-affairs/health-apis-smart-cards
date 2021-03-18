@@ -56,7 +56,7 @@ public class PayloadSignerTest {
 
   @SneakyThrows
   @Test
-  void signAndDeflate() {
+  void signAndCompress() {
     PayloadSigner signer =
         PayloadSigner.builder()
             .jwksProperties(JWKS_PROPERTIES)

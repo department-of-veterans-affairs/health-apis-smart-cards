@@ -27,14 +27,14 @@ public class PayloadSigner {
 
   private final LinkProperties linkProperties;
 
-  private byte[] deflate(String payload) {
-    return Compressors.deflate(payload.getBytes(StandardCharsets.UTF_8));
+  private byte[] compress(String payload) {
+    return Compressors.compress(payload.getBytes(StandardCharsets.UTF_8));
   }
 
-  private JWSHeader jwsHeader(JWK jwk, boolean deflate) {
+  private JWSHeader jwsHeader(JWK jwk, boolean compress) {
     JWSHeader.Builder headerBuilder =
         new JWSHeader.Builder(JWSAlgorithm.ES256).keyID(jwk.getKeyID());
-    if (deflate) {
+    if (compress) {
       headerBuilder.customParam("zip", "DEF");
     }
     return headerBuilder.build();
@@ -42,7 +42,7 @@ public class PayloadSigner {
 
   /** Sign VC payload. Generates a JWS. */
   @SneakyThrows
-  public String sign(VerifiableCredential vc, boolean deflate) {
+  public String sign(VerifiableCredential vc, boolean compress) {
     PayloadClaimsWrapper claims =
         PayloadClaimsWrapper.builder()
             .issuer(linkProperties.r4Url())
@@ -51,9 +51,9 @@ public class PayloadSigner {
             .build();
     String payloadStr = MAPPER.writeValueAsString(claims);
     byte[] payloadAsBytes =
-        deflate ? deflate(payloadStr) : payloadStr.getBytes(StandardCharsets.UTF_8);
+        compress ? compress(payloadStr) : payloadStr.getBytes(StandardCharsets.UTF_8);
     Payload payload = new Payload(payloadAsBytes);
-    JWSHeader header = jwsHeader(jwksProperties.currentPrivateJwk(), deflate);
+    JWSHeader header = jwsHeader(jwksProperties.currentPrivateJwk(), compress);
     JWSObject jwsObject = new JWSObject(header, payload);
     jwsObject.sign(new ECDSASigner(jwksProperties.currentPrivateJwk().toECKey()));
     return jwsObject.serialize();

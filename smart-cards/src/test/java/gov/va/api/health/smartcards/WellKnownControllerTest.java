@@ -5,17 +5,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import gov.va.api.health.autoconfig.configuration.JacksonConfig;
 import gov.va.api.health.r4.api.information.WellKnown;
-import gov.va.api.health.smartcards.MetadataProperties.SecurityProperties;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 
 public class WellKnownControllerTest {
   private WellKnown actual() {
     return WellKnown.builder()
-        .tokenEndpoint("https://somevasite.va.gov/token")
-        .authorizationEndpoint("https://somevasite.va.gov/authorize")
-        .managementEndpoint("https://somevasite.va.gov/manage")
-        .revocationEndpoint("https://somevasite.va.gov/revoke")
         .capabilities(
             asList(
                 "context-standalone-patient",
@@ -24,18 +19,6 @@ public class WellKnownControllerTest {
                 "permission-patient"))
         .responseTypeSupported(asList("code", "refresh-token"))
         .scopesSupported(asList("patient/$HealthWallet.issueVc"))
-        .build();
-  }
-
-  private MetadataProperties conformanceProperties() {
-    return MetadataProperties.builder()
-        .security(
-            SecurityProperties.builder()
-                .authorizeEndpoint("https://somevasite.va.gov/authorize")
-                .tokenEndpoint("https://somevasite.va.gov/token")
-                .managementEndpoint("https://somevasite.va.gov/manage")
-                .revocationEndpoint("https://somevasite.va.gov/revoke")
-                .build())
         .build();
   }
 
@@ -49,8 +32,7 @@ public class WellKnownControllerTest {
   @Test
   @SneakyThrows
   public void read() {
-    WellKnownController controller =
-        new WellKnownController(wellKnownProperties(), conformanceProperties());
+    WellKnownController controller = new WellKnownController(wellKnownProperties());
     assertThat(pretty(controller.read())).isEqualTo(pretty(actual()));
   }
 

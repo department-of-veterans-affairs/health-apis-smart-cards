@@ -15,15 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class WellKnownController {
 
   private final WellKnownProperties wellKnownProperties;
-  private final MetadataProperties metadataProperties;
 
   @GetMapping
   WellKnown read() {
     return WellKnown.builder()
-        .authorizationEndpoint(metadataProperties.getSecurity().getAuthorizeEndpoint())
-        .tokenEndpoint(metadataProperties.getSecurity().getTokenEndpoint())
-        .managementEndpoint(metadataProperties.getSecurity().getManagementEndpoint())
-        .revocationEndpoint(metadataProperties.getSecurity().getRevocationEndpoint())
         .capabilities(wellKnownProperties.getCapabilities())
         .responseTypeSupported(wellKnownProperties.getResponseTypeSupported())
         .scopesSupported(wellKnownProperties.getScopesSupported())

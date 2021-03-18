@@ -59,6 +59,20 @@ public class PatientControllerTest {
         .count();
   }
 
+  private static Parameters doHealthCardsIssue(String vcJws, String vcCompress) {
+    var patientBundleResponse =
+        new ResponseEntity<>(SAMPLES.patientBundle("123"), HttpStatus.ACCEPTED);
+    var immunizationBundleResponse =
+        new ResponseEntity<>(SAMPLES.immunizationBundle("123"), HttpStatus.ACCEPTED);
+    var locationResponse = new ResponseEntity<>(SAMPLES.location("loc-1"), HttpStatus.ACCEPTED);
+    var controller =
+        patientController(patientBundleResponse, immunizationBundleResponse, locationResponse);
+    var result =
+        controller.healthCardsIssue("123", parametersCovid19(), "", vcJws, vcCompress).getBody();
+    assertNotNull(result);
+    return result;
+  }
+
   private static List<Parameters.Parameter> findResourceLinksFromParameters(Parameters parameters) {
     return parameters.parameter().stream()
         .filter(p -> "resourceLink".equals(p.name()))
@@ -147,30 +161,10 @@ public class PatientControllerTest {
         .build();
   }
 
-  Parameters doIssueVc(String vcJws, String vcCompress) {
-    var patientBundleResponse =
-        new ResponseEntity<>(SAMPLES.patientBundle("123"), HttpStatus.ACCEPTED);
-    var immunizationBundleResponse =
-        new ResponseEntity<>(SAMPLES.immunizationBundle("123"), HttpStatus.ACCEPTED);
-    var locationResponse = new ResponseEntity<>(SAMPLES.location("loc-1"), HttpStatus.ACCEPTED);
-    var controller =
-        patientController(patientBundleResponse, immunizationBundleResponse, locationResponse);
-    var result = controller.issueVc("123", parametersCovid19(), "", vcJws, vcCompress).getBody();
-    assertNotNull(result);
-    return result;
-  }
-
-  @Test
-  void initDirectFieldAccess() {
-    new PatientController(
-            mock(DataQueryFhirClient.class), mock(PayloadSigner.class), mock(R4MixedBundler.class))
-        .initDirectFieldAccess(mock(DataBinder.class));
-  }
-
   @Test
   @SneakyThrows
-  void issueVc() {
-    var result = doIssueVc("false", "false");
+  void healthCardsIssue() {
+    var result = doHealthCardsIssue("false", "false");
     var vcJson = findVcFromParameters(result);
     var vc = MAPPER.readValue(vcJson, VerifiableCredential.class);
     assertThat(vc.context()).isEqualTo(List.of("https://www.w3.org/2018/credentials/v1"));
@@ -205,69 +199,77 @@ public class PatientControllerTest {
   }
 
   @Test
-  void issueVc_EmptyParameters() {
+  void healthCardsIssue_emptyParameters() {
     var controller = patientController(null, null, null);
     // Empty List
     assertThrows(
         Exceptions.BadRequest.class,
-        () -> controller.issueVc("123", parametersEmpty(), "", "", ""));
+        () -> controller.healthCardsIssue("123", parametersEmpty(), "", "", ""));
     // null List
     assertThrows(
         Exceptions.BadRequest.class,
-        () -> controller.issueVc("123", parametersEmpty().parameter(null), "", "", ""));
+        () -> controller.healthCardsIssue("123", parametersEmpty().parameter(null), "", "", ""));
+  }
+
+  @Test
+  void healthCardsIssue_invalidCredentialType() {
+    var controller = patientController(null, null, null);
+    assertThrows(
+        Exceptions.InvalidCredentialType.class,
+        () -> controller.healthCardsIssue("123", parametersWithCredentialType("NOPE"), "", "", ""));
   }
 
   /**
    * This test only verifies that the signed and compressed response is consistent with the unsigned
-   * version. The VerifiableCredential structure is tested through the `issueVc` test.
+   * version. The VerifiableCredential structure is tested through the `healthCardsIssue` test.
    */
   @Test
   @SneakyThrows
-  void issueVc_SignedAndCompressed() {
-    var result = doIssueVc("", "");
+  void healthCardsIssue_signedAndCompressed() {
+    var result = doHealthCardsIssue("", "");
     var jws = findVcFromParameters(result);
     assertThat(JwsHelpers.verify(jws, JWKS_PROPERTIES.currentPublicJwk())).isTrue();
     var payloadClaims = getPayloadFromJws(jws, true);
-    var resultNotSigned = doIssueVc("false", "false");
+    var resultNotSigned = doHealthCardsIssue("false", "false");
     var vc = MAPPER.readValue(findVcFromParameters(resultNotSigned), VerifiableCredential.class);
     assertThat(payloadClaims.verifiableCredential()).isEqualTo(vc);
   }
 
   /**
    * This test only verifies that the signed and uncompressed response is consistent with the
-   * unsigned version. The VerifiableCredential structure is tested through the `issueVc` test.
+   * unsigned version. The VerifiableCredential structure is tested through the `healthCardsIssue`
+   * test.
    */
   @Test
   @SneakyThrows
-  void issueVc_SignedButNotCompressed() {
-    var resultSigned = doIssueVc("", "false");
+  void healthCardsIssue_signedButNotCompressed() {
+    var resultSigned = doHealthCardsIssue("", "false");
     var jws = findVcFromParameters(resultSigned);
     assertThat(JwsHelpers.verify(jws, JWKS_PROPERTIES.currentPublicJwk())).isTrue();
     var payloadClaims = getPayloadFromJws(jws, false);
-    var resultNotSigned = doIssueVc("false", "false");
+    var resultNotSigned = doHealthCardsIssue("false", "false");
     var vc = MAPPER.readValue(findVcFromParameters(resultNotSigned), VerifiableCredential.class);
     assertThat(payloadClaims.verifiableCredential()).isEqualTo(vc);
   }
 
   @Test
-  void issueVc_invalidCredentialType() {
-    var controller = patientController(null, null, null);
-    assertThrows(
-        Exceptions.InvalidCredentialType.class,
-        () -> controller.issueVc("123", parametersWithCredentialType("NOPE"), "", "", ""));
-  }
-
-  @Test
-  void issueVc_unimplementedCredentialType() {
+  void healthCardsIssue_unimplementedCredentialType() {
     var controller = patientController(null, null, null);
     assertThrows(
         Exceptions.NotImplemented.class,
         () ->
-            controller.issueVc(
+            controller.healthCardsIssue(
                 "123",
                 parametersWithCredentialType("https://smarthealth.cards#immunization"),
                 "",
                 "",
                 ""));
+  }
+
+  @Test
+  void initDirectFieldAccess() {
+    new PatientController(
+            mock(DataQueryFhirClient.class), mock(PayloadSigner.class), mock(R4MixedBundler.class))
+        .initDirectFieldAccess(mock(DataBinder.class));
   }
 }

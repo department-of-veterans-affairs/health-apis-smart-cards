@@ -22,10 +22,9 @@ import java.util.List;
 import lombok.Builder;
 import lombok.Data;
 
-@Builder
 @Data
+@Builder
 public class MockResourceSamples {
-
   LinkProperties linkProperties;
 
   public Immunization.Bundle immunizationBundle(String icn) {

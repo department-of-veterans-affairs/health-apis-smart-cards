@@ -10,14 +10,16 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-@Component
 @Getter
+@Component
 public class JwksProperties {
   final String currentKeyId;
 
   final JWKSet jwksPrivate;
 
   final JWKSet jwksPublic;
+
+  final String jwksPublicJson;
 
   /** Default Constructor. */
   @Builder
@@ -30,6 +32,7 @@ public class JwksProperties {
     this.currentKeyId = currentKeyId;
     jwksPrivate = JWKSet.parse(jwksPrivateJson);
     jwksPublic = jwksPrivate.toPublicJWKSet();
+    jwksPublicJson = jwksPublic.toString();
   }
 
   public JWK currentPrivateJwk() {

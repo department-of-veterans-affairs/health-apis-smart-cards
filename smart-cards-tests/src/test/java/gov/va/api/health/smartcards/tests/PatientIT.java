@@ -97,74 +97,62 @@ public class PatientIT {
     String id = systemDefinition().ids().patient();
     doPost(
         systemDefinition().internal(),
-        String.format("r4/Patient/%s/$HealthWallet.issueVc", id),
+        String.format("r4/Patient/%s/$health-cards-issue", id),
         parametersCovid19(),
-        "issuevc",
+        "$health-cards-issue",
         200);
   }
 
   @Test
-  void read_externalDstu2() {
+  void read_external_dstu2() {
     assumeEnvironmentNotIn(Environment.LOCAL);
     String id = systemDefinition().ids().patient();
     doPost(
         systemDefinition().external(),
-        String.format("dstu2/Patient/%s/$HealthWallet.issueVc", id),
+        String.format("dstu2/Patient/%s/$health-cards-issue", id),
         parametersCovid19(),
-        "issuevc",
+        "$health-cards-issue",
         200);
   }
 
   @Test
-  void read_externalR4() {
+  void read_external_r4() {
     assumeEnvironmentNotIn(Environment.LOCAL);
     String id = systemDefinition().ids().patient();
     doPost(
         systemDefinition().external(),
-        String.format("r4/Patient/%s/$HealthWallet.issueVc", id),
+        String.format("r4/Patient/%s/$health-cards-issue", id),
         parametersCovid19(),
-        "issuevc",
+        "$health-cards-issue",
         200);
-  }
-
-  @Test
-  void read_invalid_badCredentialType() {
-    String id = systemDefinition().ids().patient();
-    String path = String.format("r4/Patient/%s/$HealthWallet.issueVc", id);
-    var svc = systemDefinition().internal();
-    doPost(
-        svc,
-        path,
-        parametersWithCredentialType("NOPE"),
-        "issueVc (invalid, bad credentialType)",
-        400);
   }
 
   @Test
   void read_invalid_beanValidation() {
     String id = systemDefinition().ids().patient();
-    String path = String.format("r4/Patient/%s/$HealthWallet.issueVc", id);
+    String path = String.format("r4/Patient/%s/$health-cards-issue", id);
     var svc = systemDefinition().internal();
     var parameters =
         Parameters.builder().parameter(List.of(Parameters.Parameter.builder().build())).build();
-    doPost(svc, path, parameters, "issueVc (parameters bean validation)", 400);
+    doPost(svc, path, parameters, "$health-cards-issue (parameter bean validation)", 400);
   }
 
   @Test
   void read_invalid_bodySchema() {
     String id = systemDefinition().ids().patient();
-    String path = String.format("r4/Patient/%s/$HealthWallet.issueVc", id);
+    String path = String.format("r4/Patient/%s/$health-cards-issue", id);
     var svc = systemDefinition().internal();
-    doPost(svc, path, "{\"foo\":\"bar\"}", "issueVc (invalid, bad payload schema)", 400);
-    doPost(svc, path, "NOPE", "issueVc (invalid, bad payload schema)", 400);
+    String desc = "$health-cards-issue (bad payload schema)";
+    doPost(svc, path, "{\"foo\":\"bar\"}", desc, 400);
+    doPost(svc, path, "NOPE", desc, 400);
   }
 
   @Test
   void read_invalid_emptyBody() {
     String id = systemDefinition().ids().patient();
-    String path = String.format("r4/Patient/%s/$HealthWallet.issueVc", id);
+    String path = String.format("r4/Patient/%s/$health-cards-issue", id);
     var svc = systemDefinition().internal();
-    doPost(svc, path, null, "issueVc(invalid, empty body)", 400);
+    doPost(svc, path, null, "$health-cards-issue (empty body)", 400);
   }
 
   @Test
@@ -184,19 +172,19 @@ public class PatientIT {
     doPost(
         systemDefinition().internal(),
         spec,
-        String.format("r4/Patient/%s/$HealthWallet.issueVc", id),
+        String.format("r4/Patient/%s/$health-cards-issue", id),
         payload,
-        "issueVc (no token)",
+        "$health-cards-issue (no token)",
         401);
   }
 
   @Test
   void read_invalid_parametersEmpty() {
     String id = systemDefinition().ids().patient();
-    String path = String.format("r4/Patient/%s/$HealthWallet.issueVc", id);
+    String path = String.format("r4/Patient/%s/$health-cards-issue", id);
     var svc = systemDefinition().internal();
     var empty = Parameters.builder().build();
-    doPost(svc, path, empty, "issueVc (invalid, no parameters)", 400);
+    doPost(svc, path, empty, "$health-cards-issue (no parameters)", 400);
   }
 
   @Test
@@ -204,23 +192,36 @@ public class PatientIT {
     assumeEnvironmentNotIn(Environment.LOCAL);
     doPost(
         systemDefinition().internal(),
-        String.format("r4/Patient/%s/$HealthWallet.issueVc", "5555555555555"),
+        String.format("r4/Patient/%s/$health-cards-issue", "5555555555555"),
         parametersCovid19(),
-        "issueVc (patient not-me)",
+        "$health-cards-issue (patient not-me)",
         403);
   }
 
   @Test
   void read_invalid_unimplementedCredentialType() {
     String id = systemDefinition().ids().patient();
-    String path = String.format("r4/Patient/%s/$HealthWallet.issueVc", id);
+    String path = String.format("r4/Patient/%s/$health-cards-issue", id);
     var svc = systemDefinition().internal();
     doPost(
         svc,
         path,
         parametersWithCredentialType(
             "https://smarthealth.cards#covid19", "https://smarthealth.cards#immunization"),
-        "issueVc (invalid, unimplemented credentialType)",
+        "$health-cards-issue (unimplemented credentialType)",
         501);
+  }
+
+  @Test
+  void read_invalid_unknownCredentialType() {
+    String id = systemDefinition().ids().patient();
+    String path = String.format("r4/Patient/%s/$health-cards-issue", id);
+    var svc = systemDefinition().internal();
+    doPost(
+        svc,
+        path,
+        parametersWithCredentialType("NOPE"),
+        "$health-cards-issue (unknown credentialType)",
+        400);
   }
 }

@@ -212,7 +212,7 @@ public class PatientController {
     consumeBundle(immunizations, resources, PatientController::transform);
     List<String> urls = indexAndReplaceUrls(resources);
     var vc = vc(bundler.bundle(resources), credentialTypes);
-    var signedVc = signVc(vc, vcJws, vcCompress);
+    var signedVc = signVc(vc, parseBooleanOrTrue(vcJws), parseBooleanOrTrue(vcCompress));
     var parametersResponse = parameters(signedVc, urls);
     return ResponseEntity.ok(parametersResponse);
   }
@@ -245,12 +245,10 @@ public class PatientController {
   }
 
   @SneakyThrows
-  private String signVc(VerifiableCredential vc, String vcJws, String vcCompress) {
-    boolean shouldSign = parseBooleanOrTrue(vcJws);
-    boolean shouldDeflate = parseBooleanOrTrue(vcCompress);
+  private String signVc(VerifiableCredential vc, boolean shouldSign, boolean shouldCompress) {
     if (!shouldSign) {
       return MAPPER.writeValueAsString(vc);
     }
-    return payloadSigner.sign(vc, shouldDeflate);
+    return payloadSigner.sign(vc, shouldCompress);
   }
 }

@@ -12,6 +12,7 @@ import gov.va.api.health.r4.api.bundle.AbstractBundle;
 import gov.va.api.health.r4.api.bundle.AbstractEntry;
 import gov.va.api.health.r4.api.bundle.MixedBundle;
 import gov.va.api.health.r4.api.bundle.MixedEntry;
+import gov.va.api.health.r4.api.elements.Reference;
 import gov.va.api.health.r4.api.resources.Immunization;
 import gov.va.api.health.r4.api.resources.Location;
 import gov.va.api.health.r4.api.resources.Parameters;
@@ -26,6 +27,7 @@ import gov.va.api.health.smartcards.R4MixedBundler;
 import gov.va.api.health.smartcards.vc.CredentialType;
 import gov.va.api.health.smartcards.vc.VerifiableCredential;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -89,7 +91,7 @@ public class PatientController {
     List<String> urls =
         entries.stream()
             .map(AbstractEntry::fullUrl)
-            .filter(s -> isNotBlank(s))
+            .filter(StringUtils::isNotBlank)
             .distinct()
             .collect(toCollection(ArrayList::new));
     // Index unique URLs and replace with 'resource:X' scheme
@@ -101,7 +103,7 @@ public class PatientController {
       if (entry.resource() instanceof Immunization) {
         Immunization imm = (Immunization) entry.resource();
         String patientRef =
-            Optional.of(imm).map(im -> im.patient()).map(p -> p.reference()).orElse(null);
+            Optional.of(imm).map(Immunization::patient).map(Reference::reference).orElse(null);
         if (patientRef != null) {
           if (!urls.contains(patientRef)) {
             urls.add(patientRef);
@@ -161,7 +163,7 @@ public class PatientController {
     return ImmunizationTransformer.builder().entry(entry).build().transform();
   }
 
-  private static List<CredentialType> validateCredentialTypes(List<CredentialType> credentials) {
+  private static void validateCredentialTypes(List<CredentialType> credentials) {
     if (credentials.isEmpty()) {
       throw new Exceptions.BadRequest("credentialType parameter is required");
     }
@@ -174,7 +176,6 @@ public class PatientController {
       throw new Exceptions.NotImplemented(
           String.format("Not yet implemented support for %s", requestedButUnimplemented));
     }
-    return credentials;
   }
 
   private static VerifiableCredential vc(MixedBundle bundle, List<CredentialType> credentialTypes) {
@@ -237,7 +238,7 @@ public class PatientController {
       }
       imm.contained(
           Stream.concat(
-                  Optional.ofNullable(imm.contained()).map(c -> c.stream()).orElse(Stream.empty()),
+                  Optional.ofNullable(imm.contained()).stream().flatMap(Collection::stream),
                   Stream.of(location))
               .collect(toList()));
     }

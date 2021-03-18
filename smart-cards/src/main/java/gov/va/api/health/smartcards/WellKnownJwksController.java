@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(
     path = "/.well-known/jwks.json",
-    produces = {"application/json", "application/fhir+json", "application/json+fhir"})
+    produces = {"application/json"})
 @AllArgsConstructor(onConstructor_ = @Autowired)
 public class WellKnownJwksController {
 

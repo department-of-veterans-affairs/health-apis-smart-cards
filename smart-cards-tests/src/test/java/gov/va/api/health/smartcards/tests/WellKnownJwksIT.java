@@ -15,6 +15,7 @@ import io.restassured.http.Method;
 import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 @Slf4j
@@ -48,10 +49,11 @@ public class WellKnownJwksIT {
   }
 
   @Test
+  @Disabled
   public void jwks_external() {
     assumeEnvironmentNotIn(Environment.LOCAL);
-    doGet(systemDefinition().external(), "r4/./well-known/jwks.json", 200);
-    doGet(systemDefinition().external(), "dstu2/./well-known/jwks.json", 200);
+    doGet(systemDefinition().external(), "r4/.well-known/jwks.json", 200);
+    doGet(systemDefinition().external(), "dstu2/.well-known/jwks.json", 200);
   }
 
   @Test

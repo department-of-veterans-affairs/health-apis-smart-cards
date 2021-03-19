@@ -12,12 +12,12 @@ public class Pem2JwkTest {
   }
 
   @Test
-  public void test() {
+  void test() {
     Pem2Jwk.main(args("./src/test/resources/cert.txt"));
   }
 
   @Test
-  public void test_invalid() {
+  void test_invalid() {
     // no such file
     assertThrows(
         FileNotFoundException.class, () -> Pem2Jwk.main(args("./not/a/real/file/path.txt")));

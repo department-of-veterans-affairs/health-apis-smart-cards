@@ -4,13 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.JWSObject;
-import com.nimbusds.jose.JWSVerifier;
-import com.nimbusds.jose.crypto.ECDSAVerifier;
-import com.nimbusds.jose.jwk.Curve;
-import com.nimbusds.jose.jwk.ECKey;
-import com.nimbusds.jose.jwk.JWK;
-import com.nimbusds.jose.jwk.JWKSet;
-import com.nimbusds.jose.jwk.gen.ECKeyGenerator;
 import gov.va.api.health.r4.api.bundle.AbstractBundle.BundleType;
 import gov.va.api.health.r4.api.bundle.MixedBundle;
 import gov.va.api.health.r4.api.bundle.MixedEntry;
@@ -19,22 +12,12 @@ import gov.va.api.health.r4.api.resources.Patient;
 import gov.va.api.health.smartcards.vc.PayloadClaimsWrapper;
 import gov.va.api.health.smartcards.vc.VerifiableCredential;
 import gov.va.api.health.smartcards.vc.VerifiableCredential.CredentialSubject;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 
 public class PayloadSignerTest {
-  private static final String JWK_PRIVATE = genEcJwk("123").toJSONString();
-
-  private static final JwksProperties JWKS_PROPERTIES = _jwksProperties();
-
-  @SneakyThrows
-  private static JwksProperties _jwksProperties() {
-    JWKSet jwks = new JWKSet(JWK.parse(JWK_PRIVATE));
-    String jwkSet = jwks.toString(false);
-    return new JwksProperties(jwkSet, "123");
-  }
+  private static final JwksProperties JWKS_PROPERTIES = JwsHelpers.jwksProperties("123");
 
   private static LinkProperties _linkProperties() {
     return LinkProperties.builder()
@@ -43,11 +26,6 @@ public class PayloadSignerTest {
         .baseUrl("http://sc.bar")
         .r4BasePath("r4")
         .build();
-  }
-
-  @SneakyThrows
-  private static ECKey genEcJwk(String kid) {
-    return new ECKeyGenerator(Curve.P_256).keyID(kid).generate();
   }
 
   private static VerifiableCredential vc() {
@@ -77,13 +55,8 @@ public class PayloadSignerTest {
   }
 
   @SneakyThrows
-  private String decompress(byte[] input) {
-    return new String(Compressors.inflate(input), StandardCharsets.UTF_8);
-  }
-
-  @SneakyThrows
   @Test
-  void signAndDeflate() {
+  void signAndCompress() {
     PayloadSigner signer =
         PayloadSigner.builder()
             .jwksProperties(JWKS_PROPERTIES)
@@ -93,17 +66,17 @@ public class PayloadSignerTest {
     String jws = signer.sign(vc, true);
 
     // Verify signature with public key
-    assertThat(verify(jws)).isTrue();
-    assertThat(verify(jws, genEcJwk("random").toPublicJWK())).isFalse();
+    assertThat(JwsHelpers.verify(jws, JWKS_PROPERTIES.currentPublicJwk())).isTrue();
+    assertThat(JwsHelpers.verify(jws, JwsHelpers.genEcJwk("random").toPublicJWK())).isFalse();
     JWSObject jwsObject = JWSObject.parse(jws);
 
     // Verify header
     JWSHeader jwsHeader = jwsObject.getHeader();
     assertThat(jwsHeader.getCustomParam("zip")).isEqualTo("DEF");
-    assertThat(jwsHeader.getKeyID()).isEqualTo(JWK.parse(JWK_PRIVATE).getKeyID());
+    assertThat(jwsHeader.getKeyID()).isEqualTo(JWKS_PROPERTIES.currentKeyId());
 
     // Verify payload
-    String inflated = decompress(jwsObject.getPayload().toBytes());
+    String inflated = JwsHelpers.decompress(jwsObject.getPayload().toBytes());
     PayloadClaimsWrapper claims =
         JacksonMapperConfig.createMapper().readValue(inflated, PayloadClaimsWrapper.class);
     assertThat(claims.verifiableCredential()).isEqualTo(vc);
@@ -121,30 +94,19 @@ public class PayloadSignerTest {
     String jws = signer.sign(vc, false);
 
     // Verify signature with public key
-    assertThat(verify(jws)).isTrue();
-    assertThat(verify(jws, genEcJwk("random").toPublicJWK())).isFalse();
+    assertThat(JwsHelpers.verify(jws, JWKS_PROPERTIES.currentPublicJwk())).isTrue();
+    assertThat(JwsHelpers.verify(jws, JwsHelpers.genEcJwk("random").toPublicJWK())).isFalse();
     JWSObject jwsObject = JWSObject.parse(jws);
 
     // Verify header
     JWSHeader jwsHeader = jwsObject.getHeader();
     assertThat(jwsHeader.getCustomParam("zip")).isNull();
-    assertThat(jwsHeader.getKeyID()).isEqualTo(JWK.parse(JWK_PRIVATE).getKeyID());
+    assertThat(jwsHeader.getKeyID()).isEqualTo(JWKS_PROPERTIES.currentKeyId());
 
     // Verify payload
     PayloadClaimsWrapper claims =
         JacksonMapperConfig.createMapper()
             .readValue(jwsObject.getPayload().toString(), PayloadClaimsWrapper.class);
     assertThat(claims.verifiableCredential()).isEqualTo(vc);
-  }
-
-  private boolean verify(String jws) {
-    return verify(jws, JWKS_PROPERTIES.currentPublicJwk());
-  }
-
-  @SneakyThrows
-  private boolean verify(String jws, JWK publicJwk) {
-    JWSVerifier verifier = new ECDSAVerifier(publicJwk.toECKey());
-    JWSObject jwsObject = JWSObject.parse(jws);
-    return jwsObject.verify(verifier);
   }
 }

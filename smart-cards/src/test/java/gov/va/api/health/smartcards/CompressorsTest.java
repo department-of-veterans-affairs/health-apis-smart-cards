@@ -12,14 +12,14 @@ public class CompressorsTest {
   void badDataFormat() {
     String contents = "pteracuda";
     byte[] notActuallyCompressed = contents.getBytes(StandardCharsets.UTF_8);
-    assertThrows(DataFormatException.class, () -> Compressors.inflate(notActuallyCompressed));
+    assertThrows(DataFormatException.class, () -> Compressors.uncompress(notActuallyCompressed));
   }
 
   @Test
-  void deflateAndInflate() {
+  void compressAndUncompress() {
     String contents = "a very long input to compress";
-    byte[] compressed = Compressors.deflate(contents.getBytes(StandardCharsets.UTF_8));
-    byte[] uncompressed = Compressors.inflate(compressed);
+    byte[] compressed = Compressors.compress(contents.getBytes(StandardCharsets.UTF_8));
+    byte[] uncompressed = Compressors.uncompress(compressed);
     assertThat(new String(uncompressed, StandardCharsets.UTF_8)).isEqualTo(contents);
   }
 }

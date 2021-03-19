@@ -14,7 +14,7 @@ import javax.validation.Validation;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-public class PatientTransformerTest {
+public class PatientMinimizerTest {
   @BeforeAll
   static void init() {
     Patient.IDENTIFIER_MIN_SIZE.set(0);
@@ -66,9 +66,8 @@ public class PatientTransformerTest {
 
   @Test
   void basic() {
-    var patient = patient();
-    var transformed = PatientTransformer.builder().entry(patient).build().transform();
-    assertThat(transformed)
+    var minimized = PatientMinimizer.builder().entry(patient()).build().minimize();
+    assertThat(minimized)
         .isEqualTo(
             MixedEntry.builder()
                 .fullUrl("http://example.com/r4/Patient/x")
@@ -82,7 +81,7 @@ public class PatientTransformerTest {
                         .birthDate("1955-01-01")
                         .build())
                 .build());
-    assertThat(Validation.buildDefaultValidatorFactory().getValidator().validate(transformed))
+    assertThat(Validation.buildDefaultValidatorFactory().getValidator().validate(minimized))
         .isEmpty();
   }
 }

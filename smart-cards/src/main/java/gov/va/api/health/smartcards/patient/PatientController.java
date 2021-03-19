@@ -161,11 +161,11 @@ public class PatientController {
   }
 
   private static MixedEntry transform(Patient.Entry entry) {
-    return PatientTransformer.builder().entry(entry).build().transform();
+    return PatientMinimizer.builder().entry(entry).build().transform();
   }
 
   private static MixedEntry transform(Immunization.Entry entry) {
-    return ImmunizationTransformer.builder().entry(entry).build().transform();
+    return ImmunizationMinimizer.builder().entry(entry).build().transform();
   }
 
   private static void validateCredentialTypes(List<CredentialType> credentials) {

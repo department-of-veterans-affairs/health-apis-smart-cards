@@ -39,7 +39,7 @@ import org.springframework.validation.DataBinder;
 import org.springframework.web.client.RestTemplate;
 
 public class PatientControllerTest {
-  public static final ObjectMapper MAPPER = JacksonMapperConfig.createMapper();
+  private static final ObjectMapper MAPPER = JacksonMapperConfig.createMapper();
 
   private static final JwksProperties JWKS_PROPERTIES = JwsHelpers.jwksProperties("123");
 

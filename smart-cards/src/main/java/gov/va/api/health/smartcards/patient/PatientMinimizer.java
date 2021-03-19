@@ -10,7 +10,7 @@ import lombok.Builder;
 import lombok.NonNull;
 
 @Builder
-public class PatientTransformer {
+public class PatientMinimizer {
   @NonNull Patient.Entry entry;
 
   private HumanName name(HumanName name) {

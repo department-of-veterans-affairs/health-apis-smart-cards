@@ -15,7 +15,7 @@ import lombok.Builder;
 import lombok.NonNull;
 
 @Builder
-public class ImmunizationTransformer {
+public class ImmunizationMinimizer {
   @NonNull Immunization.Entry entry;
 
   static Reference referenceOnly(@NonNull Reference reference) {

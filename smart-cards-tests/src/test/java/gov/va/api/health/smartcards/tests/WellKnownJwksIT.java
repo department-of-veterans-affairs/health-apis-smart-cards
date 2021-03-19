@@ -49,7 +49,6 @@ public class WellKnownJwksIT {
   }
 
   @Test
-  @Disabled
   public void jwks_external() {
     assumeEnvironmentNotIn(Environment.LOCAL);
     doGet(systemDefinition().external(), "r4/.well-known/jwks.json", 200);
@@ -57,7 +56,6 @@ public class WellKnownJwksIT {
   }
 
   @Test
-  @Disabled
   public void jwks_internal() {
     var internal = systemDefinition().internal();
     doGet(internal, ".well-known/jwks.json", 200);

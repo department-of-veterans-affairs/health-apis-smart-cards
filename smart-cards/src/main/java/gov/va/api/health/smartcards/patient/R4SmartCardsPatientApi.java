@@ -10,7 +10,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import org.springframework.http.ResponseEntity;
 
-public interface SmartCardsPatientApi {
+public interface R4SmartCardsPatientApi {
   @POST
   @Operation(summary = "Issues Verifiable Credential")
   @Path("Patient/{id}/$health-cards-issue")

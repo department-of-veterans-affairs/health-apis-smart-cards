@@ -10,11 +10,11 @@ import javax.ws.rs.Path;
 @OpenAPIDefinition(
     info = @Info(title = "SMART Health Cards", version = "v1"),
     servers = {
-      @Server(url = "https://sandbox-api.va.gov/services/fhir/v0/r4/", description = "Sandbox")
+      @Server(url = "https://sandbox-api.va.gov/services/fhir/v0/dstu2/", description = "Sandbox")
     },
     externalDocs =
         @ExternalDocumentation(
             description = "Smart Cards Implementation Guide",
             url = "https://smarthealth.cards"))
 @Path("/")
-public interface R4OpenApi extends R4SmartCardsPatientApi {}
+public interface Dstu2OpenApi extends R4SmartCardsPatientApi {}

@@ -18,20 +18,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(
-    value = {"/r4/metadata"},
+    value = {"/r4/metadata", "/dstu2/metadata"},
     produces = {"application/json", "application/fhir+json"})
 @AllArgsConstructor(onConstructor = @__({@Autowired}))
-public class R4MetadataController {
+public class MetadataController {
   private static final String NAME = "API Management Platform | Smart Cards - R4";
-
-  private static final String RESOURCE_DOCUMENTATION =
-      "Implemented per specification. See http://hl7.org/fhir/R4/http.html";
 
   private final BuildProperties buildProperties;
 
   private final LinkProperties pageLinks;
 
-  private List<ContactDetail> contact() {
+  private static List<ContactDetail> contact() {
     return List.of(
         ContactDetail.builder()
             .name("API Support")
@@ -41,6 +38,24 @@ public class R4MetadataController {
                         .system(ContactPoint.ContactPointSystem.email)
                         .value("api@va.gov")
                         .build()))
+            .build());
+  }
+
+  private static List<CapabilityStatement.CapabilityResource> resources() {
+    return Stream.of(
+            SupportedResource.builder()
+                .type("Patient")
+                .profileUrl("https://www.hl7.org/fhir/r4/patient.html")
+                .build())
+        .map(SupportedResource::asResource)
+        .collect(toList());
+  }
+
+  private static List<CapabilityStatement.Rest> rest() {
+    return List.of(
+        CapabilityStatement.Rest.builder()
+            .mode(CapabilityStatement.RestMode.server)
+            .resource(resources())
             .build());
   }
 
@@ -72,24 +87,6 @@ public class R4MetadataController {
         .format(List.of("application/json", "application/fhir+json"))
         .rest(rest())
         .build();
-  }
-
-  private List<CapabilityStatement.CapabilityResource> resources() {
-    return Stream.of(
-            SupportedResource.builder()
-                .type("Patient")
-                .profileUrl("https://www.hl7.org/fhir/r4/patient.html")
-                .build())
-        .map(SupportedResource::asResource)
-        .collect(toList());
-  }
-
-  private List<CapabilityStatement.Rest> rest() {
-    return List.of(
-        CapabilityStatement.Rest.builder()
-            .mode(CapabilityStatement.RestMode.server)
-            .resource(resources())
-            .build());
   }
 
   private CapabilityStatement.Software software() {
@@ -124,7 +121,7 @@ public class R4MetadataController {
       CapabilityStatement.ResourceInteraction readable =
           CapabilityStatement.ResourceInteraction.builder()
               .code(CapabilityStatement.TypeRestfulInteraction.read)
-              .documentation(RESOURCE_DOCUMENTATION)
+              .documentation("Implemented per specification. See http://hl7.org/fhir/R4/http.html")
               .build();
       return List.of(readable);
     }

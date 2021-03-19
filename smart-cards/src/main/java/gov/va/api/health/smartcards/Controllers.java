@@ -51,7 +51,7 @@ public class Controllers {
     if (str == null || isBlank(str)) {
       return null;
     }
-    List<String> splitReference = Splitter.on('/').splitToList(str);
+    List<String> splitReference = Splitter.on('/').trimResults().splitToList(str);
     if (splitReference.size() <= 1) {
       return null;
     }

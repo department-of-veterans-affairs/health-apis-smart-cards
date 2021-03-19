@@ -19,4 +19,15 @@ public class ControllersTest {
             () -> Controllers.checkRequestState(false, "%s foo %s", "hello", "goodbye"));
     assertThat(ex.getMessage()).isEqualTo("hello foo goodbye");
   }
+
+  @Test
+  void resourceId() {
+    assertThat(Controllers.resourceId((String) null)).isNull();
+    assertThat(Controllers.resourceId(" ")).isNull();
+    assertThat(Controllers.resourceId(" x ")).isNull();
+    assertThat(Controllers.resourceId(" / ")).isNull();
+    assertThat(Controllers.resourceId(" / / / ")).isNull();
+    assertThat(Controllers.resourceId(" x / ")).isNull();
+    assertThat(Controllers.resourceId(" x / y")).isEqualTo("y");
+  }
 }

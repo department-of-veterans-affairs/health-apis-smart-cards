@@ -66,9 +66,8 @@ public class PatientMinimizerTest {
 
   @Test
   void basic() {
-    var patient = patient();
-    var transformed = PatientMinimizer.builder().entry(patient).build().transform();
-    assertThat(transformed)
+    var minimized = PatientMinimizer.builder().entry(patient()).build().minimize();
+    assertThat(minimized)
         .isEqualTo(
             MixedEntry.builder()
                 .fullUrl("http://example.com/r4/Patient/x")
@@ -82,7 +81,7 @@ public class PatientMinimizerTest {
                         .birthDate("1955-01-01")
                         .build())
                 .build());
-    assertThat(Validation.buildDefaultValidatorFactory().getValidator().validate(transformed))
+    assertThat(Validation.buildDefaultValidatorFactory().getValidator().validate(minimized))
         .isEmpty();
   }
 }

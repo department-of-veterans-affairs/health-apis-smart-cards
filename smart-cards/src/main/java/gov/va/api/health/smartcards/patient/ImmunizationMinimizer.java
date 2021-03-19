@@ -18,8 +18,18 @@ import lombok.NonNull;
 public class ImmunizationMinimizer {
   @NonNull Immunization.Entry entry;
 
-  static Reference referenceOnly(@NonNull Reference reference) {
-    return Reference.builder().reference(reference.reference()).build();
+  MixedEntry minimize() {
+    return MixedEntry.builder()
+        .fullUrl(entry.fullUrl())
+        .resource(
+            Immunization.builder()
+                .status(entry.resource().status())
+                .vaccineCode(vaccineCode())
+                .patient(patient())
+                .occurrenceDateTime(occurrenceDateTime())
+                .performer(performer())
+                .build())
+        .build();
   }
 
   String occurrenceDateTime() {
@@ -33,8 +43,8 @@ public class ImmunizationMinimizer {
   }
 
   Reference patient() {
-    // Do not include display
-    return referenceOnly(entry.resource().patient());
+    // do not include display
+    return Reference.builder().reference(entry.resource().patient().reference()).build();
   }
 
   List<Immunization.Performer> performer() {
@@ -59,22 +69,8 @@ public class ImmunizationMinimizer {
             .build());
   }
 
-  MixedEntry transform() {
-    return MixedEntry.builder()
-        .fullUrl(entry.fullUrl())
-        .resource(
-            Immunization.builder()
-                .status(entry.resource().status())
-                .vaccineCode(vaccineCode())
-                .patient(patient())
-                .occurrenceDateTime(occurrenceDateTime())
-                .performer(performer())
-                .build())
-        .build();
-  }
-
   CodeableConcept vaccineCode() {
-    // Rebuild object with Coding only
+    // rebuild with coding only
     return CodeableConcept.builder().coding(entry.resource().vaccineCode().coding()).build();
   }
 }

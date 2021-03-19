@@ -101,8 +101,7 @@ public class ImmunizationMinimizerTest {
 
   @Test
   void basic() {
-    var immunization = immunization();
-    assertThat(ImmunizationMinimizer.builder().entry(immunization).build().transform())
+    assertThat(ImmunizationMinimizer.builder().entry(immunization()).build().minimize())
         .isEqualTo(
             MixedEntry.builder()
                 .fullUrl("http://example.com/r4/Immunization/imm-1")

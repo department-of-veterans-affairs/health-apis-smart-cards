@@ -17,32 +17,24 @@ import org.springframework.web.bind.annotation.RestController;
 @Builder
 public class WellKnownController {
 
-  @Builder.Default
-  private List<String> capabilities =
-      List.of(
-          "health-cards",
-          "launch-standalone",
-          "context-standalone-patient",
-          "client-confidential-symmetric");
-
-  @Builder.Default private List<String> responseTypeSupported = List.of("code", "refresh_token");
-
-  @Builder.Default
-  private List<String> scopesSupported =
-      List.of(
-          "launch",
-          "launch/patient",
-          "patient/Patient.read",
-          "patient/Immunization.read",
-          "patient/Location.read",
-          "offline_access");
-
   @GetMapping
   WellKnown read() {
     return WellKnown.builder()
-        .capabilities(capabilities)
-        .responseTypeSupported(responseTypeSupported)
-        .scopesSupported(scopesSupported)
+        .capabilities(
+            List.of(
+                "health-cards",
+                "launch-standalone",
+                "context-standalone-patient",
+                "client-confidential-symmetric"))
+        .responseTypeSupported(List.of("code", "refresh_token"))
+        .scopesSupported(
+            List.of(
+                "launch",
+                "launch/patient",
+                "patient/Patient.read",
+                "patient/Immunization.read",
+                "patient/Location.read",
+                "offline_access"))
         .build();
   }
 }

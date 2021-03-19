@@ -1,6 +1,5 @@
 package gov.va.api.health.smartcards;
 
-import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import gov.va.api.health.autoconfig.configuration.JacksonConfig;
@@ -11,15 +10,25 @@ import org.junit.jupiter.api.Test;
 
 public class WellKnownControllerTest {
   private WellKnown actual() {
+    List<String> capabilities =
+        List.of(
+            "health-cards",
+            "launch-standalone",
+            "context-standalone-patient",
+            "client-confidential-symmetric");
+    List<String> responseTypeSupported = (List.of("code", "refresh_token"));
+    List<String> scopesSupported =
+        List.of(
+            "launch",
+            "launch/patient",
+            "patient/Patient.read",
+            "patient/Immunization.read",
+            "patient/Location.read",
+            "offline_access");
     return WellKnown.builder()
-        .capabilities(
-            asList(
-                "context-standalone-patient",
-                "launch-standalone",
-                "permission-offline",
-                "permission-patient"))
-        .responseTypeSupported(asList("code", "refresh-token"))
-        .scopesSupported(asList("patient/$HealthWallet.issueVc"))
+        .capabilities(capabilities)
+        .responseTypeSupported(responseTypeSupported)
+        .scopesSupported(scopesSupported)
         .build();
   }
 
@@ -33,20 +42,7 @@ public class WellKnownControllerTest {
   @Test
   @SneakyThrows
   public void read() {
-    List<String> capabilities =
-        List.of(
-            "context-standalone-patient",
-            "launch-standalone",
-            "permission-offline",
-            "permission-patient");
-    List<String> responseTypeSupported = List.of("code", "refresh-token");
-    List<String> scopesSupported = List.of("patient/$HealthWallet.issueVc");
-    WellKnownController controller =
-        WellKnownController.builder()
-            .capabilities(capabilities)
-            .responseTypeSupported(responseTypeSupported)
-            .scopesSupported(scopesSupported)
-            .build();
+    WellKnownController controller = WellKnownController.builder().build();
     assertThat(pretty(controller.read())).isEqualTo(pretty(actual()));
   }
 }

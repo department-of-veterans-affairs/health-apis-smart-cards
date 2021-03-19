@@ -5,9 +5,6 @@ import static gov.va.api.health.sentinel.EnvironmentAssumptions.assumeEnvironmen
 import static gov.va.api.health.sentinel.ExpectedResponse.logAllWithTruncatedBody;
 import static gov.va.api.health.smartcards.tests.SystemDefinitions.systemDefinition;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import gov.va.api.health.autoconfig.configuration.JacksonConfig;
-import gov.va.api.health.r4.api.resources.Resource;
 import gov.va.api.health.sentinel.Environment;
 import gov.va.api.health.sentinel.ExpectedResponse;
 import io.restassured.RestAssured;
@@ -18,10 +15,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 @Slf4j
-public class WellKnownJwksIT {
-  private static final ObjectMapper MAPPER =
-      JacksonConfig.createMapper().registerModule(new Resource.ResourceModule());
-
+public class WellKnownIT {
   @BeforeAll
   static void assumeEnvironment() {
     assumeEnvironmentIn(
@@ -33,14 +27,21 @@ public class WellKnownJwksIT {
   }
 
   private static ExpectedResponse doGet(
-      SystemDefinitions.Service svc, String request, Integer expectedStatus) {
+      SystemDefinitions.Service svc, String request, String description, Integer expectedStatus) {
     RequestSpecification spec =
-        RestAssured.given().baseUri(svc.url()).port(svc.port()).relaxedHTTPSValidation();
-    log.info("Expect {} GET is status code ({})", svc.urlWithApiPath() + request, expectedStatus);
+        RestAssured.given()
+            .baseUri(svc.url())
+            .port(svc.port())
+            .relaxedHTTPSValidation()
+            .header("Content-Type", "application/json");
+    log.info(
+        "Expect {} GET '{}' is status code ({})",
+        svc.urlWithApiPath() + request,
+        description,
+        expectedStatus);
     ExpectedResponse response =
         ExpectedResponse.of(spec.request(Method.GET, svc.urlWithApiPath() + request))
-            .logAction(logAllWithTruncatedBody(2000))
-            .mapper(MAPPER);
+            .logAction(logAllWithTruncatedBody(2000));
     if (expectedStatus != null) {
       response.expect(expectedStatus);
     }
@@ -48,16 +49,28 @@ public class WellKnownJwksIT {
   }
 
   @Test
-  public void jwks_external() {
+  void jwks_external() {
     assumeEnvironmentNotIn(Environment.LOCAL);
-    doGet(systemDefinition().external(), "r4/.well-known/jwks.json", 200);
-    doGet(systemDefinition().external(), "dstu2/.well-known/jwks.json", 200);
+    doGet(systemDefinition().external(), "dstu2/.well-known/jwks.json", "jwks dstu2", 200);
+    doGet(systemDefinition().external(), "r4/.well-known/jwks.json", "jwks r4", 200);
   }
 
   @Test
-  public void jwks_internal() {
-    var internal = systemDefinition().internal();
-    doGet(internal, ".well-known/jwks.json", 200);
-    doGet(internal, ".well-known/jwks-no-route.json", 404);
+  void jwks_internal() {
+    doGet(systemDefinition().internal(), ".well-known/jwks.json", "jwks", 200);
+  }
+
+  @Test
+  void jwks_notFound() {
+    doGet(systemDefinition().internal(), ".well-known/jwks-no-route.json", "jwks not found", 404);
+  }
+
+  @Test
+  void smartConfiguration() {
+    doGet(
+        systemDefinition().internal(),
+        ".well-known/smart-configuration",
+        "smart configuration",
+        200);
   }
 }

@@ -23,8 +23,7 @@ public class Dstu2OpenApiController {
   @ResponseBody
   @SneakyThrows
   private static String loadOpenApi() {
-    try (InputStream is =
-        new ClassPathResource("dstu2-openapi.json").getInputStream()) {
+    try (InputStream is = new ClassPathResource("dstu2-openapi.json").getInputStream()) {
       return StreamUtils.copyToString(is, StandardCharsets.UTF_8);
     }
   }

@@ -21,7 +21,7 @@ import java.util.Properties;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.info.BuildProperties;
 
-public class R4MetadataControllerTest {
+public class MetadataControllerTest {
   @Test
   void read() {
     Properties properties = new Properties();
@@ -31,7 +31,7 @@ public class R4MetadataControllerTest {
     properties.setProperty("time", "2005-01-21T07:57:00Z");
     BuildProperties buildProperties = new BuildProperties(properties);
     assertThat(
-            new R4MetadataController(
+            new MetadataController(
                     buildProperties,
                     LinkProperties.builder()
                         .baseUrl("http://va.gov")
@@ -108,7 +108,7 @@ public class R4MetadataControllerTest {
   @Test
   void supportedResource() {
     assertThat(
-            R4MetadataController.SupportedResource.builder()
+            MetadataController.SupportedResource.builder()
                 .type("type")
                 .profileUrl("url")
                 .build()

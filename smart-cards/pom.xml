@@ -45,7 +45,6 @@
               <goal>resolve</goal>
             </goals>
             <configuration>
-              <contextId>r4-open-api</contextId>
               <resourceClasses>
                 <resourceClass>gov.va.api.health.smartcards.R4OpenApi</resourceClass>
               </resourceClasses>
@@ -62,7 +61,6 @@
               <goal>resolve</goal>
             </goals>
             <configuration>
-              <contextId>dstu2-open-api</contextId>
               <resourceClasses>
                 <resourceClass>gov.va.api.health.smartcards.Dstu2OpenApi</resourceClass>
               </resourceClasses>

@@ -18,10 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(
-    value = {"/r4/metadata"},
+    value = {"/r4/metadata", "/dstu2/metadata"},
     produces = {"application/json", "application/fhir+json"})
 @AllArgsConstructor(onConstructor = @__({@Autowired}))
-public class R4MetadataController {
+public class MetadataController {
+  // DSTU2 Endpoint will serve an R4 Response, so both are connected to the same endpoint
   private static final String NAME = "API Management Platform | Smart Cards - R4";
 
   private static final String RESOURCE_DOCUMENTATION =

@@ -9,32 +9,36 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
-@RequestMapping(
-    value = {"/.well-known/smart-configuration"},
-    produces = {"application/json", "application/fhir+json"})
-@AllArgsConstructor(onConstructor = @__({@Autowired}))
 @Builder
+@RestController
+@RequestMapping(produces = {"application/json", "application/fhir+json"})
+@AllArgsConstructor(onConstructor_ = @Autowired)
 public class WellKnownController {
+  private final JwksProperties jwksProperties;
 
-  @GetMapping
-  WellKnown read() {
+  @GetMapping(value = "/.well-known/jwks.json")
+  public String jwks() {
+    return jwksProperties.jwksPublicJson();
+  }
+
+  @GetMapping(value = "/.well-known/smart-configuration")
+  WellKnown smartConfiguration() {
     return WellKnown.builder()
         .capabilities(
             List.of(
-                "health-cards",
-                "launch-standalone",
+                "client-confidential-symmetric",
                 "context-standalone-patient",
-                "client-confidential-symmetric"))
+                "health-cards",
+                "launch-standalone"))
         .responseTypeSupported(List.of("code", "refresh_token"))
         .scopesSupported(
             List.of(
                 "launch",
                 "launch/patient",
-                "patient/Patient.read",
+                "offline_access",
                 "patient/Immunization.read",
                 "patient/Location.read",
-                "offline_access"))
+                "patient/Patient.read"))
         .build();
   }
 }

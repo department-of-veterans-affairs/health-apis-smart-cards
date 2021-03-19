@@ -2,47 +2,39 @@ package gov.va.api.health.smartcards;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import gov.va.api.health.autoconfig.configuration.JacksonConfig;
 import gov.va.api.health.r4.api.information.WellKnown;
 import java.util.List;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 
 public class WellKnownControllerTest {
-  private WellKnown actual() {
-    List<String> capabilities =
-        List.of(
-            "health-cards",
-            "launch-standalone",
-            "context-standalone-patient",
-            "client-confidential-symmetric");
-    List<String> responseTypeSupported = (List.of("code", "refresh_token"));
-    List<String> scopesSupported =
-        List.of(
-            "launch",
-            "launch/patient",
-            "patient/Patient.read",
-            "patient/Immunization.read",
-            "patient/Location.read",
-            "offline_access");
-    return WellKnown.builder()
-        .capabilities(capabilities)
-        .responseTypeSupported(responseTypeSupported)
-        .scopesSupported(scopesSupported)
-        .build();
-  }
-
-  @SneakyThrows
-  private String pretty(WellKnown wellKnown) {
-    return JacksonConfig.createMapper()
-        .writerWithDefaultPrettyPrinter()
-        .writeValueAsString(wellKnown);
+  @Test
+  void jwks() {
+    var jwksProperties = JwsHelpers.jwksProperties("123");
+    var controller = WellKnownController.builder().jwksProperties(jwksProperties).build();
+    assertThat(controller.jwks()).isEqualTo(jwksProperties.jwksPublicJson());
   }
 
   @Test
-  @SneakyThrows
-  public void read() {
+  void smartConfiguration() {
     WellKnownController controller = WellKnownController.builder().build();
-    assertThat(pretty(controller.read())).isEqualTo(pretty(actual()));
+    assertThat(controller.smartConfiguration())
+        .isEqualTo(
+            WellKnown.builder()
+                .capabilities(
+                    List.of(
+                        "client-confidential-symmetric",
+                        "context-standalone-patient",
+                        "health-cards",
+                        "launch-standalone"))
+                .responseTypeSupported(List.of("code", "refresh_token"))
+                .scopesSupported(
+                    List.of(
+                        "launch",
+                        "launch/patient",
+                        "offline_access",
+                        "patient/Immunization.read",
+                        "patient/Location.read",
+                        "patient/Patient.read"))
+                .build());
   }
 }

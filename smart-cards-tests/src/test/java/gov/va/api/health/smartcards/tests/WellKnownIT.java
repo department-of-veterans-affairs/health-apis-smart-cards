@@ -10,7 +10,6 @@ import gov.va.api.health.sentinel.ExpectedResponse;
 import io.restassured.RestAssured;
 import io.restassured.http.Method;
 import io.restassured.specification.RequestSpecification;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -27,7 +26,6 @@ public class WellKnownIT {
         Environment.LAB);
   }
 
-  @SneakyThrows
   private static ExpectedResponse doGet(
       SystemDefinitions.Service svc, String request, String description, Integer expectedStatus) {
     RequestSpecification spec =

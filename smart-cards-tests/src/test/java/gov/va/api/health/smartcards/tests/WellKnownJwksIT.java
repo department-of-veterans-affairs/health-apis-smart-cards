@@ -50,8 +50,8 @@ public class WellKnownJwksIT {
   @Test
   public void jwks_external() {
     assumeEnvironmentNotIn(Environment.LOCAL);
-    doGet(systemDefinition().external(), "r4/./well-known/jwks.json", 200);
-    doGet(systemDefinition().external(), "dstu2/./well-known/jwks.json", 200);
+    doGet(systemDefinition().external(), "r4/.well-known/jwks.json", 200);
+    doGet(systemDefinition().external(), "dstu2/.well-known/jwks.json", 200);
   }
 
   @Test

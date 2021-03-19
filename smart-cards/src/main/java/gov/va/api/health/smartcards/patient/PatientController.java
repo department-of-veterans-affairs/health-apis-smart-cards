@@ -12,6 +12,7 @@ import gov.va.api.health.r4.api.bundle.AbstractBundle;
 import gov.va.api.health.r4.api.bundle.AbstractEntry;
 import gov.va.api.health.r4.api.bundle.MixedBundle;
 import gov.va.api.health.r4.api.bundle.MixedEntry;
+import gov.va.api.health.r4.api.elements.Reference;
 import gov.va.api.health.r4.api.resources.Immunization;
 import gov.va.api.health.r4.api.resources.Location;
 import gov.va.api.health.r4.api.resources.Parameters;
@@ -21,10 +22,11 @@ import gov.va.api.health.smartcards.Controllers;
 import gov.va.api.health.smartcards.DataQueryFhirClient;
 import gov.va.api.health.smartcards.Exceptions;
 import gov.va.api.health.smartcards.JacksonMapperConfig;
-import gov.va.api.health.smartcards.R4MixedBundler;
+import gov.va.api.health.smartcards.PayloadSigner;
 import gov.va.api.health.smartcards.vc.CredentialType;
 import gov.va.api.health.smartcards.vc.VerifiableCredential;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +36,7 @@ import java.util.stream.Stream;
 import javax.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.DataBinder;
@@ -65,7 +68,15 @@ public class PatientController {
 
   private final DataQueryFhirClient fhirClient;
 
-  private final R4MixedBundler bundler;
+  private final PayloadSigner payloadSigner;
+
+  private static MixedBundle bundle(List<MixedEntry> entries) {
+    return MixedBundle.builder()
+        .resourceType("Bundle")
+        .type(AbstractBundle.BundleType.collection)
+        .entry(entries)
+        .build();
+  }
 
   private static <R extends Resource, E extends AbstractEntry<R>, B extends AbstractBundle<E>>
       void consumeBundle(B bundle, List<MixedEntry> target, Function<E, MixedEntry> transform) {
@@ -85,7 +96,7 @@ public class PatientController {
     List<String> urls =
         entries.stream()
             .map(AbstractEntry::fullUrl)
-            .filter(s -> isNotBlank(s))
+            .filter(StringUtils::isNotBlank)
             .distinct()
             .collect(toCollection(ArrayList::new));
     // Index unique URLs and replace with 'resource:X' scheme
@@ -97,7 +108,7 @@ public class PatientController {
       if (entry.resource() instanceof Immunization) {
         Immunization imm = (Immunization) entry.resource();
         String patientRef =
-            Optional.of(imm).map(im -> im.patient()).map(p -> p.reference()).orElse(null);
+            Optional.of(imm).map(Immunization::patient).map(Reference::reference).orElse(null);
         if (patientRef != null) {
           if (!urls.contains(patientRef)) {
             urls.add(patientRef);
@@ -130,19 +141,23 @@ public class PatientController {
   }
 
   @SneakyThrows
-  private static Parameters parameters(VerifiableCredential vc, List<String> urls) {
+  private static Parameters parameters(String vc, List<String> urls) {
     return Parameters.builder()
         .parameter(
             Stream.concat(
-                    List.of(
+                    Stream.of(
                         Parameters.Parameter.builder()
                             .name("verifiableCredential")
-                            .valueString(MAPPER.writeValueAsString(vc))
-                            .build())
-                        .stream(),
+                            .valueString(vc)
+                            .build()),
                     parameterResourceLinks(urls).stream())
                 .collect(toList()))
         .build();
+  }
+
+  private static boolean parseBooleanOrTrue(String value) {
+    // not using parseBoolean because we need to default to true
+    return !"false".equalsIgnoreCase(StringUtils.trimToEmpty(value));
   }
 
   private static MixedEntry transform(Patient.Entry entry) {
@@ -153,7 +168,7 @@ public class PatientController {
     return ImmunizationTransformer.builder().entry(entry).build().transform();
   }
 
-  private static List<CredentialType> validateCredentialTypes(List<CredentialType> credentials) {
+  private static void validateCredentialTypes(List<CredentialType> credentials) {
     if (credentials.isEmpty()) {
       throw new Exceptions.BadRequest("credentialType parameter is required");
     }
@@ -166,7 +181,6 @@ public class PatientController {
       throw new Exceptions.NotImplemented(
           String.format("Not yet implemented support for %s", requestedButUnimplemented));
     }
-    return credentials;
   }
 
   private static VerifiableCredential vc(MixedBundle bundle, List<CredentialType> credentialTypes) {
@@ -178,7 +192,10 @@ public class PatientController {
                     credentialTypes.stream().map(CredentialType::getUri))
                 .collect(toList()))
         .credentialSubject(
-            VerifiableCredential.CredentialSubject.builder().fhirBundle(bundle).build())
+            VerifiableCredential.CredentialSubject.builder()
+                .fhirVersion("4.0.1")
+                .fhirBundle(bundle)
+                .build())
         .build();
   }
 
@@ -186,7 +203,9 @@ public class PatientController {
   ResponseEntity<Parameters> healthCardsIssue(
       @PathVariable("id") String id,
       @Valid @RequestBody Parameters parameters,
-      @RequestHeader(name = "Authorization", required = false) String authorization) {
+      @RequestHeader(name = "Authorization", required = false) String authorization,
+      @RequestHeader(name = "x-vc-jws", required = false) String vcJws,
+      @RequestHeader(name = "x-vc-compress", required = false) String vcCompress) {
     checkState(isNotBlank(id), "id is required");
     var credentialTypes = credentialTypes(parameters);
     validateCredentialTypes(credentialTypes);
@@ -197,8 +216,9 @@ public class PatientController {
     consumeBundle(patients, resources, PatientController::transform);
     consumeBundle(immunizations, resources, PatientController::transform);
     List<String> urls = indexAndReplaceUrls(resources);
-    var vc = vc(bundler.bundle(resources), credentialTypes);
-    var parametersResponse = parameters(vc, urls);
+    var vc = vc(bundle(resources), credentialTypes);
+    var signedVc = signVc(vc, parseBooleanOrTrue(vcJws), parseBooleanOrTrue(vcCompress));
+    var parametersResponse = parameters(signedVc, urls);
     return ResponseEntity.ok(parametersResponse);
   }
 
@@ -223,9 +243,17 @@ public class PatientController {
       }
       imm.contained(
           Stream.concat(
-                  Optional.ofNullable(imm.contained()).map(c -> c.stream()).orElse(Stream.empty()),
+                  Optional.ofNullable(imm.contained()).stream().flatMap(Collection::stream),
                   Stream.of(location))
               .collect(toList()));
     }
+  }
+
+  @SneakyThrows
+  private String signVc(VerifiableCredential vc, boolean shouldSign, boolean shouldCompress) {
+    if (!shouldSign) {
+      return MAPPER.writeValueAsString(vc);
+    }
+    return payloadSigner.sign(vc, shouldCompress);
   }
 }

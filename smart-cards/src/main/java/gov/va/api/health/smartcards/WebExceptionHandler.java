@@ -37,6 +37,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.ResourceAccessException;
 
 @Slf4j
 @RestControllerAdvice
@@ -192,6 +193,12 @@ public final class WebExceptionHandler {
   @ResponseStatus(HttpStatus.NOT_IMPLEMENTED)
   OperationOutcome handleNotImplemented(Exception e, HttpServletRequest request) {
     return responseFor("not-implemented", e, request, emptyList(), true);
+  }
+
+  @ExceptionHandler({ResourceAccessException.class})
+  @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+  OperationOutcome handleServiceUnavailable(Exception e, HttpServletRequest request) {
+    return responseFor("service-unavailable", e, request, emptyList(), true);
   }
 
   /**

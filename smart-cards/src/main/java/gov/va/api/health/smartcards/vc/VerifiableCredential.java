@@ -33,6 +33,7 @@ public class VerifiableCredential {
   @AllArgsConstructor
   @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
   public static class CredentialSubject {
+    String fhirVersion;
     MixedBundle fhirBundle;
   }
 }

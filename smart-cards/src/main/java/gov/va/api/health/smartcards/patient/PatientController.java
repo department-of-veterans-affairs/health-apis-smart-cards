@@ -79,8 +79,8 @@ public class PatientController {
   }
 
   private static <R extends Resource, E extends AbstractEntry<R>, B extends AbstractBundle<E>>
-      void consumeBundle(B bundle, List<MixedEntry> target, Function<E, MixedEntry> transform) {
-    bundle.entry().stream().map(transform).forEachOrdered(target::add);
+      void consumeBundle(B bundle, List<MixedEntry> target, Function<E, MixedEntry> minimizer) {
+    bundle.entry().stream().map(minimizer).forEachOrdered(target::add);
   }
 
   private static List<CredentialType> credentialTypes(Parameters parameters) {
@@ -118,6 +118,14 @@ public class PatientController {
       }
     }
     return urls;
+  }
+
+  private static MixedEntry minimize(Patient.Entry entry) {
+    return PatientMinimizer.builder().entry(entry).build().minimize();
+  }
+
+  private static MixedEntry minimize(Immunization.Entry entry) {
+    return ImmunizationMinimizer.builder().entry(entry).build().minimize();
   }
 
   private static List<Parameters.Parameter> parameterResourceLinks(List<String> urls) {
@@ -158,14 +166,6 @@ public class PatientController {
   private static boolean parseBooleanOrTrue(String value) {
     // not using parseBoolean because we need to default to true
     return !"false".equalsIgnoreCase(StringUtils.trimToEmpty(value));
-  }
-
-  private static MixedEntry transform(Patient.Entry entry) {
-    return PatientTransformer.builder().entry(entry).build().transform();
-  }
-
-  private static MixedEntry transform(Immunization.Entry entry) {
-    return ImmunizationTransformer.builder().entry(entry).build().transform();
   }
 
   private static void validateCredentialTypes(List<CredentialType> credentials) {
@@ -213,8 +213,8 @@ public class PatientController {
     Immunization.Bundle immunizations = fhirClient.immunizationBundle(id, authorization);
     lookupAndAttachLocations(immunizations, authorization);
     List<MixedEntry> resources = new ArrayList<>();
-    consumeBundle(patients, resources, PatientController::transform);
-    consumeBundle(immunizations, resources, PatientController::transform);
+    consumeBundle(patients, resources, PatientController::minimize);
+    consumeBundle(immunizations, resources, PatientController::minimize);
     List<String> urls = indexAndReplaceUrls(resources);
     var vc = vc(bundle(resources), credentialTypes);
     var signedVc = signVc(vc, parseBooleanOrTrue(vcJws), parseBooleanOrTrue(vcCompress));

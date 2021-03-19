@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 public class Pem2JwkConverterTest {
   @Test
   @SneakyThrows
-  public void test() {
+  void test() {
     String contents =
         FileUtils.readFileToString(
             new File("src/test/resources/cert.txt"), Charset.defaultCharset());
@@ -35,7 +35,7 @@ public class Pem2JwkConverterTest {
   }
 
   @Test
-  public void test_invalid() {
+  void test_invalid() {
     assertThrows(
         JOSEException.class, () -> Pem2JwkConverter.builder().pemContents("NOPE").build().toJwk());
   }

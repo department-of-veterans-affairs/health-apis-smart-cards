@@ -10,21 +10,15 @@ import lombok.Builder;
 import lombok.NonNull;
 
 @Builder
-public class PatientTransformer {
+public class PatientMinimizer {
   @NonNull Patient.Entry entry;
 
-  private HumanName name(HumanName name) {
+  private static HumanName name(HumanName name) {
     return HumanName.builder().family(name.family()).given(name.given()).build();
   }
 
-  private List<HumanName> names() {
-    return entry.resource().name().stream().map(this::name).collect(toList());
-  }
-
-  MixedEntry transform() {
-    /*
-     * Do not include any id, meta, text, display elements
-     */
+  MixedEntry minimize() {
+    // do not include any id, meta, text, display elements
     return MixedEntry.builder()
         .fullUrl(entry.fullUrl())
         .resource(
@@ -34,5 +28,9 @@ public class PatientTransformer {
                 .birthDate(entry.resource().birthDate())
                 .build())
         .build();
+  }
+
+  private List<HumanName> names() {
+    return entry.resource().name().stream().map(PatientMinimizer::name).collect(toList());
   }
 }

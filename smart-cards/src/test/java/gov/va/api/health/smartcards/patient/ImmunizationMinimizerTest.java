@@ -16,7 +16,7 @@ import gov.va.api.health.r4.api.resources.Location.Mode;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-public class ImmunizationTransformerTest {
+public class ImmunizationMinimizerTest {
   private static Immunization.Entry immunization() {
     return Immunization.Entry.builder()
         .fullUrl("http://example.com/r4/Immunization/imm-1")
@@ -100,9 +100,8 @@ public class ImmunizationTransformerTest {
   }
 
   @Test
-  public void basic() {
-    var immunization = immunization();
-    assertThat(ImmunizationTransformer.builder().entry(immunization).build().transform())
+  void basic() {
+    assertThat(ImmunizationMinimizer.builder().entry(immunization()).build().minimize())
         .isEqualTo(
             MixedEntry.builder()
                 .fullUrl("http://example.com/r4/Immunization/imm-1")

@@ -25,7 +25,6 @@ import gov.va.api.health.smartcards.JwsHelpers;
 import gov.va.api.health.smartcards.LinkProperties;
 import gov.va.api.health.smartcards.MockResourceSamples;
 import gov.va.api.health.smartcards.PayloadSigner;
-import gov.va.api.health.smartcards.R4MixedBundler;
 import gov.va.api.health.smartcards.vc.PayloadClaimsWrapper;
 import gov.va.api.health.smartcards.vc.VerifiableCredential;
 import java.util.Arrays;
@@ -146,9 +145,8 @@ public class PatientControllerTest {
           .thenReturn(locationResponse);
     }
     var fhirClient = new DataQueryFhirClient(mockRestTemplate, linkProperties());
-    var bundler = new R4MixedBundler();
     var signer = new PayloadSigner(JWKS_PROPERTIES, linkProperties());
-    return new PatientController(fhirClient, signer, bundler);
+    return new PatientController(fhirClient, signer);
   }
 
   private static Parameters.Parameter resourceLink(String resource, String url) {
@@ -170,8 +168,7 @@ public class PatientControllerTest {
     assertThat(vc.context()).isEqualTo(List.of("https://www.w3.org/2018/credentials/v1"));
     assertThat(vc.type()).contains("VerifiableCredential", "https://smarthealth.cards#covid19");
     var fhirBundle = vc.credentialSubject().fhirBundle();
-    assertThat(fhirBundle.entry()).hasSize(fhirBundle.total());
-    assertThat(fhirBundle.total()).isEqualTo(3);
+    assertThat(fhirBundle.entry()).hasSize(3);
     assertThat(countEntriesByType(fhirBundle, "Patient")).isEqualTo(1);
     assertThat(countEntriesByType(fhirBundle, "Immunization")).isEqualTo(2);
     // verify full urls are "resource:N"
@@ -268,8 +265,7 @@ public class PatientControllerTest {
 
   @Test
   void initDirectFieldAccess() {
-    new PatientController(
-            mock(DataQueryFhirClient.class), mock(PayloadSigner.class), mock(R4MixedBundler.class))
+    new PatientController(mock(DataQueryFhirClient.class), mock(PayloadSigner.class))
         .initDirectFieldAccess(mock(DataBinder.class));
   }
 }

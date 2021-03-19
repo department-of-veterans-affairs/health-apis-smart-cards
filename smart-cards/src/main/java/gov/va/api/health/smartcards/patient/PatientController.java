@@ -23,7 +23,6 @@ import gov.va.api.health.smartcards.DataQueryFhirClient;
 import gov.va.api.health.smartcards.Exceptions;
 import gov.va.api.health.smartcards.JacksonMapperConfig;
 import gov.va.api.health.smartcards.PayloadSigner;
-import gov.va.api.health.smartcards.R4MixedBundler;
 import gov.va.api.health.smartcards.vc.CredentialType;
 import gov.va.api.health.smartcards.vc.VerifiableCredential;
 import java.util.ArrayList;
@@ -71,7 +70,13 @@ public class PatientController {
 
   private final PayloadSigner payloadSigner;
 
-  private final R4MixedBundler bundler;
+  private static MixedBundle bundle(List<MixedEntry> entries) {
+    return MixedBundle.builder()
+        .resourceType("Bundle")
+        .type(AbstractBundle.BundleType.collection)
+        .entry(entries)
+        .build();
+  }
 
   private static <R extends Resource, E extends AbstractEntry<R>, B extends AbstractBundle<E>>
       void consumeBundle(B bundle, List<MixedEntry> target, Function<E, MixedEntry> transform) {
@@ -211,7 +216,7 @@ public class PatientController {
     consumeBundle(patients, resources, PatientController::transform);
     consumeBundle(immunizations, resources, PatientController::transform);
     List<String> urls = indexAndReplaceUrls(resources);
-    var vc = vc(bundler.bundle(resources), credentialTypes);
+    var vc = vc(bundle(resources), credentialTypes);
     var signedVc = signVc(vc, parseBooleanOrTrue(vcJws), parseBooleanOrTrue(vcCompress));
     var parametersResponse = parameters(signedVc, urls);
     return ResponseEntity.ok(parametersResponse);

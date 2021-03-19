@@ -18,7 +18,7 @@ public class PatientMinimizer {
   }
 
   MixedEntry minimize() {
-    // Do not include any id, meta, text, display elements
+    // do not include any id, meta, text, display elements
     return MixedEntry.builder()
         .fullUrl(entry.fullUrl())
         .resource(

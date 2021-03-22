@@ -243,7 +243,7 @@ public class PatientIT {
         svc,
         path,
         parametersWithCredentialType(
-            "https://smarthealth.cards#covid19", "https://smarthealth.cards#immunization"),
+            "https://smarthealth.cards#covid19", "https://smarthealth.cards#laboratory"),
         "$health-cards-issue (unimplemented credentialType)",
         501);
   }

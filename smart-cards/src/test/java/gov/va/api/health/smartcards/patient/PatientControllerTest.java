@@ -216,20 +216,27 @@ public class PatientControllerTest {
         () -> controller.healthCardsIssue("123", parametersWithCredentialType("NOPE"), "", "", ""));
   }
 
-  /**
-   * This test only verifies that the signed and compressed response is consistent with the unsigned
-   * version. The VerifiableCredential structure is tested through the `healthCardsIssue` test.
-   */
   @Test
-  @SneakyThrows
-  void healthCardsIssue_signedAndCompressed() {
-    var result = doHealthCardsIssue("", "");
-    var jws = findVcFromParameters(result);
-    assertThat(JwsHelpers.verify(jws, JWKS_PROPERTIES.currentPublicJwk())).isTrue();
-    var payloadClaims = getPayloadFromJws(jws, true);
-    var resultNotSigned = doHealthCardsIssue("false", "false");
-    var vc = MAPPER.readValue(findVcFromParameters(resultNotSigned), VerifiableCredential.class);
-    assertThat(payloadClaims.verifiableCredential()).isEqualTo(vc);
+  void healthCardsIssue_moreGranularCredentialType() {
+    var controller = patientController(null, null, null);
+    assertThrows(
+        Exceptions.BadRequest.class,
+        () ->
+            controller.healthCardsIssue(
+                "123",
+                parametersWithCredentialType("https://smarthealth.cards#health-card"),
+                "",
+                "",
+                ""));
+    assertThrows(
+        Exceptions.NotImplemented.class,
+        () ->
+            controller.healthCardsIssue(
+                "123",
+                parametersWithCredentialType("https://smarthealth.cards#immunization"),
+                "",
+                "",
+                ""));
   }
 
   /**
@@ -249,6 +256,22 @@ public class PatientControllerTest {
     assertThat(payloadClaims.verifiableCredential()).isEqualTo(vc);
   }
 
+  /**
+   * This test only verifies that the signed and compressed response is consistent with the unsigned
+   * version. The VerifiableCredential structure is tested through the `healthCardsIssue` test.
+   */
+  @Test
+  @SneakyThrows
+  void healthCardsIssue_smignedAndCopressed() {
+    var result = doHealthCardsIssue("", "");
+    var jws = findVcFromParameters(result);
+    assertThat(JwsHelpers.verify(jws, JWKS_PROPERTIES.currentPublicJwk())).isTrue();
+    var payloadClaims = getPayloadFromJws(jws, true);
+    var resultNotSigned = doHealthCardsIssue("false", "false");
+    var vc = MAPPER.readValue(findVcFromParameters(resultNotSigned), VerifiableCredential.class);
+    assertThat(payloadClaims.verifiableCredential()).isEqualTo(vc);
+  }
+
   @Test
   void healthCardsIssue_unimplementedCredentialType() {
     var controller = patientController(null, null, null);
@@ -257,7 +280,7 @@ public class PatientControllerTest {
         () ->
             controller.healthCardsIssue(
                 "123",
-                parametersWithCredentialType("https://smarthealth.cards#immunization"),
+                parametersWithCredentialType("https://smarthealth.cards#laboratory"),
                 "",
                 "",
                 ""));

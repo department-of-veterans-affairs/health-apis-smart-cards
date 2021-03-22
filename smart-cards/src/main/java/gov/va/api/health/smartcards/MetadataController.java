@@ -44,7 +44,6 @@ public class MetadataController {
   private static List<CapabilityStatement.CapabilityResource> resources() {
     return Stream.of(
             SupportedResource.builder()
-                .type("Patient")
                 .profileUrl("https://www.hl7.org/fhir/r4/patient.html")
                 .build())
         .map(SupportedResource::asResource)

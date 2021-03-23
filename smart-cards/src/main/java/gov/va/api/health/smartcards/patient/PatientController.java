@@ -204,7 +204,7 @@ public class PatientController {
     // Reject a request with only #immunization
     if (credentials.contains(CredentialType.IMMUNIZATION)
         && !credentials.contains(CredentialType.COVID_19)) {
-      throw new Exceptions.NotImplemented("Only support COVID19 credential type");
+      throw new Exceptions.NotImplemented("Only support covid19 credential type");
     }
   }
 

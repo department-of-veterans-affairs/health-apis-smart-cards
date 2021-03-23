@@ -84,8 +84,8 @@ public class MetadataControllerTest {
                             .resource(
                                 List.of(
                                     CapabilityResource.builder()
-                                        .type("Patient")
-                                        .profile("https://www.hl7.org/fhir/r4/patient.html")
+                                        .type("Parameters")
+                                        .profile("https://www.hl7.org/fhir/r4/parameters.html")
                                         .interaction(
                                             List.of(
                                                 resourceInteraction(TypeRestfulInteraction.read)))

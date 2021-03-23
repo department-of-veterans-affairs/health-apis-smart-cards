@@ -80,7 +80,7 @@ public class PatientController {
     bundle.entry().stream().map(minimizer).forEachOrdered(target::add);
   }
 
-  private static List<CredentialType> credentialTypes(Parameters parameters) {
+  static List<CredentialType> credentialTypes(Parameters parameters) {
     checkRequestState(parameters.parameter() != null, "parameters are required");
     List<CredentialType> types =
         parameters.parameter().stream()

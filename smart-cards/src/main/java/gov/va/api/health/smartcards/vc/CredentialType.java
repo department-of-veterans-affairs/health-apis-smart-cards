@@ -4,10 +4,11 @@ import gov.va.api.health.smartcards.Exceptions;
 import java.util.Arrays;
 
 public enum CredentialType {
-  COVID_19("https://smarthealth.cards#covid19"),
+  // ordered by granularity for sorting
+  HEALTH_CARD("https://smarthealth.cards#health-card"),
   IMMUNIZATION("https://smarthealth.cards#immunization"),
-  PRESENTATION_CONTEXT_ONLINE("https://smarthealth.cards#presentation-context-online"),
-  PRESENTATION_CONTEXT_IN_PERSON("https://smarthealth.cards#presentation-context-in-person");
+  LABORATORY("https://smarthealth.cards#laboratory"),
+  COVID_19("https://smarthealth.cards#covid19");
 
   private final String uri;
 

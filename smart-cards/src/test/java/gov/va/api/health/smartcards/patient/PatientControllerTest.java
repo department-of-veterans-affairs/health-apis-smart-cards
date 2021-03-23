@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.same;
@@ -25,13 +26,19 @@ import gov.va.api.health.smartcards.JwsHelpers;
 import gov.va.api.health.smartcards.LinkProperties;
 import gov.va.api.health.smartcards.MockResourceSamples;
 import gov.va.api.health.smartcards.PayloadSigner;
+import gov.va.api.health.smartcards.vc.CredentialType;
 import gov.va.api.health.smartcards.vc.PayloadClaimsWrapper;
 import gov.va.api.health.smartcards.vc.VerifiableCredential;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,6 +52,29 @@ public class PatientControllerTest {
 
   private static final MockResourceSamples SAMPLES =
       MockResourceSamples.builder().linkProperties(linkProperties()).build();
+
+  static Stream<Arguments> _credentialTypes() {
+    // HEALTH_CARD, IMMUNIZATION, LABORATORY , COVID_19
+    boolean o = false;
+    boolean l = true;
+    return Stream.of(
+        arguments(o, o, o, o, Exceptions.BadRequest.class),
+        arguments(o, o, o, l, null),
+        arguments(o, o, l, o, Exceptions.NotImplemented.class),
+        arguments(o, o, l, l, Exceptions.NotImplemented.class),
+        arguments(o, l, o, o, Exceptions.NotImplemented.class),
+        arguments(o, l, o, l, null),
+        arguments(o, l, l, o, Exceptions.NotImplemented.class),
+        arguments(o, l, l, l, Exceptions.NotImplemented.class),
+        arguments(l, o, o, o, Exceptions.BadRequest.class),
+        arguments(l, o, o, l, null),
+        arguments(l, o, l, o, Exceptions.NotImplemented.class),
+        arguments(l, o, l, l, Exceptions.NotImplemented.class),
+        arguments(l, l, o, o, Exceptions.NotImplemented.class),
+        arguments(l, l, o, l, null),
+        arguments(l, l, l, o, Exceptions.NotImplemented.class),
+        arguments(l, l, l, l, Exceptions.NotImplemented.class));
+  }
 
   @BeforeAll
   static void _init() {
@@ -78,7 +108,6 @@ public class PatientControllerTest {
         .collect(toList());
   }
 
-  @SneakyThrows
   private static String findVcFromParameters(Parameters parameters) {
     var maybeParam =
         parameters.parameter().stream()
@@ -118,7 +147,7 @@ public class PatientControllerTest {
   private static Parameters parametersWithCredentialType(String... credentialType) {
     return Parameters.builder()
         .parameter(
-            Arrays.stream(credentialType)
+            Stream.of(credentialType)
                 .map(c -> Parameters.Parameter.builder().name("credentialType").valueUri(c).build())
                 .collect(toList()))
         .build();
@@ -157,6 +186,43 @@ public class PatientControllerTest {
                 Parameters.Parameter.builder().name("bundledResource").valueUri(resource).build(),
                 Parameters.Parameter.builder().name("hostedResource").valueUri(url).build()))
         .build();
+  }
+
+  @ParameterizedTest
+  @MethodSource(value = "_credentialTypes")
+  void credentialTypes(
+      boolean healthCard,
+      boolean immunization,
+      boolean laboratory,
+      boolean covid19,
+      Class<? extends Exception> exClass) {
+    List<String> types = new ArrayList<>();
+    if (healthCard) {
+      types.add("https://smarthealth.cards#health-card");
+    }
+    if (immunization) {
+      types.add("https://smarthealth.cards#immunization");
+    }
+    if (laboratory) {
+      types.add("https://smarthealth.cards#laboratory");
+    }
+    if (covid19) {
+      types.add("https://smarthealth.cards#covid19");
+    }
+    if (exClass == null) {
+      Set<CredentialType> credentials =
+          PatientController.credentialTypes(
+              parametersWithCredentialType(types.toArray(new String[0])));
+      assertThat(credentials)
+          .containsExactlyInAnyOrder(
+              CredentialType.HEALTH_CARD, CredentialType.IMMUNIZATION, CredentialType.COVID_19);
+    } else {
+      assertThrows(
+          exClass,
+          () ->
+              PatientController.credentialTypes(
+                  parametersWithCredentialType(types.toArray(new String[0]))));
+    }
   }
 
   @Test
@@ -216,6 +282,29 @@ public class PatientControllerTest {
         () -> controller.healthCardsIssue("123", parametersWithCredentialType("NOPE"), "", "", ""));
   }
 
+  @Test
+  void healthCardsIssue_moreGranularCredentialType() {
+    var controller = patientController(null, null, null);
+    assertThrows(
+        Exceptions.BadRequest.class,
+        () ->
+            controller.healthCardsIssue(
+                "123",
+                parametersWithCredentialType("https://smarthealth.cards#health-card"),
+                "",
+                "",
+                ""));
+    assertThrows(
+        Exceptions.NotImplemented.class,
+        () ->
+            controller.healthCardsIssue(
+                "123",
+                parametersWithCredentialType("https://smarthealth.cards#immunization"),
+                "",
+                "",
+                ""));
+  }
+
   /**
    * This test only verifies that the signed and compressed response is consistent with the unsigned
    * version. The VerifiableCredential structure is tested through the `healthCardsIssue` test.
@@ -257,7 +346,7 @@ public class PatientControllerTest {
         () ->
             controller.healthCardsIssue(
                 "123",
-                parametersWithCredentialType("https://smarthealth.cards#immunization"),
+                parametersWithCredentialType("https://smarthealth.cards#laboratory"),
                 "",
                 "",
                 ""));

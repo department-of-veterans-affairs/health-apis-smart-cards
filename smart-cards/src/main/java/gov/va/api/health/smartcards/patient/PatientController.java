@@ -88,7 +88,7 @@ public class PatientController {
             .map(Parameters.Parameter::valueUri)
             .map(CredentialType::fromUri)
             .collect(toList());
-
+    validateCredentialTypes(types);
     // Expand credential types.
     if (!types.contains(CredentialType.HEALTH_CARD)) {
       types.add(CredentialType.HEALTH_CARD);
@@ -134,6 +134,14 @@ public class PatientController {
 
   private static MixedEntry minimize(Immunization.Entry entry) {
     return ImmunizationMinimizer.builder().entry(entry).build().minimize();
+  }
+
+  private static List<MixedEntry> minimize(
+      Patient.Bundle patient, Immunization.Bundle immunizations) {
+    List<MixedEntry> resources = new ArrayList<>();
+    consumeBundle(patient, resources, PatientController::minimize);
+    consumeBundle(immunizations, resources, PatientController::minimize);
+    return resources;
   }
 
   private static List<Parameters.Parameter> parameterResourceLinks(List<String> urls) {
@@ -189,7 +197,6 @@ public class PatientController {
       throw new Exceptions.NotImplemented(
           String.format("Not yet implemented support for %s", requestedButUnimplemented));
     }
-
     // Reject a request with ONLY #health-card
     if (credentials.equals(List.of(CredentialType.HEALTH_CARD))) {
       throw new Exceptions.BadRequest("Specify a more granular credential type");
@@ -226,13 +233,10 @@ public class PatientController {
       @RequestHeader(name = "x-vc-compress", required = false) String vcCompress) {
     checkState(isNotBlank(id), "id is required");
     var credentialTypes = credentialTypes(parameters);
-    validateCredentialTypes(credentialTypes);
     Patient.Bundle patients = fhirClient.patientBundle(id, authorization);
     Immunization.Bundle immunizations = fhirClient.immunizationBundle(id, authorization);
     lookupAndAttachLocations(immunizations, authorization);
-    List<MixedEntry> resources = new ArrayList<>();
-    consumeBundle(patients, resources, PatientController::minimize);
-    consumeBundle(immunizations, resources, PatientController::minimize);
+    List<MixedEntry> resources = minimize(patients, immunizations);
     List<String> urls = indexAndReplaceUrls(resources);
     var vc = vc(bundle(resources), credentialTypes);
     var signedVc = signVc(vc, parseBooleanOrTrue(vcJws), parseBooleanOrTrue(vcCompress));

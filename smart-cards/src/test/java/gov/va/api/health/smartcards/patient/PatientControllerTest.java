@@ -262,7 +262,7 @@ public class PatientControllerTest {
    */
   @Test
   @SneakyThrows
-  void healthCardsIssue_smignedAndCopressed() {
+  void healthCardsIssue_signedAndCompressed() {
     var result = doHealthCardsIssue("", "");
     var jws = findVcFromParameters(result);
     assertThat(JwsHelpers.verify(jws, JWKS_PROPERTIES.currentPublicJwk())).isTrue();

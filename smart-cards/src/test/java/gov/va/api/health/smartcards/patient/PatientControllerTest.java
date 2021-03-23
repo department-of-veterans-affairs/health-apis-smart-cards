@@ -187,8 +187,8 @@ public class PatientControllerTest {
         .build();
   }
 
-  @MethodSource(value = "_credentialTypes")
   @ParameterizedTest
+  @MethodSource(value = "_credentialTypes")
   void credentialTypes(
       boolean healthCard,
       boolean immunization,
@@ -211,7 +211,7 @@ public class PatientControllerTest {
     if (exClass == null) {
       List<CredentialType> credentials =
           PatientController.credentialTypes(
-              parametersWithCredentialType(types.toArray(new String[] {})));
+              parametersWithCredentialType(types.toArray(new String[0])));
       assertThat(credentials)
           .containsExactlyInAnyOrder(
               CredentialType.HEALTH_CARD, CredentialType.IMMUNIZATION, CredentialType.COVID_19);
@@ -220,7 +220,7 @@ public class PatientControllerTest {
           exClass,
           () ->
               PatientController.credentialTypes(
-                  parametersWithCredentialType(types.toArray(new String[] {}))));
+                  parametersWithCredentialType(types.toArray(new String[0]))));
     }
   }
 

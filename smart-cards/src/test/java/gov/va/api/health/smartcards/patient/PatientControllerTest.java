@@ -31,6 +31,7 @@ import gov.va.api.health.smartcards.vc.PayloadClaimsWrapper;
 import gov.va.api.health.smartcards.vc.VerifiableCredential;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeAll;
@@ -209,7 +210,7 @@ public class PatientControllerTest {
       types.add("https://smarthealth.cards#covid19");
     }
     if (exClass == null) {
-      List<CredentialType> credentials =
+      Set<CredentialType> credentials =
           PatientController.credentialTypes(
               parametersWithCredentialType(types.toArray(new String[] {})));
       assertThat(credentials)

@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static gov.va.api.health.smartcards.Controllers.checkRequestState;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
@@ -31,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import javax.validation.Valid;
@@ -80,21 +82,19 @@ public class PatientController {
     bundle.entry().stream().map(minimizer).forEachOrdered(target::add);
   }
 
-  static List<CredentialType> credentialTypes(Parameters parameters) {
+  static Set<CredentialType> credentialTypes(Parameters parameters) {
     checkRequestState(parameters.parameter() != null, "parameters are required");
-    List<CredentialType> types =
+    Set<CredentialType> types =
         parameters.parameter().stream()
             .filter(p -> "credentialType".equals(p.name()))
             .map(Parameters.Parameter::valueUri)
             .map(CredentialType::fromUri)
-            .collect(toList());
+            .collect(toSet());
     validateCredentialTypes(types);
     // Expand credential types.
-    if (!types.contains(CredentialType.HEALTH_CARD)) {
-      types.add(CredentialType.HEALTH_CARD);
-    }
+    types.add(CredentialType.HEALTH_CARD);
     // Just covid19 assumes immunizations by default
-    if (types.contains(CredentialType.COVID_19) && !types.contains(CredentialType.IMMUNIZATION)) {
+    if (types.contains(CredentialType.COVID_19)) {
       types.add(CredentialType.IMMUNIZATION);
     }
     return types;
@@ -184,7 +184,7 @@ public class PatientController {
     return !"false".equalsIgnoreCase(StringUtils.trimToEmpty(value));
   }
 
-  private static void validateCredentialTypes(List<CredentialType> credentials) {
+  private static void validateCredentialTypes(Set<CredentialType> credentials) {
     if (credentials.isEmpty()) {
       throw new Exceptions.BadRequest("credentialType parameter is required");
     }
@@ -198,7 +198,7 @@ public class PatientController {
           String.format("Not yet implemented support for %s", requestedButUnimplemented));
     }
     // Reject a request with ONLY #health-card
-    if (credentials.equals(List.of(CredentialType.HEALTH_CARD))) {
+    if (credentials.equals(Set.of(CredentialType.HEALTH_CARD))) {
       throw new Exceptions.BadRequest("Specify a more granular credential type");
     }
     // Reject a request with only #immunization
@@ -208,7 +208,7 @@ public class PatientController {
     }
   }
 
-  private static VerifiableCredential vc(MixedBundle bundle, List<CredentialType> credentialTypes) {
+  private static VerifiableCredential vc(MixedBundle bundle, Set<CredentialType> credentialTypes) {
     return VerifiableCredential.builder()
         .context(List.of("https://www.w3.org/2018/credentials/v1"))
         .type(

@@ -26,6 +26,11 @@
       <version>${fhir-resources.version}</version>
     </dependency>
     <dependency>
+      <groupId>gov.va.api.health</groupId>
+      <artifactId>argonaut-dstu2</artifactId>
+      <version>${fhir-resources.version}</version>
+    </dependency>
+    <dependency>
       <groupId>com.nimbusds</groupId>
       <artifactId>nimbus-jose-jwt</artifactId>
       <version>${nimbus-jose-jwt.version}</version>

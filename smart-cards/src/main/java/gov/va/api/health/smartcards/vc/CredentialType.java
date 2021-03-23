@@ -4,9 +4,7 @@ import gov.va.api.health.smartcards.Exceptions;
 import java.util.Arrays;
 
 public enum CredentialType {
-  // Purposely NOT alphabetized!
-  // These types become more granular the lower they are in this list.
-  // We want to keep the enum's natural order (by order of declaration) when sorting!
+  // ordered by granularity for sorting
   HEALTH_CARD("https://smarthealth.cards#health-card"),
   IMMUNIZATION("https://smarthealth.cards#immunization"),
   LABORATORY("https://smarthealth.cards#laboratory"),

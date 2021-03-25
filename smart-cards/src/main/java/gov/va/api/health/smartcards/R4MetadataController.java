@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(
     value = {"/r4/metadata"},
     produces = {"application/json", "application/fhir+json"})
-@AllArgsConstructor(onConstructor = @__({@Autowired}))
+@AllArgsConstructor(onConstructor_ = @Autowired)
 public class R4MetadataController {
   private static final String NAME = "API Management Platform | Smart Cards - R4";
 

@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(
     value = {"/dstu2/metadata"},
     produces = {"application/json", "application/fhir+json"})
-@AllArgsConstructor(onConstructor = @__({@Autowired}))
+@AllArgsConstructor(onConstructor_ = @Autowired)
 public class Dstu2MetadataController {
 
   private static final String NAME = "API Management Platform | Smart Cards - R4";
@@ -64,7 +64,6 @@ public class Dstu2MetadataController {
   @GetMapping
   Conformance read() {
     return Conformance.builder()
-        .resourceType("Conformance")
         .id("smart-cards-conformance")
         .version("1.0.2")
         .name(NAME)

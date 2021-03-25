@@ -2,15 +2,9 @@ package gov.va.api.health.smartcards;
 
 import static java.util.stream.Collectors.toList;
 
+import gov.va.api.health.dstu2.api.datatypes.ContactPoint;
 import gov.va.api.health.dstu2.api.elements.Reference;
 import gov.va.api.health.dstu2.api.resources.Conformance;
-import gov.va.api.health.dstu2.api.resources.Conformance.Contact;
-import gov.va.api.health.dstu2.api.resources.Conformance.Kind;
-import gov.va.api.health.dstu2.api.resources.Conformance.ResourceInteractionCode;
-import gov.va.api.health.dstu2.api.resources.Conformance.RestMode;
-import gov.va.api.health.dstu2.api.resources.Conformance.RestResource;
-import gov.va.api.health.dstu2.api.resources.Conformance.RestResourceVersion;
-import gov.va.api.health.dstu2.api.resources.Conformance.Status;
 import java.util.List;
 import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
@@ -35,16 +29,14 @@ public class Dstu2MetadataController {
 
   private final LinkProperties pageLinks;
 
-  private static List<Contact> contact() {
+  private static List<Conformance.Contact> contact() {
     return List.of(
         Conformance.Contact.builder()
             .name("API Support")
             .telecom(
                 List.of(
-                    gov.va.api.health.dstu2.api.datatypes.ContactPoint.builder()
-                        .system(
-                            gov.va.api.health.dstu2.api.datatypes.ContactPoint.ContactPointSystem
-                                .email)
+                    ContactPoint.builder()
+                        .system(ContactPoint.ContactPointSystem.email)
                         .value("api@va.gov")
                         .build()))
             .build());
@@ -61,7 +53,8 @@ public class Dstu2MetadataController {
   }
 
   private static List<Conformance.Rest> rest() {
-    return List.of(Conformance.Rest.builder().mode(RestMode.server).resource(resources()).build());
+    return List.of(
+        Conformance.Rest.builder().mode(Conformance.RestMode.server).resource(resources()).build());
   }
 
   private Conformance.Implementation implementation() {
@@ -76,13 +69,13 @@ public class Dstu2MetadataController {
         .version("1.0.2")
         .name(NAME)
         .publisher("Department of Veterans Affairs")
-        .status(Status.active)
+        .status(Conformance.Status.active)
         .implementation(implementation())
         .experimental(true)
         .contact(contact())
         .date(buildProperties.getTime().toString())
         .description("Read and search support for credentials of immunization by patient.")
-        .kind(Kind.capability)
+        .kind(Conformance.Kind.capability)
         .software(software())
         .fhirVersion("4.0.1")
         .format(List.of("application/json", "application/fhir+json"))
@@ -106,18 +99,18 @@ public class Dstu2MetadataController {
     String profileUrl;
 
     Conformance.RestResource asResource() {
-      return RestResource.builder()
+      return Conformance.RestResource.builder()
           .type(type)
           .profile(Reference.builder().reference(profileUrl).build())
           .interaction(interactions())
-          .versioning(RestResourceVersion.no_version)
+          .versioning(Conformance.RestResourceVersion.no_version)
           .build();
     }
 
     private List<Conformance.ResourceInteraction> interactions() {
       Conformance.ResourceInteraction readable =
           Conformance.ResourceInteraction.builder()
-              .code(ResourceInteractionCode.read)
+              .code(Conformance.ResourceInteractionCode.read)
               .documentation("Implemented per specification. See http://hl7.org/fhir/R4/http.html")
               .build();
       return List.of(readable);

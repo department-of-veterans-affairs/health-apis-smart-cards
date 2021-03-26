@@ -305,6 +305,28 @@ public class PatientControllerTest {
                 ""));
   }
 
+  @Test
+  void healthCardsIssue_noImmunizationsOnRecord() {
+    var patientBundleResponse =
+        new ResponseEntity<>(SAMPLES.patientBundle("123"), HttpStatus.ACCEPTED);
+    var immunizationBundleResponse =
+        new ResponseEntity<>(SAMPLES.immunizationEmpty("123"), HttpStatus.ACCEPTED);
+    var controller = patientController(patientBundleResponse, immunizationBundleResponse, null);
+    var result = controller.healthCardsIssue("123", parametersCovid19(), "", "", "").getBody();
+    assertNotNull(result);
+    assertThat(result).isEqualTo(Parameters.builder().build());
+  }
+
+  @Test
+  void healthCardsIssue_noSuchPatient() {
+    var patientBundleResponse =
+        new ResponseEntity<>(SAMPLES.patientEmpty("123"), HttpStatus.ACCEPTED);
+    var controller = patientController(patientBundleResponse, null, null);
+    assertThrows(
+        Exceptions.NotFound.class,
+        () -> controller.healthCardsIssue("123", parametersCovid19(), "", "", "").getBody());
+  }
+
   /**
    * This test only verifies that the signed and compressed response is consistent with the unsigned
    * version. The VerifiableCredential structure is tested through the `healthCardsIssue` test.

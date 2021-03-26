@@ -124,6 +124,23 @@ public class MockResourceSamples {
         .build();
   }
 
+  public Immunization.Bundle immunizationEmpty(String icn) {
+    return Immunization.Bundle.builder()
+        .type(AbstractBundle.BundleType.searchset)
+        .link(
+            List.of(
+                BundleLink.builder()
+                    .relation(BundleLink.LinkRelation.self)
+                    .url(
+                        String.format(
+                            "%s?patient=%s",
+                            linkProperties.dataQueryR4ResourceUrl("Immunization"), icn))
+                    .build()))
+        .total(0)
+        .entry(List.of())
+        .build();
+  }
+
   public Location location(String id) {
     return Location.builder()
         .id(id)
@@ -221,6 +238,22 @@ public class MockResourceSamples {
                     .search(
                         AbstractEntry.Search.builder().mode(AbstractEntry.SearchMode.match).build())
                     .build()))
+        .build();
+  }
+
+  public Patient.Bundle patientEmpty(String id) {
+    return Patient.Bundle.builder()
+        .type(AbstractBundle.BundleType.searchset)
+        .link(
+            List.of(
+                BundleLink.builder()
+                    .relation(BundleLink.LinkRelation.self)
+                    .url(
+                        String.format(
+                            "%s?_id=%s", linkProperties.dataQueryR4ResourceUrl("Patient"), id))
+                    .build()))
+        .total(0)
+        .entry(List.of())
         .build();
   }
 }

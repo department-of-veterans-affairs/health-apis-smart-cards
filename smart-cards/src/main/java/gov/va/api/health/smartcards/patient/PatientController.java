@@ -224,6 +224,14 @@ public class PatientController {
         .build();
   }
 
+  private Patient.Bundle findPatientByIcn(String icn, String authorization) {
+    var patients = fhirClient.patientBundle(icn, authorization);
+    if (patients.total() == 0) {
+      throw new Exceptions.NotFound(icn);
+    }
+    return patients;
+  }
+
   @PostMapping(value = "/{id}/$health-cards-issue")
   ResponseEntity<Parameters> healthCardsIssue(
       @PathVariable("id") String id,
@@ -233,8 +241,11 @@ public class PatientController {
       @RequestHeader(name = "x-vc-compress", required = false) String vcCompress) {
     checkState(isNotBlank(id), "id is required");
     var credentialTypes = credentialTypes(parameters);
-    Patient.Bundle patients = fhirClient.patientBundle(id, authorization);
+    Patient.Bundle patients = findPatientByIcn(id, authorization);
     Immunization.Bundle immunizations = fhirClient.immunizationBundle(id, authorization);
+    if (immunizations.total() == 0) {
+      return ResponseEntity.ok(Parameters.builder().build());
+    }
     lookupAndAttachLocations(immunizations, authorization);
     List<MixedEntry> resources = minimize(patients, immunizations);
     List<String> urls = indexAndReplaceUrls(resources);

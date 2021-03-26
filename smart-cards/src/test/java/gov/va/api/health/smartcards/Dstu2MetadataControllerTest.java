@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import gov.va.api.health.dstu2.api.elements.Reference;
 import gov.va.api.health.dstu2.api.resources.Conformance;
+import gov.va.api.health.dstu2.api.resources.Conformance.AcceptUnknown;
 import gov.va.api.health.dstu2.api.resources.Conformance.ResourceInteractionCode;
 import gov.va.api.health.dstu2.api.resources.Conformance.RestResource;
 import gov.va.api.health.dstu2.api.resources.Conformance.RestResourceVersion;
@@ -22,24 +23,13 @@ public class Dstu2MetadataControllerTest {
     properties.setProperty("version", "3.14159");
     properties.setProperty("time", "2005-01-21T07:57:00Z");
     BuildProperties buildProperties = new BuildProperties(properties);
-    assertThat(
-            new Dstu2MetadataController(
-                    buildProperties,
-                    LinkProperties.builder()
-                        .baseUrl("http://va.gov")
-                        .r4BasePath("api/r4")
-                        .dqInternalR4BasePath("/r4")
-                        .dqInternalUrl("/fhir/v0/r4")
-                        .build())
-                .read())
+    assertThat(new Dstu2MetadataController(buildProperties).read())
         .isEqualTo(
             Conformance.builder()
                 .id("smart-cards-conformance")
                 .resourceType("Conformance")
                 .version("1.0.2")
                 .name("API Management Platform | Smart Cards - R4")
-                .status(Conformance.Status.active)
-                .experimental(true)
                 .date("2005-01-21T07:57:00Z")
                 .publisher("Department of Veterans Affairs")
                 .contact(
@@ -55,6 +45,7 @@ public class Dstu2MetadataControllerTest {
                                         .value("api@va.gov")
                                         .build()))
                             .build()))
+                .acceptUnknown(AcceptUnknown.no)
                 .description("Read and search support for credentials of immunization by patient.")
                 .kind(Conformance.Kind.capability)
                 .software(
@@ -62,11 +53,6 @@ public class Dstu2MetadataControllerTest {
                         .name("foo.bar:smart-cards")
                         .version("3.14159")
                         .releaseDate("2005-01-21T07:57:00Z")
-                        .build())
-                .implementation(
-                    Conformance.Implementation.builder()
-                        .description("API Management Platform | Smart Cards - R4")
-                        .url("http://va.gov/api/r4")
                         .build())
                 .fhirVersion("4.0.1")
                 .format(List.of("application/json", "application/fhir+json"))

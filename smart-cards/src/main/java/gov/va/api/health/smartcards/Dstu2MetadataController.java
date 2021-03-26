@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.toList;
 import gov.va.api.health.dstu2.api.datatypes.ContactPoint;
 import gov.va.api.health.dstu2.api.elements.Reference;
 import gov.va.api.health.dstu2.api.resources.Conformance;
+import gov.va.api.health.dstu2.api.resources.Conformance.AcceptUnknown;
 import java.util.List;
 import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
@@ -26,8 +27,6 @@ public class Dstu2MetadataController {
   private static final String NAME = "API Management Platform | Smart Cards - R4";
 
   private final BuildProperties buildProperties;
-
-  private final LinkProperties pageLinks;
 
   private static List<Conformance.Contact> contact() {
     return List.of(
@@ -57,10 +56,6 @@ public class Dstu2MetadataController {
         Conformance.Rest.builder().mode(Conformance.RestMode.server).resource(resources()).build());
   }
 
-  private Conformance.Implementation implementation() {
-    return Conformance.Implementation.builder().description(NAME).url(pageLinks.r4Url()).build();
-  }
-
   @GetMapping
   Conformance read() {
     return Conformance.builder()
@@ -68,15 +63,13 @@ public class Dstu2MetadataController {
         .version("1.0.2")
         .name(NAME)
         .publisher("Department of Veterans Affairs")
-        .status(Conformance.Status.active)
-        .implementation(implementation())
-        .experimental(true)
         .contact(contact())
         .date(buildProperties.getTime().toString())
         .description("Read and search support for credentials of immunization by patient.")
         .kind(Conformance.Kind.capability)
         .software(software())
         .fhirVersion("4.0.1")
+        .acceptUnknown(AcceptUnknown.no)
         .format(List.of("application/json", "application/fhir+json"))
         .rest(rest())
         .build();

@@ -4,17 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import gov.va.api.health.dstu2.api.elements.Reference;
 import gov.va.api.health.dstu2.api.resources.Conformance;
-import gov.va.api.health.dstu2.api.resources.Conformance.AcceptUnknown;
-import gov.va.api.health.dstu2.api.resources.Conformance.ResourceInteractionCode;
-import gov.va.api.health.dstu2.api.resources.Conformance.RestResource;
-import gov.va.api.health.dstu2.api.resources.Conformance.RestResourceVersion;
 import java.util.List;
 import java.util.Properties;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.info.BuildProperties;
 
 public class Dstu2MetadataControllerTest {
-
   @Test
   void read() {
     Properties properties = new Properties();
@@ -28,7 +23,7 @@ public class Dstu2MetadataControllerTest {
             Conformance.builder()
                 .id("smart-cards-conformance")
                 .resourceType("Conformance")
-                .version("1.0.2")
+                .version("3.14159")
                 .name("API Management Platform | Smart Cards - R4")
                 .date("2005-01-21T07:57:00Z")
                 .publisher("Department of Veterans Affairs")
@@ -45,15 +40,10 @@ public class Dstu2MetadataControllerTest {
                                         .value("api@va.gov")
                                         .build()))
                             .build()))
-                .acceptUnknown(AcceptUnknown.no)
-                .description("Read and search support for credentials of immunization by patient.")
+                .acceptUnknown(Conformance.AcceptUnknown.no)
+                .description("Read and search support for smart health cards.")
                 .kind(Conformance.Kind.capability)
-                .software(
-                    Conformance.Software.builder()
-                        .name("foo.bar:smart-cards")
-                        .version("3.14159")
-                        .releaseDate("2005-01-21T07:57:00Z")
-                        .build())
+                .software(Conformance.Software.builder().name("foo.bar:smart-cards").build())
                 .fhirVersion("4.0.1")
                 .format(List.of("application/json", "application/fhir+json"))
                 .rest(
@@ -62,7 +52,7 @@ public class Dstu2MetadataControllerTest {
                             .mode(Conformance.RestMode.server)
                             .resource(
                                 List.of(
-                                    RestResource.builder()
+                                    Conformance.RestResource.builder()
                                         .type("Parameters")
                                         .profile(
                                             Reference.builder()
@@ -71,17 +61,14 @@ public class Dstu2MetadataControllerTest {
                                                 .build())
                                         .interaction(
                                             List.of(
-                                                resourceInteraction(ResourceInteractionCode.read)))
-                                        .versioning(RestResourceVersion.no_version)
+                                                Conformance.ResourceInteraction.builder()
+                                                    .code(Conformance.ResourceInteractionCode.read)
+                                                    .documentation(
+                                                        "Implemented per specification. See http://hl7.org/fhir/R4/http.html")
+                                                    .build()))
+                                        .versioning(Conformance.RestResourceVersion.no_version)
                                         .build()))
                             .build()))
                 .build());
-  }
-
-  Conformance.ResourceInteraction resourceInteraction(Conformance.ResourceInteractionCode type) {
-    return Conformance.ResourceInteraction.builder()
-        .code(type)
-        .documentation("Implemented per specification. See http://hl7.org/fhir/R4/http.html")
-        .build();
   }
 }

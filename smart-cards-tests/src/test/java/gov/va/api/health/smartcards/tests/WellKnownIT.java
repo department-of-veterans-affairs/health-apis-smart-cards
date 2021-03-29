@@ -1,25 +1,13 @@
 package gov.va.api.health.smartcards.tests;
 
-import static gov.va.api.health.sentinel.EnvironmentAssumptions.assumeEnvironmentIn;
 import static gov.va.api.health.sentinel.EnvironmentAssumptions.assumeEnvironmentNotIn;
 import static gov.va.api.health.smartcards.tests.Requests.doGet;
 import static gov.va.api.health.smartcards.tests.SystemDefinitions.systemDefinition;
 
 import gov.va.api.health.sentinel.Environment;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 public class WellKnownIT {
-  @BeforeAll
-  static void assumeEnvironment() {
-    assumeEnvironmentIn(
-        Environment.LOCAL,
-        Environment.QA,
-        Environment.STAGING,
-        Environment.STAGING_LAB,
-        Environment.LAB);
-  }
-
   @Test
   void jwks_external() {
     assumeEnvironmentNotIn(Environment.LOCAL);

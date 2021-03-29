@@ -8,10 +8,10 @@
     <relativePath/>
   </parent>
   <artifactId>smart-cards-tests</artifactId>
-  <version>0.0.34-SNAPSHOT</version>
+  <version>0.0.34</version>
   <packaging>jar</packaging>
   <properties>
-    <fhir-resources.version>6.0.7</fhir-resources.version>
+    <fhir-resources.version>6.0.9</fhir-resources.version>
     <jwk-set.private-json>{"keys":[{"kty":"EC","d":"5h-A-oFDpePWC9zZ54_sWANZlwDxppu2-DQuAuvW3Bw","use":"sig","crv":"P-256","kid":"gSb6VludekqwZS_0osHNxAK2y2Rua1V_aGWNFaTvgNM","x":"WcBuVJRGiCvhEdU6nbKysIxEjQOqzaH-kiIZoIpFNfE","y":"FiWqBp6ilDBJ-VEnZsgHTK4fYKmB841n2wNMfvFZB2E","alg":"ES256"}]}</jwk-set.private-json>
     <jwk-set.private-json.escape>{\"keys\":[{\"kty\":\"EC\",\"d\":\"5h-A-oFDpePWC9zZ54_sWANZlwDxppu2-DQuAuvW3Bw\",\"use\":\"sig\",\"crv\":\"P-256\",\"kid\":\"gSb6VludekqwZS_0osHNxAK2y2Rua1V_aGWNFaTvgNM\",\"x\":\"WcBuVJRGiCvhEdU6nbKysIxEjQOqzaH-kiIZoIpFNfE\",\"y\":\"FiWqBp6ilDBJ-VEnZsgHTK4fYKmB841n2wNMfvFZB2E\",\"alg\":\"ES256\"}]}</jwk-set.private-json.escape>
     <sentinel.skipLaunch>false</sentinel.skipLaunch>

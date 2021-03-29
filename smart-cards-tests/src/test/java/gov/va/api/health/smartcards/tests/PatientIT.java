@@ -1,6 +1,5 @@
 package gov.va.api.health.smartcards.tests;
 
-import static gov.va.api.health.sentinel.EnvironmentAssumptions.assumeEnvironmentIn;
 import static gov.va.api.health.sentinel.EnvironmentAssumptions.assumeEnvironmentNotIn;
 import static gov.va.api.health.sentinel.ExpectedResponse.logAllWithTruncatedBody;
 import static gov.va.api.health.smartcards.tests.SystemDefinitions.systemDefinition;
@@ -21,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 @Slf4j
@@ -30,16 +28,6 @@ public class PatientIT {
       JacksonConfig.createMapper().registerModule(new Resource.ResourceModule());
 
   private static final String ACCESS_TOKEN = System.getProperty("access-token", "unset");
-
-  @BeforeAll
-  static void assumeEnvironment() {
-    assumeEnvironmentIn(
-        Environment.LOCAL,
-        Environment.QA,
-        Environment.STAGING,
-        Environment.STAGING_LAB,
-        Environment.LAB);
-  }
 
   @SneakyThrows
   private static ExpectedResponse doPost(

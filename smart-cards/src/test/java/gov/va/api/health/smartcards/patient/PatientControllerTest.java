@@ -314,7 +314,7 @@ public class PatientControllerTest {
     var controller = patientController(patientBundleResponse, immunizationBundleResponse, null);
     var result = controller.healthCardsIssue("123", parametersCovid19(), "", "", "").getBody();
     assertNotNull(result);
-    assertThat(result).isEqualTo(Parameters.builder().build());
+    assertThat(result).isEqualTo(Parameters.builder().parameter(List.of()).build());
   }
 
   @Test

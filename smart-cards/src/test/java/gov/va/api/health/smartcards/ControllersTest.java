@@ -12,12 +12,6 @@ public class ControllersTest {
         assertThrows(
             Exceptions.BadRequest.class, () -> Controllers.checkRequestState(false, "message"));
     assertThat(ex.getMessage()).isEqualTo("message");
-
-    ex =
-        assertThrows(
-            Exceptions.BadRequest.class,
-            () -> Controllers.checkRequestState(false, "%s foo %s", "hello", "goodbye"));
-    assertThat(ex.getMessage()).isEqualTo("hello foo goodbye");
   }
 
   @Test

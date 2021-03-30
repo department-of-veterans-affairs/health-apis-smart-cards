@@ -17,10 +17,10 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@AllArgsConstructor(onConstructor_ = @Autowired)
 @Builder
 @Component
-public class PayloadSigner {
+@AllArgsConstructor(onConstructor_ = @Autowired)
+public final class PayloadSigner {
   private static final ObjectMapper MAPPER = JacksonMapperConfig.createMapper();
 
   private final JwksProperties jwksProperties;

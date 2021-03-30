@@ -46,7 +46,7 @@ public class OpenApiController {
   @GetMapping(
       value = {"/dstu2", "/dstu2/openapi.json"},
       produces = "application/json")
-  public String dstu2() {
+  String dstu2() {
     return DSTU2_OPEN_API;
   }
 
@@ -54,7 +54,7 @@ public class OpenApiController {
   @GetMapping(
       value = {"/r4", "/r4/openapi.json"},
       produces = "application/json")
-  public String r4() {
+  String r4() {
     return R4_OPEN_API;
   }
 }

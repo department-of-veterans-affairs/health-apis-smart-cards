@@ -13,7 +13,7 @@ public class JacksonMapperConfig {
   }
 
   @Bean
-  public ObjectMapper objectMapper() {
+  ObjectMapper objectMapper() {
     return createMapper();
   }
 }

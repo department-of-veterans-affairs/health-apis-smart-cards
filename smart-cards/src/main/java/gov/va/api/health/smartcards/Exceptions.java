@@ -3,7 +3,7 @@ package gov.va.api.health.smartcards;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public class Exceptions {
+public final class Exceptions {
   public static final class BadRequest extends RuntimeException {
     public BadRequest(String message) {
       super(message);

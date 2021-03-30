@@ -7,7 +7,6 @@ import gov.va.api.health.r4.api.resources.Location;
 import gov.va.api.health.r4.api.resources.Patient;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -18,13 +17,13 @@ import org.springframework.web.client.RestTemplate;
 
 @Component
 @AllArgsConstructor(onConstructor_ = @Autowired)
-public class DataQueryFhirClient implements FhirClient {
+public final class DataQueryFhirClient {
   // https://www.cdc.gov/vaccines/programs/iis/COVID-19-related-codes.html
   private static final List<String> COVID19_VACCINE_CODES = List.of("207", "208", "210", "212");
 
-  final RestTemplate restTemplate;
+  private final RestTemplate restTemplate;
 
-  final LinkProperties linkProperties;
+  private final LinkProperties linkProperties;
 
   private static HttpEntity<HttpHeaders> prepareHeaders(String authorization) {
     var dqHeaders = new HttpHeaders();
@@ -40,7 +39,7 @@ public class DataQueryFhirClient implements FhirClient {
     return restTemplate.exchange(url, HttpMethod.GET, entity, responseType);
   }
 
-  @Override
+  /** Retrieve immunization bundle. */
   public Immunization.Bundle immunizationBundle(String icn, String authorization) {
     String url =
         String.format(
@@ -62,14 +61,13 @@ public class DataQueryFhirClient implements FhirClient {
     return immunizationBundle;
   }
 
-  @Override
+  /** Retrieve location. */
   public Location location(String id, String authorization) {
     String url = String.format("%s/%s", linkProperties.dataQueryR4ResourceUrl("Location"), id);
     return doGet(url, authorization, Location.class).getBody();
   }
 
-  @Override
-  @SneakyThrows
+  /** Retrieve patient bundle. */
   public Patient.Bundle patientBundle(String icn, String authorization) {
     String url = String.format("%s?_id=%s", linkProperties.dataQueryR4ResourceUrl("Patient"), icn);
     return doGet(url, authorization, Patient.Bundle.class).getBody();

@@ -1,8 +1,8 @@
 package gov.va.api.health.smartcards;
 
-import gov.va.api.health.r4.api.datatypes.ContactDetail;
-import gov.va.api.health.r4.api.datatypes.ContactPoint;
-import gov.va.api.health.r4.api.resources.CapabilityStatement;
+import gov.va.api.health.dstu2.api.datatypes.ContactPoint;
+import gov.va.api.health.dstu2.api.elements.Reference;
+import gov.va.api.health.dstu2.api.resources.Conformance;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,19 +13,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(
-    value = "/r4/metadata",
+    value = "/dstu2/metadata",
     produces = {"application/json", "application/fhir+json"})
 @AllArgsConstructor(onConstructor_ = @Autowired)
-public class R4MetadataController {
+public class MetadataDstu2Controller {
   private static final String NAME = "API Management Platform | Smart Cards - R4";
 
   private final BuildProperties buildProperties;
 
-  private final LinkProperties pageLinks;
-
-  private static List<ContactDetail> contact() {
+  private static List<Conformance.Contact> contact() {
     return List.of(
-        ContactDetail.builder()
+        Conformance.Contact.builder()
             .name("API Support")
             .telecom(
                 List.of(
@@ -36,68 +34,55 @@ public class R4MetadataController {
             .build());
   }
 
-  private static List<CapabilityStatement.Rest> rest() {
+  private static List<Conformance.Rest> rest() {
     return List.of(
-        CapabilityStatement.Rest.builder()
-            .mode(CapabilityStatement.RestMode.server)
+        Conformance.Rest.builder()
+            .mode(Conformance.RestMode.server)
             .resource(restResources())
             .build());
   }
 
-  private static List<CapabilityStatement.CapabilityResource> restResources() {
+  private static List<Conformance.RestResource> restResources() {
     return List.of(
-        CapabilityStatement.CapabilityResource.builder()
+        Conformance.RestResource.builder()
             .type("Parameters")
-            .profile("https://www.hl7.org/fhir/r4/parameters.html")
+            .profile(
+                Reference.builder()
+                    .reference("https://www.hl7.org/fhir/r4/parameters.html")
+                    .build())
             .interaction(
                 List.of(
-                    CapabilityStatement.ResourceInteraction.builder()
-                        .code(CapabilityStatement.TypeRestfulInteraction.read)
+                    Conformance.ResourceInteraction.builder()
+                        .code(Conformance.ResourceInteractionCode.read)
                         .documentation(
                             "Implemented per specification. See http://hl7.org/fhir/R4/http.html")
                         .build()))
-            .versioning(CapabilityStatement.Versioning.no_version)
-            .referencePolicy(
-                List.of(
-                    CapabilityStatement.ReferencePolicy.literal,
-                    CapabilityStatement.ReferencePolicy.local))
+            .versioning(Conformance.RestResourceVersion.no_version)
             .build());
   }
 
-  private CapabilityStatement.Implementation implementation() {
-    return CapabilityStatement.Implementation.builder()
-        .description(NAME)
-        .url(pageLinks.r4Url())
-        .build();
-  }
-
   @GetMapping
-  CapabilityStatement read() {
-    return CapabilityStatement.builder()
-        .id("smart-cards-capability-statement")
+  Conformance read() {
+    return Conformance.builder()
+        .id("smart-cards-conformance")
         .version(buildProperties.getVersion())
         .name(NAME)
-        .title(NAME)
-        .status(CapabilityStatement.Status.active)
-        .experimental(true)
-        .date(buildProperties.getTime().toString())
         .publisher("Department of Veterans Affairs")
         .contact(contact())
+        .date(buildProperties.getTime().toString())
         .description("Read and search support for smart health cards.")
-        .kind(CapabilityStatement.Kind.capability)
+        .kind(Conformance.Kind.capability)
         .software(software())
-        .implementation(implementation())
         .fhirVersion("4.0.1")
+        .acceptUnknown(Conformance.AcceptUnknown.no)
         .format(List.of("application/json", "application/fhir+json"))
         .rest(rest())
         .build();
   }
 
-  private CapabilityStatement.Software software() {
-    return CapabilityStatement.Software.builder()
+  private Conformance.Software software() {
+    return Conformance.Software.builder()
         .name(buildProperties.getGroup() + ":" + buildProperties.getArtifact())
-        .version(buildProperties.getVersion())
-        .releaseDate(buildProperties.getTime().toString())
         .build();
   }
 }

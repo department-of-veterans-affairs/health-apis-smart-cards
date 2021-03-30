@@ -11,13 +11,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Builder
 @RestController
-@RequestMapping(produces = {"application/json", "application/fhir+json"})
 @AllArgsConstructor(onConstructor_ = @Autowired)
+@RequestMapping(produces = {"application/json", "application/fhir+json"})
 public class WellKnownController {
   private final JwksProperties jwksProperties;
 
   @GetMapping(value = "/.well-known/jwks.json")
-  public String jwks() {
+  String jwks() {
     return jwksProperties.jwksPublicJson();
   }
 

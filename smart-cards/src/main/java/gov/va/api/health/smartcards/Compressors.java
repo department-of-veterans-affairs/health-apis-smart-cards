@@ -1,6 +1,5 @@
 package gov.va.api.health.smartcards;
 
-
 import java.io.ByteArrayOutputStream;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;

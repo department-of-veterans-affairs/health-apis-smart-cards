@@ -21,6 +21,11 @@ public class WellKnownController {
     return jwksProperties.jwksPublicJson();
   }
 
+  @GetMapping(value = "/r4/.well-known/jwks.json")
+  String jwksR4() {
+    return jwks();
+  }
+
   @GetMapping(value = "/.well-known/smart-configuration")
   WellKnown smartConfiguration() {
     return WellKnown.builder()

@@ -12,6 +12,7 @@ public class WellKnownControllerTest {
     var jwksProperties = JwsHelpers.jwksProperties("123");
     var controller = WellKnownController.builder().jwksProperties(jwksProperties).build();
     assertThat(controller.jwks()).isEqualTo(jwksProperties.jwksPublicJson());
+    assertThat(controller.jwksR4()).isEqualTo(jwksProperties.jwksPublicJson());
   }
 
   @Test

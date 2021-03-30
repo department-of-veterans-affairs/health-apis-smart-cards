@@ -10,8 +10,8 @@ import lombok.Builder;
 import lombok.NonNull;
 
 @Builder
-public class PatientMinimizer {
-  @NonNull Patient.Entry entry;
+public final class PatientMinimizer {
+  @NonNull private final Patient.Entry entry;
 
   private static HumanName name(HumanName name) {
     return HumanName.builder().family(name.family()).given(name.given()).build();

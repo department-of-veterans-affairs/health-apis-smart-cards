@@ -376,7 +376,9 @@ public class PatientControllerTest {
 
   @Test
   void initDirectFieldAccess() {
-    new PatientController(mock(DataQueryFhirClient.class), mock(PayloadSigner.class))
+    new PatientController(
+            new DataQueryFhirClient(mock(RestTemplate.class), linkProperties()),
+            new PayloadSigner(JWKS_PROPERTIES, linkProperties()))
         .initDirectFieldAccess(mock(DataBinder.class));
   }
 }

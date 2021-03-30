@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class PayloadClaimsWrapper {
+public final class PayloadClaimsWrapper {
   @JsonProperty("iss")
   String issuer;
 

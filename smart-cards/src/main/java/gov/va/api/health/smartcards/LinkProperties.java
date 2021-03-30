@@ -6,13 +6,15 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import gov.va.api.health.r4.api.resources.Resource;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Getter
+@ToString
 @Component
-public class LinkProperties {
+public final class LinkProperties {
   private final String r4Url;
 
   private final String dataQueryInternalR4Url;

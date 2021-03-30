@@ -1,21 +1,20 @@
 package gov.va.api.health.smartcards;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.ByteArrayOutputStream;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
+import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public class Compressors {
+public final class Compressors {
   private static final int BUFFER_SIZE = 1024;
 
   /** Compress a payload with Java's ZLIB implementation. */
   @SneakyThrows
-  public static byte[] compress(byte[] input) {
-    checkNotNull(input);
+  public static byte[] compress(@NonNull byte[] input) {
     Deflater deflater = new Deflater(Deflater.DEFLATED, true);
     deflater.setInput(input);
     deflater.finish();
@@ -36,8 +35,7 @@ public class Compressors {
 
   /** Decompress a payload with Java's ZLIB implementation. */
   @SneakyThrows
-  public static byte[] uncompress(byte[] input) {
-    checkNotNull(input);
+  public static byte[] uncompress(@NonNull byte[] input) {
     Inflater inflater = new Inflater(true);
     inflater.setInput(input);
     byte[] buffer = new byte[BUFFER_SIZE];

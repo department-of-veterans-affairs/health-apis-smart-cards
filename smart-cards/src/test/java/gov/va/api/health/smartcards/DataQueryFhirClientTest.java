@@ -17,6 +17,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 public class DataQueryFhirClientTest {
+  private static LinkProperties linkProperties() {
+    return LinkProperties.builder()
+        .dqInternalUrl("http://dq.foo")
+        .dqInternalR4BasePath("r4")
+        .baseUrl("http://sc.bar")
+        .r4BasePath("r4")
+        .build();
+  }
+
   @Test
   void invalidImmunizationBundleThrowsException() {
     RestTemplate restTemplate = mock(RestTemplate.class);
@@ -29,8 +38,7 @@ public class DataQueryFhirClientTest {
             eq(Immunization.Bundle.class)))
         .thenReturn(response);
     DataQueryFhirClient dataQueryFhirClient =
-        new DataQueryFhirClient(restTemplate, mock(LinkProperties.class));
-
+        new DataQueryFhirClient(restTemplate, linkProperties());
     assertThat(dataQueryFhirClient.immunizationBundle("123", "")).isEqualTo(bundle);
   }
 
@@ -42,7 +50,7 @@ public class DataQueryFhirClientTest {
             any(String.class), eq(HttpMethod.GET), any(HttpEntity.class), eq(Patient.Bundle.class)))
         .thenReturn(response);
     DataQueryFhirClient dataQueryFhirClient =
-        new DataQueryFhirClient(restTemplate, mock(LinkProperties.class));
+        new DataQueryFhirClient(restTemplate, linkProperties());
     assertThat(dataQueryFhirClient.patientBundle("123", ""))
         .isEqualTo(Patient.Bundle.builder().build());
   }

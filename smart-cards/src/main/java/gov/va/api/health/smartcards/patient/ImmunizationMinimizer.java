@@ -15,8 +15,8 @@ import lombok.Builder;
 import lombok.NonNull;
 
 @Builder
-public class ImmunizationMinimizer {
-  @NonNull Immunization.Entry entry;
+public final class ImmunizationMinimizer {
+  @NonNull private final Immunization.Entry entry;
 
   MixedEntry minimize() {
     return MixedEntry.builder()

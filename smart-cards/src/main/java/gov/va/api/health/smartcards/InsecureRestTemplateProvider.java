@@ -20,7 +20,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 @Component
-public class InsecureRestTemplateProvider {
+public final class InsecureRestTemplateProvider {
   private Supplier<ClientHttpRequestFactory> bufferingRequestFactory(HttpClient client) {
     return () ->
         new BufferingClientHttpRequestFactory(new HttpComponentsClientHttpRequestFactory(client));

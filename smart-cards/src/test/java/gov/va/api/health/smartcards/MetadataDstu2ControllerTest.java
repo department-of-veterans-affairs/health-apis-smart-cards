@@ -9,7 +9,7 @@ import java.util.Properties;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.info.BuildProperties;
 
-public class Dstu2MetadataControllerTest {
+public class MetadataDstu2ControllerTest {
   @Test
   void read() {
     Properties properties = new Properties();
@@ -18,7 +18,7 @@ public class Dstu2MetadataControllerTest {
     properties.setProperty("version", "3.14159");
     properties.setProperty("time", "2005-01-21T07:57:00Z");
     BuildProperties buildProperties = new BuildProperties(properties);
-    assertThat(new Dstu2MetadataController(buildProperties).read())
+    assertThat(new MetadataDstu2Controller(buildProperties).read())
         .isEqualTo(
             Conformance.builder()
                 .id("smart-cards-conformance")

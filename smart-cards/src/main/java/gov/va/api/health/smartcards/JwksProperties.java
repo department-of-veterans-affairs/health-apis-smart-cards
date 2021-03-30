@@ -7,24 +7,25 @@ import com.nimbusds.jose.jwk.JWKSet;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import lombok.ToString;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Getter
+@ToString
 @Component
-public class JwksProperties {
-  final String currentKeyId;
+public final class JwksProperties {
+  private final String currentKeyId;
 
-  final JWKSet jwksPrivate;
+  private final JWKSet jwksPrivate;
 
-  final JWKSet jwksPublic;
+  private final JWKSet jwksPublic;
 
-  final String jwksPublicJson;
+  private final String jwksPublicJson;
 
-  /** Default Constructor. */
   @Builder
   @SneakyThrows
-  public JwksProperties(
+  JwksProperties(
       @Value("${jwk-set.private-json}") String jwksPrivateJson,
       @Value("${jwk-set.current-key-id}") String currentKeyId) {
     checkState(!"unset".equals(jwksPrivateJson), "jwk-set.private-json is unset");

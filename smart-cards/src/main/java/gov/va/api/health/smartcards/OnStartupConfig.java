@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class OnStartupConfig {
+public final class OnStartupConfig {
   private static final String PATIENT_IDENTIFIER_SIZE_PROPERTY =
       Patient.class.getName() + ".identifier.min-size";
 

@@ -45,11 +45,11 @@ import org.springframework.web.client.ResourceAccessException;
 public final class WebExceptionHandler {
   private static final ObjectMapper MAPPER = JacksonMapperConfig.createMapper();
 
-  private final String encryptionKey;
+  private final String key;
 
-  public WebExceptionHandler(@Value("${web-exception-key}") String encryptionKey) {
-    checkState(!"unset".equals(encryptionKey), "web-exception-key is unset");
-    this.encryptionKey = encryptionKey;
+  public WebExceptionHandler(@Value("${web-exception-key}") String key) {
+    checkState(!"unset".equals(key), "web-exception-key is unset");
+    this.key = key;
   }
 
   private static List<Throwable> causes(Throwable tr) {
@@ -134,7 +134,7 @@ public final class WebExceptionHandler {
 
   private List<Extension> extensions(Throwable tr, HttpServletRequest request) {
     List<Extension> extensions = new ArrayList<>(5);
-    BasicEncryption encrypter = BasicEncryption.forKey(encryptionKey);
+    BasicEncryption encrypter = BasicEncryption.forKey(key);
     extensions.add(
         Extension.builder().url("timestamp").valueInstant(Instant.now().toString()).build());
     extensions.add(
@@ -171,31 +171,31 @@ public final class WebExceptionHandler {
     return responseFor("structure", e, request, emptyList(), true);
   }
 
-  @ExceptionHandler({HttpClientErrorException.Forbidden.class})
+  @ExceptionHandler(HttpClientErrorException.Forbidden.class)
   @ResponseStatus(HttpStatus.FORBIDDEN)
   OperationOutcome handleForbidden(Exception e, HttpServletRequest request) {
     return responseFor("forbidden", e, request, emptyList(), true);
   }
 
-  @ExceptionHandler({HttpRequestMethodNotSupportedException.class})
+  @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
   @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
   OperationOutcome handleNotAllowed(Exception e, HttpServletRequest request) {
     return responseFor("not-allowed", e, request, emptyList(), true);
   }
 
-  @ExceptionHandler({HttpClientErrorException.NotFound.class, Exceptions.NotFound.class})
+  @ExceptionHandler({Exceptions.NotFound.class, HttpClientErrorException.NotFound.class})
   @ResponseStatus(HttpStatus.NOT_FOUND)
   OperationOutcome handleNotFound(Exception e, HttpServletRequest request) {
     return responseFor("not-found", e, request, emptyList(), true);
   }
 
-  @ExceptionHandler({Exceptions.NotImplemented.class})
+  @ExceptionHandler(Exceptions.NotImplemented.class)
   @ResponseStatus(HttpStatus.NOT_IMPLEMENTED)
   OperationOutcome handleNotImplemented(Exception e, HttpServletRequest request) {
     return responseFor("not-implemented", e, request, emptyList(), true);
   }
 
-  @ExceptionHandler({ResourceAccessException.class})
+  @ExceptionHandler(ResourceAccessException.class)
   @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
   OperationOutcome handleServiceUnavailable(Exception e, HttpServletRequest request) {
     return responseFor("service-unavailable", e, request, emptyList(), true);
@@ -219,7 +219,7 @@ public final class WebExceptionHandler {
     return responseFor("exception", e, request, emptyList(), true);
   }
 
-  @ExceptionHandler({HttpClientErrorException.Unauthorized.class})
+  @ExceptionHandler(HttpClientErrorException.Unauthorized.class)
   @ResponseStatus(HttpStatus.UNAUTHORIZED)
   OperationOutcome handleUnauthorized(Exception e, HttpServletRequest request) {
     return responseFor("unauthorized", e, request, emptyList(), true);

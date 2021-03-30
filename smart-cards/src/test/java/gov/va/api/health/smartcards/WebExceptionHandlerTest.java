@@ -9,10 +9,12 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.io.JsonEOFException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.google.common.collect.ImmutableMap;
 import gov.va.api.health.r4.api.elements.Narrative;
 import gov.va.api.health.r4.api.resources.OperationOutcome;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
@@ -21,12 +23,36 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.Validation;
 import javax.validation.constraints.NotNull;
 import lombok.Builder;
+import lombok.SneakyThrows;
 import lombok.Value;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.UnsatisfiedServletRequestParameterException;
+import org.springframework.web.client.HttpClientErrorException;
 
 public class WebExceptionHandlerTest {
+  private static final ObjectMapper MAPPER = JacksonMapperConfig.createMapper();
+
+  @SneakyThrows
+  private static HttpClientErrorException unauthorizedError() {
+    OperationOutcome outcome = OperationOutcome.builder().id("exception").build();
+    var body = MAPPER.writeValueAsString(outcome);
+    HttpHeaders headers = HttpHeaders.EMPTY;
+    return HttpClientErrorException.create(
+        HttpStatus.UNAUTHORIZED,
+        "401",
+        HttpHeaders.EMPTY,
+        body.getBytes(StandardCharsets.UTF_8),
+        StandardCharsets.UTF_8);
+  }
+
+  private static HttpClientErrorException unauthorizedErrorWithEmptyBody() {
+    return HttpClientErrorException.create(
+        HttpStatus.UNAUTHORIZED, "401", HttpHeaders.EMPTY, new byte[0], StandardCharsets.UTF_8);
+  }
+
   @Test
   void badRequest() {
     OperationOutcome outcome =
@@ -205,6 +231,34 @@ public class WebExceptionHandlerTest {
                         OperationOutcome.Issue.builder()
                             .severity(OperationOutcome.Issue.IssueSeverity.fatal)
                             .code("database")
+                            .build()))
+                .build());
+  }
+
+  @Test
+  void unauthorized() {
+    OperationOutcome outcome =
+        new WebExceptionHandler("")
+            .handleUnauthorized(unauthorizedError(), mock(HttpServletRequest.class));
+    assertThat(outcome).isEqualTo(OperationOutcome.builder().id("exception").build());
+
+    OperationOutcome outcomeFromEmpty =
+        new WebExceptionHandler("")
+            .handleUnauthorized(unauthorizedErrorWithEmptyBody(), mock(HttpServletRequest.class));
+    assertThat(outcomeFromEmpty.id(null).extension(null))
+        .isEqualTo(
+            OperationOutcome.builder()
+                .resourceType("OperationOutcome")
+                .text(
+                    Narrative.builder()
+                        .status(Narrative.NarrativeStatus.additional)
+                        .div("<div>Failure: null</div>")
+                        .build())
+                .issue(
+                    List.of(
+                        OperationOutcome.Issue.builder()
+                            .severity(OperationOutcome.Issue.IssueSeverity.fatal)
+                            .code("unauthorized")
                             .build()))
                 .build());
   }

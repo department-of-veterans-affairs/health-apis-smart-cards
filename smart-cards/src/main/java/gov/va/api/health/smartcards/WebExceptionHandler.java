@@ -20,6 +20,7 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
@@ -132,6 +133,14 @@ public final class WebExceptionHandler {
         .build();
   }
 
+  Optional<OperationOutcome> asOperationOutcome(String json) {
+    try {
+      return Optional.of(MAPPER.readValue(json, OperationOutcome.class));
+    } catch (Exception e) {
+      return Optional.empty();
+    }
+  }
+
   private List<Extension> extensions(Throwable tr, HttpServletRequest request) {
     List<Extension> extensions = new ArrayList<>(5);
     BasicEncryption encrypter = BasicEncryption.forKey(key);
@@ -174,7 +183,8 @@ public final class WebExceptionHandler {
   @ExceptionHandler(HttpClientErrorException.Forbidden.class)
   @ResponseStatus(HttpStatus.FORBIDDEN)
   OperationOutcome handleForbidden(Exception e, HttpServletRequest request) {
-    return responseFor("forbidden", e, request, emptyList(), true);
+    Optional<OperationOutcome> maybeOperationOutcome = operationOutcomeFromClientResponse(e);
+    return maybeOperationOutcome.orElse(responseFor("forbidden", e, request, emptyList(), true));
   }
 
   @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
@@ -186,7 +196,8 @@ public final class WebExceptionHandler {
   @ExceptionHandler({Exceptions.NotFound.class, HttpClientErrorException.NotFound.class})
   @ResponseStatus(HttpStatus.NOT_FOUND)
   OperationOutcome handleNotFound(Exception e, HttpServletRequest request) {
-    return responseFor("not-found", e, request, emptyList(), true);
+    Optional<OperationOutcome> maybeOperationOutcome = operationOutcomeFromClientResponse(e);
+    return maybeOperationOutcome.orElse(responseFor("not-found", e, request, emptyList(), true));
   }
 
   @ExceptionHandler(Exceptions.NotImplemented.class)
@@ -222,7 +233,8 @@ public final class WebExceptionHandler {
   @ExceptionHandler(HttpClientErrorException.Unauthorized.class)
   @ResponseStatus(HttpStatus.UNAUTHORIZED)
   OperationOutcome handleUnauthorized(Exception e, HttpServletRequest request) {
-    return responseFor("unauthorized", e, request, emptyList(), true);
+    Optional<OperationOutcome> maybeOperationOutcome = operationOutcomeFromClientResponse(e);
+    return maybeOperationOutcome.orElse(responseFor("unauthorized", e, request, emptyList(), true));
   }
 
   /**
@@ -239,6 +251,21 @@ public final class WebExceptionHandler {
             .map(v -> v.getPropertyPath() + " " + v.getMessage())
             .collect(toList());
     return responseFor("structure", e, request, diagnostics, true);
+  }
+
+  Optional<OperationOutcome> operationOutcomeFromClientResponse(Exception e) {
+    var maybeClientError = parseHttpClientErrorException(e);
+    if (maybeClientError.isPresent()) {
+      return asOperationOutcome(maybeClientError.get().getResponseBodyAsString());
+    }
+    return Optional.empty();
+  }
+
+  Optional<HttpClientErrorException> parseHttpClientErrorException(Throwable tr) {
+    if (tr instanceof HttpClientErrorException) {
+      return Optional.of((HttpClientErrorException) tr);
+    }
+    return Optional.empty();
   }
 
   @SneakyThrows

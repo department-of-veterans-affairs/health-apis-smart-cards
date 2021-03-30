@@ -36,21 +36,13 @@ public class WebExceptionHandlerTest {
   private static final ObjectMapper MAPPER = JacksonMapperConfig.createMapper();
 
   @SneakyThrows
-  private static HttpClientErrorException unauthorizedError() {
-    OperationOutcome outcome = OperationOutcome.builder().id("exception").build();
-    var body = MAPPER.writeValueAsString(outcome);
-    HttpHeaders headers = HttpHeaders.EMPTY;
+  private static HttpClientErrorException unauthorizedError(OperationOutcome outcome) {
+    byte[] bytes =
+        outcome == null
+            ? new byte[0]
+            : MAPPER.writeValueAsString(outcome).getBytes(StandardCharsets.UTF_8);
     return HttpClientErrorException.create(
-        HttpStatus.UNAUTHORIZED,
-        "401",
-        HttpHeaders.EMPTY,
-        body.getBytes(StandardCharsets.UTF_8),
-        StandardCharsets.UTF_8);
-  }
-
-  private static HttpClientErrorException unauthorizedErrorWithEmptyBody() {
-    return HttpClientErrorException.create(
-        HttpStatus.UNAUTHORIZED, "401", HttpHeaders.EMPTY, new byte[0], StandardCharsets.UTF_8);
+        HttpStatus.UNAUTHORIZED, "401", HttpHeaders.EMPTY, bytes, StandardCharsets.UTF_8);
   }
 
   @Test
@@ -237,14 +229,15 @@ public class WebExceptionHandlerTest {
 
   @Test
   void unauthorized() {
+    OperationOutcome clientOutcome = OperationOutcome.builder().id("exception").build();
     OperationOutcome outcome =
         new WebExceptionHandler("")
-            .handleUnauthorized(unauthorizedError(), mock(HttpServletRequest.class));
-    assertThat(outcome).isEqualTo(OperationOutcome.builder().id("exception").build());
+            .handleUnauthorized(unauthorizedError(clientOutcome), mock(HttpServletRequest.class));
+    assertThat(outcome).isEqualTo(clientOutcome);
 
     OperationOutcome outcomeFromEmpty =
         new WebExceptionHandler("")
-            .handleUnauthorized(unauthorizedErrorWithEmptyBody(), mock(HttpServletRequest.class));
+            .handleUnauthorized(unauthorizedError(null), mock(HttpServletRequest.class));
     assertThat(outcomeFromEmpty.id(null).extension(null))
         .isEqualTo(
             OperationOutcome.builder()

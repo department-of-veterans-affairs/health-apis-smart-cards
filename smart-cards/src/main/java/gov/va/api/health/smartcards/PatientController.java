@@ -219,7 +219,6 @@ public class PatientController {
     return patients;
   }
 
-  @SneakyThrows
   @PostMapping(value = "/{id}/$health-cards-issue")
   ResponseEntity<Parameters> healthCardsIssue(
       @PathVariable("id") String id,

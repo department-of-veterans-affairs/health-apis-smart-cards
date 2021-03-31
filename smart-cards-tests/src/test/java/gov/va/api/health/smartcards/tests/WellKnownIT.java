@@ -18,6 +18,8 @@ public class WellKnownIT {
   @Test
   void jwks_internal() {
     doGet(systemDefinition().internal(), ".well-known/jwks.json", "jwks", 200);
+    doGet(systemDefinition().internal(), "dstu2/.well-known/jwks.json", "jwks dstu2", 200);
+    doGet(systemDefinition().internal(), "r4/.well-known/jwks.json", "jwks r4", 200);
   }
 
   @Test
@@ -31,6 +33,16 @@ public class WellKnownIT {
         systemDefinition().internal(),
         ".well-known/smart-configuration",
         "smart configuration",
+        200);
+    doGet(
+        systemDefinition().internal(),
+        "dstu2/.well-known/smart-configuration",
+        "smart configuration dstu2",
+        200);
+    doGet(
+        systemDefinition().internal(),
+        "r4/.well-known/smart-configuration",
+        "smart configuration r4",
         200);
   }
 }

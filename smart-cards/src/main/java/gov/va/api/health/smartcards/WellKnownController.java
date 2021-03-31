@@ -12,16 +12,18 @@ import org.springframework.web.bind.annotation.RestController;
 @Builder
 @RestController
 @AllArgsConstructor(onConstructor_ = @Autowired)
-@RequestMapping(produces = {"application/json", "application/fhir+json"})
+@RequestMapping(
+    value = {"/.well-known", "/dstu2/.well-known", "/r4/.well-known"},
+    produces = {"application/json", "application/fhir+json"})
 public class WellKnownController {
   private final JwksProperties jwksProperties;
 
-  @GetMapping(value = "/.well-known/jwks.json")
+  @GetMapping(value = "/jwks.json")
   String jwks() {
     return jwksProperties.jwksPublicJson();
   }
 
-  @GetMapping(value = "/.well-known/smart-configuration")
+  @GetMapping(value = "/smart-configuration")
   WellKnown smartConfiguration() {
     return WellKnown.builder()
         .capabilities(

@@ -20,6 +20,7 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
@@ -38,6 +39,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestClientResponseException;
 
 @Slf4j
 @RestControllerAdvice
@@ -64,6 +67,14 @@ public final class WebExceptionHandler {
     }
   }
 
+  private static Optional<OperationOutcome> deserializeOperationOutcome(String json) {
+    try {
+      return Optional.of(MAPPER.readValue(json, OperationOutcome.class));
+    } catch (Exception e) {
+      return Optional.empty();
+    }
+  }
+
   private static boolean isJsonError(Throwable tr) {
     Throwable current = tr;
     while (current != null) {
@@ -73,6 +84,21 @@ public final class WebExceptionHandler {
       current = current.getCause();
     }
     return false;
+  }
+
+  private static Optional<OperationOutcome> operationOutcomeFromClientResponse(Throwable tr) {
+    var maybeClientError = parseHttpClientErrorException(tr);
+    if (maybeClientError.isPresent()) {
+      return deserializeOperationOutcome(maybeClientError.get().getResponseBodyAsString());
+    }
+    return Optional.empty();
+  }
+
+  private static Optional<RestClientResponseException> parseHttpClientErrorException(Throwable tr) {
+    if (tr instanceof RestClientException) {
+      return Optional.of((RestClientResponseException) tr);
+    }
+    return Optional.empty();
   }
 
   private static String reconstructUrl(HttpServletRequest request) {
@@ -248,7 +274,9 @@ public final class WebExceptionHandler {
       HttpServletRequest request,
       List<String> diagnostics,
       boolean printStackTrace) {
-    OperationOutcome response = asOperationOutcome(code, tr, request, diagnostics);
+    Optional<OperationOutcome> maybeOperationOutcome = operationOutcomeFromClientResponse(tr);
+    OperationOutcome response =
+        maybeOperationOutcome.orElse(asOperationOutcome(code, tr, request, diagnostics));
     if (printStackTrace) {
       log.error("Response {}", MAPPER.writeValueAsString(response), tr);
     } else {

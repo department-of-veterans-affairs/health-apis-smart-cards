@@ -124,6 +124,8 @@ class SystemDefinitions {
 
     String urlWithApiPath() {
       StringBuilder builder = new StringBuilder(url());
+      builder.append(":");
+      builder.append(port());
       if (!apiPath().startsWith("/")) {
         builder.append('/');
       }

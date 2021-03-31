@@ -244,7 +244,7 @@ public class PatientController {
     Patient.Bundle patients = findPatientByIcn(id, authorization);
     Immunization.Bundle immunizations = fhirClient.immunizationBundle(id, authorization);
     if (immunizations.total() == 0) {
-      return ResponseEntity.ok(Parameters.builder().build());
+      return ResponseEntity.ok(Parameters.builder().parameter(List.of()).build());
     }
     lookupAndAttachLocations(immunizations, authorization);
     List<MixedEntry> resources = minimize(patients, immunizations);

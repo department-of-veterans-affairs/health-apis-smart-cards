@@ -94,17 +94,6 @@ public class PatientIT {
   }
 
   @Test
-  void read() {
-    String id = systemDefinition().ids().patient();
-    doPost(
-        systemDefinition().internal(),
-        String.format("r4/Patient/%s/$health-cards-issue", id),
-        parametersCovid19(),
-        "$health-cards-issue",
-        200);
-  }
-
-  @Test
   void read_doNotCompress() {
     String id = systemDefinition().ids().patient();
     doPost(
@@ -126,6 +115,17 @@ public class PatientIT {
         "$health-cards-issue",
         200,
         Map.of("x-vc-jws", "false"));
+  }
+
+  @Test
+  void read_dstu2() {
+    String id = systemDefinition().ids().patient();
+    doPost(
+        systemDefinition().internal(),
+        String.format("dstu2/Patient/%s/$health-cards-issue", id),
+        parametersCovid19(),
+        "$health-cards-issue",
+        200);
   }
 
   @Test
@@ -247,5 +247,16 @@ public class PatientIT {
         parametersWithCredentialType("NOPE"),
         "$health-cards-issue (unknown credentialType)",
         400);
+  }
+
+  @Test
+  void read_r4() {
+    String id = systemDefinition().ids().patient();
+    doPost(
+        systemDefinition().internal(),
+        String.format("r4/Patient/%s/$health-cards-issue", id),
+        parametersCovid19(),
+        "$health-cards-issue",
+        200);
   }
 }

@@ -54,7 +54,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 @RestController
 @RequestMapping(
-    value = "/r4/Patient",
+    value = {"/dstu2/Patient", "/r4/Patient"},
     produces = {"application/json", "application/fhir+json"})
 @AllArgsConstructor(onConstructor_ = @Autowired)
 public class PatientController {
@@ -85,7 +85,9 @@ public class PatientController {
   static Set<CredentialType> credentialTypes(Parameters parameters) {
     checkRequestState(parameters.parameter() != null, "parameters are required");
     Set<CredentialType> types =
-        parameters.parameter().stream()
+        parameters
+            .parameter()
+            .stream()
             .filter(p -> "credentialType".equals(p.name()))
             .map(Parameters.Parameter::valueUri)
             .map(CredentialType::fromUri)
@@ -102,7 +104,8 @@ public class PatientController {
 
   private static List<String> indexAndReplaceUrls(List<MixedEntry> entries) {
     List<String> urls =
-        entries.stream()
+        entries
+            .stream()
             .map(AbstractEntry::fullUrl)
             .filter(StringUtils::isNotBlank)
             .distinct()
@@ -189,7 +192,8 @@ public class PatientController {
       throw new Exceptions.BadRequest("credentialType parameter is required");
     }
     var requestedButUnimplemented =
-        UNIMPLEMENTED_CREDENTIAL_TYPES.stream()
+        UNIMPLEMENTED_CREDENTIAL_TYPES
+            .stream()
             .filter(credentials::contains)
             .map(CredentialType::getUri)
             .collect(toList());

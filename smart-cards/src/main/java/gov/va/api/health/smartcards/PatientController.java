@@ -29,7 +29,6 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 import javax.validation.Valid;
 import lombok.AllArgsConstructor;
-import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -156,7 +155,6 @@ public class PatientController {
         .collect(toList());
   }
 
-  @SneakyThrows
   private static Parameters parameters(String vc, List<String> urls) {
     return Parameters.builder()
         .parameter(

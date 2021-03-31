@@ -51,7 +51,7 @@
             </goals>
             <configuration>
               <resourceClasses>
-                <resourceClass>gov.va.api.health.smartcards.R4OpenApi</resourceClass>
+                <resourceClass>gov.va.api.health.smartcards.OpenApiR4</resourceClass>
               </resourceClasses>
               <outputFileName>r4-openapi</outputFileName>
               <outputPath>${project.build.outputDirectory}</outputPath>
@@ -67,7 +67,7 @@
             </goals>
             <configuration>
               <resourceClasses>
-                <resourceClass>gov.va.api.health.smartcards.Dstu2OpenApi</resourceClass>
+                <resourceClass>gov.va.api.health.smartcards.OpenApiDstu2</resourceClass>
               </resourceClasses>
               <outputFileName>dstu2-openapi</outputFileName>
               <outputPath>${project.build.outputDirectory}</outputPath>

@@ -200,8 +200,7 @@ public final class WebExceptionHandler {
   @ExceptionHandler(HttpClientErrorException.Forbidden.class)
   @ResponseStatus(HttpStatus.FORBIDDEN)
   OperationOutcome handleForbidden(Exception e, HttpServletRequest request) {
-    Optional<OperationOutcome> maybeOperationOutcome = operationOutcomeFromClientResponse(e);
-    return maybeOperationOutcome.orElse(responseFor("forbidden", e, request, emptyList(), true));
+    return responseFor("forbidden", e, request, emptyList(), true);
   }
 
   @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
@@ -213,8 +212,7 @@ public final class WebExceptionHandler {
   @ExceptionHandler({Exceptions.NotFound.class, HttpClientErrorException.NotFound.class})
   @ResponseStatus(HttpStatus.NOT_FOUND)
   OperationOutcome handleNotFound(Exception e, HttpServletRequest request) {
-    Optional<OperationOutcome> maybeOperationOutcome = operationOutcomeFromClientResponse(e);
-    return maybeOperationOutcome.orElse(responseFor("not-found", e, request, emptyList(), true));
+    return responseFor("not-found", e, request, emptyList(), true);
   }
 
   @ExceptionHandler(Exceptions.NotImplemented.class)
@@ -250,8 +248,7 @@ public final class WebExceptionHandler {
   @ExceptionHandler(HttpClientErrorException.Unauthorized.class)
   @ResponseStatus(HttpStatus.UNAUTHORIZED)
   OperationOutcome handleUnauthorized(Exception e, HttpServletRequest request) {
-    Optional<OperationOutcome> maybeOperationOutcome = operationOutcomeFromClientResponse(e);
-    return maybeOperationOutcome.orElse(responseFor("unauthorized", e, request, emptyList(), true));
+    return responseFor("unauthorized", e, request, emptyList(), true);
   }
 
   /**
@@ -277,6 +274,10 @@ public final class WebExceptionHandler {
       HttpServletRequest request,
       List<String> diagnostics,
       boolean printStackTrace) {
+    Optional<OperationOutcome> maybeOperationOutcome = operationOutcomeFromClientResponse(tr);
+    if (maybeOperationOutcome.isPresent()) {
+      return maybeOperationOutcome.get();
+    }
     OperationOutcome response = asOperationOutcome(code, tr, request, diagnostics);
     if (printStackTrace) {
       log.error("Response {}", MAPPER.writeValueAsString(response), tr);

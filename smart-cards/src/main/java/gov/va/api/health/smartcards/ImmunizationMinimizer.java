@@ -1,4 +1,4 @@
-package gov.va.api.health.smartcards.patient;
+package gov.va.api.health.smartcards;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.util.CollectionUtils.isEmpty;

@@ -1,4 +1,4 @@
-package gov.va.api.health.smartcards.patient;
+package gov.va.api.health.smartcards;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

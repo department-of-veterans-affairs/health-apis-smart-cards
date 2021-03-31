@@ -1,4 +1,4 @@
-package gov.va.api.health.smartcards.patient;
+package gov.va.api.health.smartcards;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.stream.Collectors.toList;
@@ -18,17 +18,6 @@ import gov.va.api.health.r4.api.resources.Immunization;
 import gov.va.api.health.r4.api.resources.Location;
 import gov.va.api.health.r4.api.resources.Parameters;
 import gov.va.api.health.r4.api.resources.Patient;
-import gov.va.api.health.smartcards.DataQueryFhirClient;
-import gov.va.api.health.smartcards.Exceptions;
-import gov.va.api.health.smartcards.JacksonMapperConfig;
-import gov.va.api.health.smartcards.JwksProperties;
-import gov.va.api.health.smartcards.JwsHelpers;
-import gov.va.api.health.smartcards.LinkProperties;
-import gov.va.api.health.smartcards.MockResourceSamples;
-import gov.va.api.health.smartcards.PayloadSigner;
-import gov.va.api.health.smartcards.vc.CredentialType;
-import gov.va.api.health.smartcards.vc.PayloadClaimsWrapper;
-import gov.va.api.health.smartcards.vc.VerifiableCredential;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;

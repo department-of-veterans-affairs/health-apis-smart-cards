@@ -1,14 +1,13 @@
-package gov.va.api.health.smartcards.patient;
+package gov.va.api.health.smartcards;
 
-import static com.google.common.base.Preconditions.checkState;
-import static gov.va.api.health.smartcards.Controllers.checkRequestState;
+import static gov.va.api.health.smartcards.Controllers.parseBooleanOrTrue;
+import static gov.va.api.health.smartcards.Controllers.resourceId;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import gov.va.api.health.r4.api.bundle.AbstractBundle;
 import gov.va.api.health.r4.api.bundle.AbstractEntry;
 import gov.va.api.health.r4.api.bundle.MixedBundle;
@@ -19,13 +18,6 @@ import gov.va.api.health.r4.api.resources.Location;
 import gov.va.api.health.r4.api.resources.Parameters;
 import gov.va.api.health.r4.api.resources.Patient;
 import gov.va.api.health.r4.api.resources.Resource;
-import gov.va.api.health.smartcards.Controllers;
-import gov.va.api.health.smartcards.DataQueryFhirClient;
-import gov.va.api.health.smartcards.Exceptions;
-import gov.va.api.health.smartcards.JacksonMapperConfig;
-import gov.va.api.health.smartcards.PayloadSigner;
-import gov.va.api.health.smartcards.vc.CredentialType;
-import gov.va.api.health.smartcards.vc.VerifiableCredential;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -58,8 +50,6 @@ import org.springframework.web.bind.annotation.RestController;
     produces = {"application/json", "application/fhir+json"})
 @AllArgsConstructor(onConstructor_ = @Autowired)
 public class PatientController {
-  private static final ObjectMapper MAPPER = JacksonMapperConfig.createMapper();
-
   private static final String RESOURCE_PREFIX = "resource:";
 
   private static final List<CredentialType> UNIMPLEMENTED_CREDENTIAL_TYPES =
@@ -83,19 +73,19 @@ public class PatientController {
   }
 
   static Set<CredentialType> credentialTypes(Parameters parameters) {
-    checkRequestState(parameters.parameter() != null, "parameters are required");
+    if (parameters.parameter() == null) {
+      throw new Exceptions.BadRequest("parameters are required");
+    }
     Set<CredentialType> types =
-        parameters
-            .parameter()
-            .stream()
+        parameters.parameter().stream()
             .filter(p -> "credentialType".equals(p.name()))
             .map(Parameters.Parameter::valueUri)
             .map(CredentialType::fromUri)
             .collect(toSet());
     validateCredentialTypes(types);
-    // Expand credential types.
+    // expand credential types
     types.add(CredentialType.HEALTH_CARD);
-    // Just covid19 assumes immunizations by default
+    // just covid1-9 assumes immunization by default
     if (types.contains(CredentialType.COVID_19)) {
       types.add(CredentialType.IMMUNIZATION);
     }
@@ -104,13 +94,12 @@ public class PatientController {
 
   private static List<String> indexAndReplaceUrls(List<MixedEntry> entries) {
     List<String> urls =
-        entries
-            .stream()
+        entries.stream()
             .map(AbstractEntry::fullUrl)
             .filter(StringUtils::isNotBlank)
             .distinct()
             .collect(toCollection(ArrayList::new));
-    // Index unique URLs and replace with 'resource:X' scheme
+    // index unique URLs and replace with 'resource:X' scheme
     for (MixedEntry entry : entries) {
       if (isBlank(entry.fullUrl())) {
         continue;
@@ -182,18 +171,12 @@ public class PatientController {
         .build();
   }
 
-  private static boolean parseBooleanOrTrue(String value) {
-    // not using parseBoolean because we need to default to true
-    return !"false".equalsIgnoreCase(StringUtils.trimToEmpty(value));
-  }
-
   private static void validateCredentialTypes(Set<CredentialType> credentials) {
     if (credentials.isEmpty()) {
       throw new Exceptions.BadRequest("credentialType parameter is required");
     }
     var requestedButUnimplemented =
-        UNIMPLEMENTED_CREDENTIAL_TYPES
-            .stream()
+        UNIMPLEMENTED_CREDENTIAL_TYPES.stream()
             .filter(credentials::contains)
             .map(CredentialType::getUri)
             .collect(toList());
@@ -201,11 +184,11 @@ public class PatientController {
       throw new Exceptions.NotImplemented(
           String.format("Not yet implemented support for %s", requestedButUnimplemented));
     }
-    // Reject a request with ONLY #health-card
+    // reject a request with only #health-card
     if (credentials.equals(Set.of(CredentialType.HEALTH_CARD))) {
       throw new Exceptions.BadRequest("Specify a more granular credential type");
     }
-    // Reject a request with only #immunization
+    // reject a request with only #immunization
     if (credentials.contains(CredentialType.IMMUNIZATION)
         && !credentials.contains(CredentialType.COVID_19)) {
       throw new Exceptions.NotImplemented("Only support covid19 credential type");
@@ -229,13 +212,14 @@ public class PatientController {
   }
 
   private Patient.Bundle findPatientByIcn(String icn, String authorization) {
-    var patients = fhirClient.patientBundle(icn, authorization);
-    if (patients.total() == 0) {
+    Patient.Bundle patients = fhirClient.patientBundle(icn, authorization);
+    if (isEmpty(patients.entry())) {
       throw new Exceptions.NotFound(icn);
     }
     return patients;
   }
 
+  @SneakyThrows
   @PostMapping(value = "/{id}/$health-cards-issue")
   ResponseEntity<Parameters> healthCardsIssue(
       @PathVariable("id") String id,
@@ -243,18 +227,21 @@ public class PatientController {
       @RequestHeader(name = "Authorization", required = false) String authorization,
       @RequestHeader(name = "x-vc-jws", required = false) String vcJws,
       @RequestHeader(name = "x-vc-compress", required = false) String vcCompress) {
-    checkState(isNotBlank(id), "id is required");
-    var credentialTypes = credentialTypes(parameters);
+    if (isBlank(id)) {
+      throw new Exceptions.BadRequest("id is required");
+    }
+    Set<CredentialType> credentialTypes = credentialTypes(parameters);
     Patient.Bundle patients = findPatientByIcn(id, authorization);
     Immunization.Bundle immunizations = fhirClient.immunizationBundle(id, authorization);
-    if (immunizations.total() == 0) {
+    if (isEmpty(immunizations.entry())) {
       return ResponseEntity.ok(Parameters.builder().parameter(List.of()).build());
     }
     lookupAndAttachLocations(immunizations, authorization);
     List<MixedEntry> resources = minimize(patients, immunizations);
     List<String> urls = indexAndReplaceUrls(resources);
     var vc = vc(bundle(resources), credentialTypes);
-    var signedVc = signVc(vc, parseBooleanOrTrue(vcJws), parseBooleanOrTrue(vcCompress));
+    String signedVc =
+        payloadSigner.sign(vc, parseBooleanOrTrue(vcJws), parseBooleanOrTrue(vcCompress));
     var parametersResponse = parameters(signedVc, urls);
     return ResponseEntity.ok(parametersResponse);
   }
@@ -269,7 +256,7 @@ public class PatientController {
     Map<String, Location> locations = new HashMap<>();
     for (Immunization.Entry entry : immunizations.entry()) {
       Immunization imm = entry.resource();
-      String locId = Controllers.resourceId(imm.location());
+      String locId = resourceId(imm.location());
       if (locId == null) {
         continue;
       }
@@ -284,13 +271,5 @@ public class PatientController {
                   Stream.of(location))
               .collect(toList()));
     }
-  }
-
-  @SneakyThrows
-  private String signVc(VerifiableCredential vc, boolean shouldSign, boolean shouldCompress) {
-    if (!shouldSign) {
-      return MAPPER.writeValueAsString(vc);
-    }
-    return payloadSigner.sign(vc, shouldCompress);
   }
 }

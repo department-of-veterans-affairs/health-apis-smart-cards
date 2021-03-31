@@ -1,25 +1,18 @@
 package gov.va.api.health.smartcards;
 
-import static com.google.common.base.Preconditions.checkState;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import com.google.common.base.Splitter;
 import gov.va.api.health.r4.api.elements.Reference;
 import java.util.List;
-import lombok.NonNull;
-import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.StringUtils;
 
 @UtilityClass
 public final class Controllers {
-  /** Wrapper for Preconditions.checkState which throws a BadRequest. */
-  @SneakyThrows
-  public static void checkRequestState(boolean condition, @NonNull String message) {
-    try {
-      checkState(condition, message);
-    } catch (IllegalStateException e) {
-      throw new Exceptions.BadRequest(e.getMessage(), e);
-    }
+  public static boolean parseBooleanOrTrue(String value) {
+    // not using parseBoolean because we need to default to true
+    return !"false".equalsIgnoreCase(StringUtils.trimToEmpty(value));
   }
 
   /**

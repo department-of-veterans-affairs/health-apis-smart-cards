@@ -1,4 +1,4 @@
-package gov.va.api.health.smartcards.patient;
+package gov.va.api.health.smartcards;
 
 import gov.va.api.health.r4.api.resources.Parameters;
 import io.swagger.v3.oas.annotations.Operation;

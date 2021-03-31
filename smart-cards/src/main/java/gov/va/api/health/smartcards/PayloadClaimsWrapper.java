@@ -1,4 +1,4 @@
-package gov.va.api.health.smartcards.vc;
+package gov.va.api.health.smartcards;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
@@ -13,11 +13,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class PayloadClaimsWrapper {
   @JsonProperty("iss")
-  String issuer;
+  private String issuer;
 
   @JsonProperty("iat")
-  long issuedAt;
+  private long issuedAt;
 
   @JsonProperty("vc")
-  VerifiableCredential verifiableCredential;
+  private VerifiableCredential verifiableCredential;
 }

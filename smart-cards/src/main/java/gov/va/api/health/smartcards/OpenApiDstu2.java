@@ -1,6 +1,5 @@
 package gov.va.api.health.smartcards;
 
-import gov.va.api.health.smartcards.patient.OpenApiR4HealthCards;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;

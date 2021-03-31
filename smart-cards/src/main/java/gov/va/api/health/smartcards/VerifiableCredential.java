@@ -1,4 +1,4 @@
-package gov.va.api.health.smartcards.vc;
+package gov.va.api.health.smartcards;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import gov.va.api.health.r4.api.bundle.MixedBundle;
@@ -15,19 +15,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class VerifiableCredential {
   @JsonProperty("@context")
-  List<String> context;
+  private List<String> context;
 
-  List<String> type;
+  private List<String> type;
 
-  CredentialSubject credentialSubject;
+  private CredentialSubject credentialSubject;
 
   @Data
   @Builder
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   @AllArgsConstructor(access = AccessLevel.PRIVATE)
   public static class CredentialSubject {
-    String fhirVersion;
+    private String fhirVersion;
 
-    MixedBundle fhirBundle;
+    private MixedBundle fhirBundle;
   }
 }

@@ -9,9 +9,7 @@ import gov.va.api.health.r4.api.bundle.MixedBundle;
 import gov.va.api.health.r4.api.bundle.MixedEntry;
 import gov.va.api.health.r4.api.datatypes.HumanName;
 import gov.va.api.health.r4.api.resources.Patient;
-import gov.va.api.health.smartcards.vc.PayloadClaimsWrapper;
-import gov.va.api.health.smartcards.vc.VerifiableCredential;
-import gov.va.api.health.smartcards.vc.VerifiableCredential.CredentialSubject;
+import gov.va.api.health.smartcards.VerifiableCredential.CredentialSubject;
 import java.util.List;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
@@ -54,8 +52,8 @@ public class PayloadSignerTest {
         .build();
   }
 
-  @SneakyThrows
   @Test
+  @SneakyThrows
   void signAndCompress() {
     PayloadSigner signer =
         PayloadSigner.builder()
@@ -63,7 +61,7 @@ public class PayloadSignerTest {
             .linkProperties(_linkProperties())
             .build();
     var vc = vc();
-    String jws = signer.sign(vc, true);
+    String jws = signer.sign(vc, true, true);
 
     // Verify signature with public key
     assertThat(JwsHelpers.verify(jws, JWKS_PROPERTIES.currentPublicJwk())).isTrue();
@@ -82,8 +80,8 @@ public class PayloadSignerTest {
     assertThat(claims.verifiableCredential()).isEqualTo(vc);
   }
 
-  @SneakyThrows
   @Test
+  @SneakyThrows
   void signWithoutCompressions() {
     PayloadSigner signer =
         PayloadSigner.builder()
@@ -91,7 +89,7 @@ public class PayloadSignerTest {
             .linkProperties(_linkProperties())
             .build();
     var vc = vc();
-    String jws = signer.sign(vc, false);
+    String jws = signer.sign(vc, true, false);
 
     // Verify signature with public key
     assertThat(JwsHelpers.verify(jws, JWKS_PROPERTIES.currentPublicJwk())).isTrue();

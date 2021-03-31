@@ -275,10 +275,8 @@ public final class WebExceptionHandler {
       List<String> diagnostics,
       boolean printStackTrace) {
     Optional<OperationOutcome> maybeOperationOutcome = operationOutcomeFromClientResponse(tr);
-    if (maybeOperationOutcome.isPresent()) {
-      return maybeOperationOutcome.get();
-    }
-    OperationOutcome response = asOperationOutcome(code, tr, request, diagnostics);
+    OperationOutcome response =
+        maybeOperationOutcome.orElse(asOperationOutcome(code, tr, request, diagnostics));
     if (printStackTrace) {
       log.error("Response {}", MAPPER.writeValueAsString(response), tr);
     } else {

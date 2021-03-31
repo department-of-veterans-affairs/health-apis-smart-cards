@@ -39,6 +39,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestClientResponseException;
 
 @Slf4j
 @RestControllerAdvice
@@ -65,6 +67,14 @@ public final class WebExceptionHandler {
     }
   }
 
+  private static Optional<OperationOutcome> deserializeOperationOutcome(String json) {
+    try {
+      return Optional.of(MAPPER.readValue(json, OperationOutcome.class));
+    } catch (Exception e) {
+      return Optional.empty();
+    }
+  }
+
   private static boolean isJsonError(Throwable tr) {
     Throwable current = tr;
     while (current != null) {
@@ -74,6 +84,21 @@ public final class WebExceptionHandler {
       current = current.getCause();
     }
     return false;
+  }
+
+  private static Optional<OperationOutcome> operationOutcomeFromClientResponse(Throwable tr) {
+    var maybeClientError = parseHttpClientErrorException(tr);
+    if (maybeClientError.isPresent()) {
+      return deserializeOperationOutcome(maybeClientError.get().getResponseBodyAsString());
+    }
+    return Optional.empty();
+  }
+
+  private static Optional<RestClientResponseException> parseHttpClientErrorException(Throwable tr) {
+    if (tr instanceof RestClientException) {
+      return Optional.of((RestClientResponseException) tr);
+    }
+    return Optional.empty();
   }
 
   private static String reconstructUrl(HttpServletRequest request) {
@@ -131,14 +156,6 @@ public final class WebExceptionHandler {
                 .build())
         .issue(List.of(issue))
         .build();
-  }
-
-  Optional<OperationOutcome> asOperationOutcome(String json) {
-    try {
-      return Optional.of(MAPPER.readValue(json, OperationOutcome.class));
-    } catch (Exception e) {
-      return Optional.empty();
-    }
   }
 
   private List<Extension> extensions(Throwable tr, HttpServletRequest request) {
@@ -251,21 +268,6 @@ public final class WebExceptionHandler {
             .map(v -> v.getPropertyPath() + " " + v.getMessage())
             .collect(toList());
     return responseFor("structure", e, request, diagnostics, true);
-  }
-
-  Optional<OperationOutcome> operationOutcomeFromClientResponse(Exception e) {
-    var maybeClientError = parseHttpClientErrorException(e);
-    if (maybeClientError.isPresent()) {
-      return asOperationOutcome(maybeClientError.get().getResponseBodyAsString());
-    }
-    return Optional.empty();
-  }
-
-  Optional<HttpClientErrorException> parseHttpClientErrorException(Throwable tr) {
-    if (tr instanceof HttpClientErrorException) {
-      return Optional.of((HttpClientErrorException) tr);
-    }
-    return Optional.empty();
   }
 
   @SneakyThrows

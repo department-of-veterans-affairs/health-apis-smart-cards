@@ -122,16 +122,10 @@ class SystemDefinitions {
 
     @NonNull String apiPath;
 
-    String formattedPort() {
-      if (port == 443 || port == 80) {
-        return "";
-      }
-      return String.format(":%s", port());
-    }
-
     String urlWithApiPath() {
       StringBuilder builder = new StringBuilder(url());
-      builder.append(formattedPort());
+      builder.append(":");
+      builder.append(port());
       if (!apiPath().startsWith("/")) {
         builder.append('/');
       }

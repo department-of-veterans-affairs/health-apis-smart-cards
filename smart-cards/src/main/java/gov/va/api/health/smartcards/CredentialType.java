@@ -1,6 +1,5 @@
-package gov.va.api.health.smartcards.vc;
+package gov.va.api.health.smartcards;
 
-import gov.va.api.health.smartcards.Exceptions;
 import java.util.Arrays;
 
 public enum CredentialType {

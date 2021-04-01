@@ -50,7 +50,7 @@ public final class WebExceptionHandler {
 
   private final String key;
 
-  public WebExceptionHandler(@Value("${web-exception-key}") String key) {
+  WebExceptionHandler(@Value("${web-exception-key}") String key) {
     checkState(!"unset".equals(key), "web-exception-key is unset");
     this.key = key;
   }

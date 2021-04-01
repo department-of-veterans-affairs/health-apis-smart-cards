@@ -1,4 +1,4 @@
-package gov.va.api.health.smartcards.patient;
+package gov.va.api.health.smartcards;
 
 import gov.va.api.health.r4.api.resources.Parameters;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,7 +10,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import org.springframework.http.ResponseEntity;
 
-public interface R4SmartCardsPatientApi {
+public interface OpenApiR4HealthCards {
   @POST
   @Operation(summary = "Issues Verifiable Credential")
   @Path("Patient/{id}/$health-cards-issue")

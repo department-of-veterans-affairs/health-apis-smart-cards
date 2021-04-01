@@ -7,8 +7,6 @@ import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jose.Payload;
 import com.nimbusds.jose.crypto.ECDSASigner;
 import com.nimbusds.jose.jwk.JWK;
-import gov.va.api.health.smartcards.vc.PayloadClaimsWrapper;
-import gov.va.api.health.smartcards.vc.VerifiableCredential;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import lombok.AllArgsConstructor;
@@ -42,7 +40,10 @@ public final class PayloadSigner {
 
   /** Sign VC payload. Generates a JWS. */
   @SneakyThrows
-  public String sign(VerifiableCredential vc, boolean compress) {
+  public String sign(VerifiableCredential vc, boolean shouldSign, boolean shouldCompress) {
+    if (!shouldSign) {
+      return MAPPER.writeValueAsString(vc);
+    }
     PayloadClaimsWrapper claims =
         PayloadClaimsWrapper.builder()
             .issuer(linkProperties.r4Url())
@@ -51,9 +52,9 @@ public final class PayloadSigner {
             .build();
     String payloadStr = MAPPER.writeValueAsString(claims);
     byte[] payloadAsBytes =
-        compress ? compress(payloadStr) : payloadStr.getBytes(StandardCharsets.UTF_8);
+        shouldCompress ? compress(payloadStr) : payloadStr.getBytes(StandardCharsets.UTF_8);
     Payload payload = new Payload(payloadAsBytes);
-    JWSHeader header = jwsHeader(jwksProperties.currentPrivateJwk(), compress);
+    JWSHeader header = jwsHeader(jwksProperties.currentPrivateJwk(), shouldCompress);
     JWSObject jwsObject = new JWSObject(header, payload);
     jwsObject.sign(new ECDSASigner(jwksProperties.currentPrivateJwk().toECKey()));
     return jwsObject.serialize();

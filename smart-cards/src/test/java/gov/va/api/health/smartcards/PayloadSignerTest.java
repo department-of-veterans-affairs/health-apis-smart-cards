@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.JWSObject;
-import gov.va.api.health.r4.api.bundle.AbstractBundle.BundleType;
+import gov.va.api.health.r4.api.bundle.AbstractBundle;
 import gov.va.api.health.r4.api.bundle.MixedBundle;
 import gov.va.api.health.r4.api.bundle.MixedEntry;
 import gov.va.api.health.r4.api.datatypes.HumanName;
@@ -35,7 +35,7 @@ public class PayloadSignerTest {
                 .fhirBundle(
                     MixedBundle.builder()
                         .resourceType("Bundle")
-                        .type(BundleType.collection)
+                        .type(AbstractBundle.BundleType.collection)
                         .total(1)
                         .entry(
                             List.of(

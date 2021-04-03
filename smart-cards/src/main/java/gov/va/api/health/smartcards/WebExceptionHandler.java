@@ -70,7 +70,7 @@ public final class WebExceptionHandler {
   private static Optional<OperationOutcome> deserializeOperationOutcome(String json) {
     try {
       return Optional.of(MAPPER.readValue(json, OperationOutcome.class));
-    } catch (Exception e) {
+    } catch (JsonProcessingException  e) {
       return Optional.empty();
     }
   }

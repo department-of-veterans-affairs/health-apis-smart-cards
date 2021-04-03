@@ -25,7 +25,7 @@ public final class VerifiableCredential {
   @Builder
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   @AllArgsConstructor(access = AccessLevel.PRIVATE)
-  public static class CredentialSubject {
+  public static final class CredentialSubject {
     private String fhirVersion;
 
     private MixedBundle fhirBundle;

@@ -1,0 +1,26 @@
+  @startuml
+class PatientController <<RestController>>
+class DataQueryFhirClient
+class PatientMinimizer
+class ImmunizationMinimizer
+class Patient
+class Immunization
+class Location
+class PayloadSigner
+class WebExceptionHandler <<RestControllerAdvice>>
+
+
+WebExceptionHandler .. PatientController: <<decorates>>
+
+PatientController *--> DataQueryFhirClient: <<autowire>>
+PatientController *--> PayloadSigner: <<autowire>>
+
+DataQueryFhirClient ..> Patient : <<find>>
+DataQueryFhirClient ..> Immunization: <<find>>
+DataQueryFhirClient ..> Location: <<find>>
+
+PatientMinimizer ..up..> Patient: <<minimize>>
+ImmunizationMinimizer ..up..> Immunization: <<minimize>>
+
+
+@enduml

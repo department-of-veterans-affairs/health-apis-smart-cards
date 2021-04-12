@@ -47,7 +47,7 @@ public final class PayloadSigner {
     PayloadClaimsWrapper claims =
         PayloadClaimsWrapper.builder()
             .issuer(linkProperties.r4Url())
-            .issuedAt(Instant.now().toEpochMilli())
+            .issuanceDate(Instant.now().toEpochMilli())
             .verifiableCredential(vc)
             .build();
     String payloadStr = MAPPER.writeValueAsString(claims);

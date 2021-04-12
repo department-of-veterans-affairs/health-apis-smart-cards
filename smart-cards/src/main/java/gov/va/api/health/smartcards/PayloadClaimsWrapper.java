@@ -15,8 +15,8 @@ public final class PayloadClaimsWrapper {
   @JsonProperty("iss")
   private String issuer;
 
-  @JsonProperty("iat")
-  private long issuedAt;
+  @JsonProperty("nbf")
+  private long issuanceDate;
 
   @JsonProperty("vc")
   private VerifiableCredential verifiableCredential;

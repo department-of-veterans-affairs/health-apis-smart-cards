@@ -4,10 +4,10 @@ Main application.
 
 ## Local Development
 
-### Configs
-Run `make-configs.sh` first (outputs properties to `config` directory):
+### Config
+`../make-configs.sh`
 
-`./make-configs.sh`
+Use `less config/application-dev.properties` to verify application properties for local development.
 
 ### Build
 

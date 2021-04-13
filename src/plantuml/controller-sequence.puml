@@ -1,0 +1,67 @@
+@startuml
+
+title "health-cards-issue"
+
+skinparam shadowing false
+skinparam sequence {
+  LifeLineBorderColor Black
+  LifeLineBackgroundColor lightgrey
+}
+
+participant Consumer
+participant PatientController
+participant DataQueryFhirClient
+participant PatientMinimizer
+participant ImmunizationMinimizer
+participant PayloadSigner
+participant WebExceptionHandler
+
+Consumer -> PatientController
+activate PatientController
+  PatientController -> PatientController : Validate request
+  PatientController -> DataQueryFhirClient : find Patient
+  activate DataQueryFhirClient
+    return Patient
+  PatientController -> DataQueryFhirClient : find Immunizations
+  activate DataQueryFhirClient
+    DataQueryFhirClient -> DataQueryFhirClient : filter
+    return Immunization.Bundle
+  PatientController -> PatientMinimizer
+  activate PatientMinimizer
+    return Patient
+  
+  loop for each Immunization
+    PatientController -> DataQueryFhirClient : find Location
+    activate DataQueryFhirClient
+      return Location
+    PatientController -> ImmunizationMinimizer
+    activate ImmunizationMinimizer
+      return Immunization
+  end
+
+  PatientController -> PatientController : replace urls
+  PatientController -> PatientController : VerifiableCredential
+  PatientController -> PayloadSigner : sign
+  activate PayloadSigner
+      PayloadSigner -> PayloadSigner : build header and claims
+      PayloadSigner -> PayloadSigner : compress
+      PayloadSigner -> PayloadSigner : sign
+    return JWS
+  
+  PatientController -> PatientController : build Parameters response
+
+  PatientController -> Consumer : Parameters
+
+  alt some kind of failure
+  PatientController -> WebExceptionHandler
+  activate WebExceptionHandler
+    WebExceptionHandler -> Consumer : OperationOutcome
+    deactivate
+
+  end
+
+  
+deactivate
+
+
+@enduml

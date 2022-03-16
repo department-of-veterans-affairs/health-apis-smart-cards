@@ -7,7 +7,7 @@
     <version>9.0.6</version>
   </parent>
   <artifactId>smart-cards-parent</artifactId>
-  <version>0.0.46-SNAPSHOT</version>
+  <version>0.0.46</version>
   <packaging>pom</packaging>
   <modules>
     <module>pem-to-jwk</module>

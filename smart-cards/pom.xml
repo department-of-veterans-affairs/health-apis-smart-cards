@@ -12,8 +12,9 @@
   <packaging>jar</packaging>
   <properties>
     <fhir-resources.version>10.0.7</fhir-resources.version>
-    <nimbus-jose-jwt.version>9.7</nimbus-jose-jwt.version>
-    <swagger-maven-plugin.version>2.1.7</swagger-maven-plugin.version>
+    <guava.version>31.1-jre</guava.version>
+    <nimbus-jose-jwt.version>9.21</nimbus-jose-jwt.version>
+    <swagger-maven-plugin.version>2.1.13</swagger-maven-plugin.version>
   </properties>
   <dependencies>
     <dependency>
@@ -29,6 +30,11 @@
       <groupId>gov.va.api.health</groupId>
       <artifactId>argonaut-dstu2</artifactId>
       <version>${fhir-resources.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>${guava.version}</version>
     </dependency>
     <dependency>
       <groupId>com.nimbusds</groupId>

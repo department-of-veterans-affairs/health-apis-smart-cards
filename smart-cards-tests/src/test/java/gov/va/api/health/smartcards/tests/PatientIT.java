@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 @Slf4j
 public class PatientIT {
   private static final ObjectMapper MAPPER =
-      JacksonConfig.createMapper().registerModule(new Resource.ResourceModule());
+      JacksonConfig.createMapper();
 
   private static final String ACCESS_TOKEN = System.getProperty("access-token", "unset");
 

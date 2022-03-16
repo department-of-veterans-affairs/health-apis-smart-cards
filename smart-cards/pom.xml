@@ -4,16 +4,17 @@
   <parent>
     <groupId>gov.va.api.health</groupId>
     <artifactId>service-starter</artifactId>
-    <version>7.0.23</version>
+    <version>9.0.6</version>
     <relativePath/>
   </parent>
   <artifactId>smart-cards</artifactId>
   <version>0.0.46-SNAPSHOT</version>
   <packaging>jar</packaging>
   <properties>
-    <fhir-resources.version>6.0.10</fhir-resources.version>
-    <nimbus-jose-jwt.version>9.7</nimbus-jose-jwt.version>
-    <swagger-maven-plugin.version>2.1.7</swagger-maven-plugin.version>
+    <fhir-resources.version>10.0.7</fhir-resources.version>
+    <guava.version>31.1-jre</guava.version>
+    <nimbus-jose-jwt.version>9.21</nimbus-jose-jwt.version>
+    <swagger-maven-plugin.version>2.1.13</swagger-maven-plugin.version>
   </properties>
   <dependencies>
     <dependency>
@@ -29,6 +30,11 @@
       <groupId>gov.va.api.health</groupId>
       <artifactId>argonaut-dstu2</artifactId>
       <version>${fhir-resources.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>${guava.version}</version>
     </dependency>
     <dependency>
       <groupId>com.nimbusds</groupId>
